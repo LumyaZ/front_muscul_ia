@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { User } from '../models/user.model';
 import { environment } from '../../environments/environment';
+import { CreateUserWithProfileRequest, CreateUserWithProfileResponse } from '../models/user-profile.model';
 
 export interface LoginRequest {
   email: string;
@@ -116,5 +117,21 @@ export class AuthService {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('current_user');
     this.router.navigate(['/login']);
+  }
+
+  /**
+   * Create a new user with profile in one request
+   * Créer un nouvel utilisateur avec profil en une seule requête
+   */
+  createUserWithProfile(request: CreateUserWithProfileRequest): Observable<CreateUserWithProfileResponse> {
+    return this.http.post<CreateUserWithProfileResponse>(`${this.apiUrl}/create-user-with-profile`, request);
+  }
+
+  /**
+   * Register a new user (legacy method)
+   * Inscrire un nouvel utilisateur (méthode legacy)
+   */
+  signupLegacy(userData: RegisterRequest): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/register`, userData);
   }
 }

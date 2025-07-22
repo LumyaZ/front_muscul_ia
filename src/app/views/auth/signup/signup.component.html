@@ -1,79 +1,153 @@
-<form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate>
-  <h2>Sign Up</h2>
-  <div>
-    <label for="email">Email</label>
-    <input
-      id="email"
-      type="email"
-      formControlName="email"
-      required
-      aria-required="true"
-    />
-    <div
-      *ngIf="
-        signupForm.get('email')?.invalid && signupForm.get('email')?.touched
-      "
-    >
-      <small *ngIf="signupForm.get('email')?.errors?.['required']"
-        >Email is required.</small
-      >
-      <small *ngIf="signupForm.get('email')?.errors?.['email']"
-        >Invalid email format.</small
-      >
+<div class="signup-container">
+  <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate class="signup-form">
+    <h2>Créer un compte</h2>
+    
+    <!-- Informations d'authentification -->
+    <div class="form-section">
+      <h3>Informations de connexion</h3>
+      
+      <div class="form-group">
+        <label for="email">Email *</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="votre.email@exemple.com"
+          required
+          aria-required="true"
+        />
+        <div class="error-message" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+          <small *ngIf="signupForm.get('email')?.errors?.['required']">L'email est requis.</small>
+          <small *ngIf="signupForm.get('email')?.errors?.['email']">Format d'email invalide.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mot de passe *</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          placeholder="Minimum 6 caractères"
+          required
+          aria-required="true"
+        />
+        <div class="error-message" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+          <small *ngIf="signupForm.get('password')?.errors?.['required']">Le mot de passe est requis.</small>
+          <small *ngIf="signupForm.get('password')?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmer le mot de passe *</label>
+        <input
+          id="confirmPassword"
+          type="password"
+          formControlName="confirmPassword"
+          placeholder="Répétez votre mot de passe"
+          required
+          aria-required="true"
+        />
+        <div class="error-message" *ngIf="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched">
+          <small *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">La confirmation est requise.</small>
+        </div>
+        <div class="error-message" *ngIf="signupForm.errors?.['passwordMismatch'] && signupForm.get('confirmPassword')?.touched">
+          <small>Les mots de passe ne correspondent pas.</small>
+        </div>
+      </div>
     </div>
-  </div>
-  <div>
-    <label for="password">Password</label>
-    <input
-      id="password"
-      type="password"
-      formControlName="password"
-      required
-      aria-required="true"
-    />
-    <div
-      *ngIf="
-        signupForm.get('password')?.invalid &&
-        signupForm.get('password')?.touched
-      "
-    >
-      <small *ngIf="signupForm.get('password')?.errors?.['required']"
-        >Password is required.</small
-      >
-      <small *ngIf="signupForm.get('password')?.errors?.['minlength']"
-        >Password must be at least 6 characters.</small
-      >
+
+    <!-- Informations personnelles -->
+    <div class="form-section">
+      <h3>Informations personnelles</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">Prénom *</label>
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            placeholder="Votre prénom"
+            required
+            aria-required="true"
+          />
+          <div class="error-message" *ngIf="signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched">
+            <small *ngIf="signupForm.get('firstName')?.errors?.['required']">Le prénom est requis.</small>
+            <small *ngIf="signupForm.get('firstName')?.errors?.['minlength']">Le prénom doit contenir au moins 2 caractères.</small>
+            <small *ngIf="signupForm.get('firstName')?.errors?.['maxlength']">Le prénom ne peut pas dépasser 50 caractères.</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Nom *</label>
+          <input
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            placeholder="Votre nom"
+            required
+            aria-required="true"
+          />
+          <div class="error-message" *ngIf="signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched">
+            <small *ngIf="signupForm.get('lastName')?.errors?.['required']">Le nom est requis.</small>
+            <small *ngIf="signupForm.get('lastName')?.errors?.['minlength']">Le nom doit contenir au moins 2 caractères.</small>
+            <small *ngIf="signupForm.get('lastName')?.errors?.['maxlength']">Le nom ne peut pas dépasser 50 caractères.</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="dateOfBirth">Date de naissance *</label>
+        <input
+          id="dateOfBirth"
+          type="date"
+          formControlName="dateOfBirth"
+          required
+          aria-required="true"
+          [max]="getMaxDate()"
+        />
+        <div class="error-message" *ngIf="signupForm.get('dateOfBirth')?.invalid && signupForm.get('dateOfBirth')?.touched">
+          <small *ngIf="signupForm.get('dateOfBirth')?.errors?.['required']">La date de naissance est requise.</small>
+          <small *ngIf="signupForm.get('dateOfBirth')?.errors?.['futureDate']">La date de naissance ne peut pas être dans le futur.</small>
+          <small *ngIf="signupForm.get('dateOfBirth')?.errors?.['tooYoung']">Vous devez avoir au moins 13 ans.</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">Numéro de téléphone</label>
+        <input
+          id="phoneNumber"
+          type="tel"
+          formControlName="phoneNumber"
+          placeholder="+33 1 23 45 67 89 ou 01 23 45 67 89"
+        />
+        <div class="error-message" *ngIf="signupForm.get('phoneNumber')?.invalid && signupForm.get('phoneNumber')?.touched">
+          <small *ngIf="signupForm.get('phoneNumber')?.errors?.['pattern']">Format de téléphone invalide. Utilisez le format français.</small>
+        </div>
+      </div>
     </div>
-  </div>
-  <div>
-    <label for="confirmPassword">Confirm Password</label>
-    <input
-      id="confirmPassword"
-      type="password"
-      formControlName="confirmPassword"
-      required
-      aria-required="true"
-    />
-    <div
-      *ngIf="
-        signupForm.get('confirmPassword')?.invalid &&
-        signupForm.get('confirmPassword')?.touched
-      "
-    >
-      <small *ngIf="signupForm.get('confirmPassword')?.errors?.['required']"
-        >Confirmation is required.</small
+
+    <!-- Messages d'erreur et boutons -->
+    <div class="form-actions">
+      <div *ngIf="error" class="error-message global-error">{{ error }}</div>
+      
+      <button 
+        type="submit" 
+        [disabled]="signupForm.invalid || isLoading"
+        class="btn-primary"
       >
+        <span *ngIf="!isLoading">Créer mon compte</span>
+        <span *ngIf="isLoading">Création en cours...</span>
+      </button>
+      
+      <button 
+        type="button" 
+        (click)="goToLogin()"
+        class="btn-secondary"
+      >
+        Déjà un compte ? Se connecter
+      </button>
     </div>
-    <div
-      *ngIf="
-        signupForm.errors?.['passwordsMismatch'] &&
-        signupForm.get('confirmPassword')?.touched
-      "
-    >
-      <small>Passwords do not match.</small>
-    </div>
-  </div>
-  <div *ngIf="error" class="error">{{ error }}</div>
-  <button type="submit" [disabled]="signupForm.invalid">Sign Up</button>
-  <button type="button" (click)="goToLogin()">Login</button>
-</form>
+  </form>
+</div>

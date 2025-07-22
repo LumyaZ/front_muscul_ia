@@ -11,10 +11,9 @@ import { User } from '../../models/user.model';
  */
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.scss'],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
   imports: [CommonModule, HttpClientModule],
-  providers: [AuthService],
   standalone: true
 })
 export class DashboardComponent implements OnInit {
@@ -26,14 +25,11 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("DashboardComponent ngOnInit");
-    // Vérifier si l'utilisateur est authentifié
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);
       return;
     }
 
-    // Récupérer les informations de l'utilisateur
     this.currentUser = this.authService.getCurrentUser();
   }
 

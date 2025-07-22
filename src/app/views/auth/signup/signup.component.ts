@@ -124,7 +124,15 @@ export class SignupComponent {
         next: (response) => {
           this.isLoading = false;
           console.log('User and profile created successfully:', response);
-          this.router.navigate(['/dashboard']);
+          
+          // Générer un token simple (en production, le back devrait le fournir)
+          const token = this.generateToken();
+          
+          // Sauvegarder les données d'authentification
+          this.saveAuthData(response.user, token);
+          
+          // Rediriger vers la page training-info
+          this.router.navigate(['/training-info']);
         },
         error: (error) => {
           this.isLoading = false;
@@ -133,6 +141,25 @@ export class SignupComponent {
         },
       });
     }
+  }
+
+  /**
+   * Generate a simple token (in production, this should come from the backend)
+   * Générer un token simple (en production, cela devrait venir du backend)
+   */
+  private generateToken(): string {
+    return (
+      'token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    );
+  }
+
+  /**
+   * Save authentication data to localStorage
+   * Sauvegarder les données d'authentification dans localStorage
+   */
+  private saveAuthData(user: any, token: string): void {
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('current_user', JSON.stringify(user));
   }
 
   /**

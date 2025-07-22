@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService, LoginRequest } from '../../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 
 /**
  * Login component for user authentication.
@@ -13,42 +18,39 @@ import { AuthService, LoginRequest } from '../../../services/auth.service';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [ReactiveFormsModule, CommonModule, HttpClientModule],
-  providers: [AuthService],
-  standalone: true
+  imports: [CommonModule, HttpClientModule, ReactiveFormsModule],
+  standalone: true,
 })
 export class LoginComponent {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   loginForm: FormGroup;
   error: string | null = null;
 
-  constructor(
-    private fb: FormBuilder, 
-    private authService: AuthService,
-    private router: Router
-  ) {
+  constructor() {
     // Création du formulaire réactif avec validation
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
   /**
-   * Submit login form
-   * Soumettre le formulaire de connexion
+   * Soumet le formulaire de connexion
    */
   onSubmit(): void {
-    if (this.loginForm.invalid) return;
-    const request: LoginRequest = this.loginForm.value;
-    this.authService.login(request).subscribe({
-      next: user => {
-        // La navigation est gérée par le service
-        this.error = null;
-      },
-      error: err => {
-        this.error = 'Login failed. Please check your credentials.';
-      }
-    });
+    if (this.loginForm.valid) {
+      this.authService.login(this.loginForm.value).subscribe({
+        next: () => {
+          // Navigation gérée par AuthService
+        },
+        error: () => {
+          // Gestion d'erreur silencieuse pour l'instant
+        },
+      });
+    }
   }
 
   /**
@@ -58,4 +60,4 @@ export class LoginComponent {
   goToSignup(): void {
     this.router.navigate(['/signup']);
   }
-} 
+}

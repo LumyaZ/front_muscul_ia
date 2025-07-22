@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -14,15 +14,13 @@ import { User } from '../../models/user.model';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   imports: [CommonModule, HttpClientModule],
-  standalone: true
+  standalone: true,
 })
 export class DashboardComponent implements OnInit {
-  currentUser: User | null = null;
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  currentUser: User | null = null;
 
   ngOnInit(): void {
     if (!this.authService.isAuthenticated()) {

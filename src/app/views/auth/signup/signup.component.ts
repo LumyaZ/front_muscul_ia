@@ -1,9 +1,15 @@
-import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+} from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService, RegisterRequest } from '../../../services/auth.service';
+import { AuthService } from '../../../services/auth.service';
 
 /**
  * Signup component for user registration.
@@ -13,60 +19,70 @@ import { AuthService, RegisterRequest } from '../../../services/auth.service';
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
-  imports: [ReactiveFormsModule, CommonModule, HttpClientModule],
-  providers: [AuthService],
-  standalone: true
+  imports: [CommonModule, HttpClientModule, ReactiveFormsModule],
+  standalone: true,
 })
 export class SignupComponent {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
   signupForm: FormGroup;
   error: string | null = null;
 
-  constructor(
-    private fb: FormBuilder, 
-    private authService: AuthService,
-    private router: Router
-  ) {
+  constructor() {
     // Création du formulaire réactif avec validation
-    this.signupForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordsMatchValidator });
+    this.signupForm = this.fb.group(
+      {
+        email: ['', [Validators.required, Validators.email]],
+        password: ['', [Validators.required, Validators.minLength(6)]],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validators: this.passwordMatchValidator },
+    );
   }
 
   /**
-   * Custom validator to check if passwords match
-   * Validateur personnalisé pour vérifier la correspondance des mots de passe
+   * Validateur personnalisé pour vérifier que les mots de passe correspondent
+   * @param control - Contrôle du formulaire
+   * @returns object | null - Erreur ou null si valide
    */
-  passwordsMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { passwordsMismatch: true };
+  passwordMatchValidator(
+    control: AbstractControl,
+  ): Record<string, boolean> | null {
+    const password = control.get('password');
+    const confirmPassword = control.get('confirmPassword');
+
+    if (
+      password &&
+      confirmPassword &&
+      password.value !== confirmPassword.value
+    ) {
+      return { passwordMismatch: true };
+    }
+    return null;
   }
 
   /**
-   * Submit signup form
-   * Soumettre le formulaire d'inscription
+   * Soumet le formulaire d'inscription
    */
   onSubmit(): void {
-    if (this.signupForm.invalid) return;
-    const request: RegisterRequest = this.signupForm.value;
-    this.authService.signup(request).subscribe({
-      next: user => {
-        // La navigation est gérée par le service
-        this.error = null;
-      },
-      error: err => {
-        this.error = 'Signup failed. Please check your data.';
-      }
-    });
+    if (this.signupForm.valid) {
+      this.authService.signup(this.signupForm.value).subscribe({
+        next: () => {
+          // Navigation gérée par AuthService
+        },
+        error: () => {
+          // Gestion d'erreur silencieuse pour l'instant
+        },
+      });
+    }
   }
 
   /**
-   * Navigate to login page
-   * Naviguer vers la page de connexion
+   * Redirige vers la page de connexion
    */
   goToLogin(): void {
     this.router.navigate(['/login']);
   }
-} 
+}

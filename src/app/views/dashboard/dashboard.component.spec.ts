@@ -11,9 +11,9 @@ describe('DashboardComponent', () => {
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', [
-      'isAuthenticated', 
-      'getCurrentUser', 
-      'logout'
+      'isAuthenticated',
+      'getCurrentUser',
+      'logout',
     ]);
 
     // Configuration par défaut des mocks
@@ -21,20 +21,17 @@ describe('DashboardComponent', () => {
     authServiceSpy.getCurrentUser.and.returnValue({
       id: 1,
       email: 'test@example.com',
-      creationDate: '2024-01-01T00:00:00'
+      creationDate: '2024-01-01T00:00:00',
     });
 
     await TestBed.configureTestingModule({
       imports: [
         DashboardComponent,
         RouterTestingModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
       ],
-      providers: [
-        { provide: AuthService, useValue: authServiceSpy }
-      ]
-    })
-    .compileComponents();
+      providers: [{ provide: AuthService, useValue: authServiceSpy }],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;

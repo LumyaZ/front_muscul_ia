@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { Observable, tap } from 'rxjs';
 import { User } from '../models/user.model';
 import { environment } from '../../environments/environment';
 
@@ -21,11 +21,14 @@ export interface AuthResponse {
   token: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthService {
-  private apiUrl = environment.apiUrl + '/auth'; 
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
-  constructor(private http: HttpClient, private router: Router) {}
+  private apiUrl = environment.apiUrl + '/auth';
 
   /**
    * Login user with email and password
@@ -33,14 +36,14 @@ export class AuthService {
    */
   login(request: LoginRequest): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/login`, request).pipe(
-      tap(user => {
+      tap((user) => {
         // Générer un token simple (en production, le back devrait le fournir)
         const token = this.generateToken();
         // Sauvegarder dans localStorage
         this.saveAuthData(user, token);
         // Naviguer vers le dashboard
         this.router.navigate(['/dashboard']);
-      })
+      }),
     );
   }
 
@@ -50,14 +53,14 @@ export class AuthService {
    */
   signup(request: RegisterRequest): Observable<User> {
     return this.http.post<User>(`${this.apiUrl}/register`, request).pipe(
-      tap(user => {
+      tap((user) => {
         // Générer un token simple (en production, le back devrait le fournir)
         const token = this.generateToken();
         // Sauvegarder dans localStorage
         this.saveAuthData(user, token);
         // Naviguer vers le dashboard
         this.router.navigate(['/dashboard']);
-      })
+      }),
     );
   }
 
@@ -66,7 +69,9 @@ export class AuthService {
    * Générer un token simple (en production, cela devrait venir du backend)
    */
   private generateToken(): string {
-    return 'token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return (
+      'token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+    );
   }
 
   /**
@@ -74,8 +79,8 @@ export class AuthService {
    * Sauvegarder les données d'authentification dans localStorage
    */
   private saveAuthData(user: User, token: string): void {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('current_user', JSON.stringify(user));
   }
 
   /**
@@ -83,7 +88,7 @@ export class AuthService {
    * Récupérer l'utilisateur actuel depuis localStorage
    */
   getCurrentUser(): User | null {
-    const userStr = localStorage.getItem('user');
+    const userStr = localStorage.getItem('current_user');
     return userStr ? JSON.parse(userStr) : null;
   }
 
@@ -92,7 +97,7 @@ export class AuthService {
    * Récupérer le token actuel depuis localStorage
    */
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem('auth_token');
   }
 
   /**
@@ -100,7 +105,7 @@ export class AuthService {
    * Vérifier si l'utilisateur est authentifié
    */
   isAuthenticated(): boolean {
-    return this.getToken() !== null;
+    return !!this.getToken();
   }
 
   /**
@@ -108,8 +113,8 @@ export class AuthService {
    * Déconnexion utilisateur et nettoyage du localStorage
    */
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('current_user');
     this.router.navigate(['/login']);
   }
-} 
+}

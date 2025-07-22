@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 import { SignupComponent } from './signup.component';
 import { AuthService } from '../../../services/auth.service';
+import { of } from 'rxjs';
 
 /**
  * Basic unit test for SignupComponent.
@@ -12,7 +13,7 @@ import { AuthService } from '../../../services/auth.service';
 describe('SignupComponent', () => {
   let component: SignupComponent;
   let fixture: ComponentFixture<SignupComponent>;
-  let authService: jasmine.SpyObj<AuthService>;
+  let mockAuthService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['signup']);
@@ -20,18 +21,18 @@ describe('SignupComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         SignupComponent,
-        ReactiveFormsModule, 
         HttpClientTestingModule,
-        RouterTestingModule
+        RouterTestingModule,
+        ReactiveFormsModule,
       ],
-      providers: [
-        { provide: AuthService, useValue: authServiceSpy }
-      ]
+      providers: [{ provide: AuthService, useValue: authServiceSpy }],
     }).compileComponents();
-    
+
     fixture = TestBed.createComponent(SignupComponent);
     component = fixture.componentInstance;
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    mockAuthService = TestBed.inject(
+      AuthService,
+    ) as jasmine.SpyObj<AuthService>;
     fixture.detectChanges();
   });
 
@@ -39,15 +40,15 @@ describe('SignupComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have invalid form when empty', () => {
+  it('should have an invalid form initially', () => {
     expect(component.signupForm.valid).toBeFalsy();
   });
 
-  it('should have valid form with correct data', () => {
+  it('should have a valid form with correct data', () => {
     component.signupForm.patchValue({
       email: 'test@example.com',
       password: 'password123',
-      confirmPassword: 'password123'
+      confirmPassword: 'password123',
     });
     expect(component.signupForm.valid).toBeTruthy();
   });
@@ -56,9 +57,44 @@ describe('SignupComponent', () => {
     component.signupForm.patchValue({
       email: 'test@example.com',
       password: 'password123',
-      confirmPassword: 'differentpassword'
+      confirmPassword: 'differentpassword',
     });
     expect(component.signupForm.valid).toBeFalsy();
-    expect(component.signupForm.errors?.['passwordsMismatch']).toBeTruthy();
+    expect(component.signupForm.errors?.['passwordMismatch']).toBeTruthy();
   });
-}); 
+
+  it('should call authService.signup when form is valid', () => {
+    const mockUser = {
+      id: 1,
+      email: 'test@example.com',
+      creationDate: '2024-01-01T00:00:00',
+    };
+    mockAuthService.signup.and.returnValue(of(mockUser));
+
+    component.signupForm.patchValue({
+      email: 'test@example.com',
+      password: 'password123',
+      confirmPassword: 'password123',
+    });
+
+    component.onSubmit();
+
+    expect(mockAuthService.signup).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: 'password123',
+      confirmPassword: 'password123',
+    });
+  });
+
+  it('should not call authService.signup when form is invalid', () => {
+    component.signupForm.patchValue({
+      email: 'invalid-email',
+      password: '123',
+      confirmPassword: 'different',
+    });
+
+    component.onSubmit();
+
+    expect(mockAuthService.signup).not.toHaveBeenCalled();
+  });
+});

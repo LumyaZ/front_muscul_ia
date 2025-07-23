@@ -12,153 +12,222 @@
     </div>
   </div>
 
-  <div class="form-header">
-    <h2>{{ isEditMode ? 'Modifier les informations d\'entraînement' : 'Créer les informations d\'entraînement' }}</h2>
-    <p class="form-description">
-      {{ isEditMode ? 'Mettez à jour vos informations d\'entraînement pour personnaliser votre expérience.' : 'Configurez vos informations d\'entraînement pour personnaliser votre expérience.' }}
-    </p>
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+        <div class="step-number">1</div>
+        <span class="step-label">Informations personnelles</span>
+      </div>
+      <div class="progress-line" [class.completed]="currentStep > 1"></div>
+      <div class="progress-step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+        <div class="step-number">2</div>
+        <span class="step-label">Expérience d'entraînement</span>
+      </div>
+      <div class="progress-line" [class.completed]="currentStep > 2"></div>
+      <div class="progress-step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
+        <div class="step-number">3</div>
+        <span class="step-label">Objectifs et préférences</span>
+      </div>
+      <div class="progress-line" [class.completed]="currentStep > 3"></div>
+      <div class="progress-step" [class.active]="currentStep >= 4" [class.completed]="currentStep > 4">
+        <div class="step-number">4</div>
+        <span class="step-label">Équipement</span>
+      </div>
+    </div>
   </div>
 
   <form [formGroup]="trainingInfoForm" (ngSubmit)="onSubmit()" class="training-info-form">
     
-    <!-- Personal Information Section -->
-    <div class="form-section">
-      <h3>Informations personnelles</h3>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="gender">Genre *</label>
-          <select id="gender" formControlName="gender" class="form-control">
-            <option value="">Sélectionnez un genre</option>
-            <option *ngFor="let gender of genderOptions" [value]="gender">
-              {{ getDisplayName(gender, genderDisplayNames) }}
-            </option>
-          </select>
-          <div *ngIf="trainingInfoForm.get('gender')?.invalid && trainingInfoForm.get('gender')?.touched" class="error-message">
-            Le genre est obligatoire
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="weight">Poids (kg) *</label>
-          <input type="number" id="weight" formControlName="weight" class="form-control" min="30" max="300" step="0.1">
-          <div *ngIf="trainingInfoForm.get('weight')?.invalid && trainingInfoForm.get('weight')?.touched" class="error-message">
-            <span *ngIf="trainingInfoForm.get('weight')?.errors?.['required']">Le poids est obligatoire</span>
-            <span *ngIf="trainingInfoForm.get('weight')?.errors?.['min']">Le poids doit être d'au moins 30 kg</span>
-            <span *ngIf="trainingInfoForm.get('weight')?.errors?.['max']">Le poids ne peut pas dépasser 300 kg</span>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="height">Taille (cm) *</label>
-          <input type="number" id="height" formControlName="height" class="form-control" min="100" max="250" step="0.1">
-          <div *ngIf="trainingInfoForm.get('height')?.invalid && trainingInfoForm.get('height')?.touched" class="error-message">
-            <span *ngIf="trainingInfoForm.get('height')?.errors?.['required']">La taille est obligatoire</span>
-            <span *ngIf="trainingInfoForm.get('height')?.errors?.['min']">La taille doit être d'au moins 100 cm</span>
-            <span *ngIf="trainingInfoForm.get('height')?.errors?.['max']">La taille ne peut pas dépasser 250 cm</span>
-          </div>
-        </div>
+    <!-- Step 1: Personal Information -->
+    <div class="form-step" *ngIf="currentStep === 1">
+      <div class="step-header">
+        <h2>Étape 1 : Informations personnelles</h2>
+        <p>Commençons par vos informations de base</p>
       </div>
+      
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Genre *</label>
+            <div class="button-group">
+              <button 
+                type="button" 
+                *ngFor="let gender of genderOptions" 
+                [class.selected]="trainingInfoForm.get('gender')?.value === gender"
+                (click)="selectOption('gender', gender)"
+                class="option-button">
+                {{ getDisplayName(gender, genderDisplayNames) }}
+              </button>
+            </div>
+            <div *ngIf="trainingInfoForm.get('gender')?.invalid && trainingInfoForm.get('gender')?.touched" class="error-message">
+              Le genre est obligatoire
+            </div>
+          </div>
+        </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="bodyFatPercentage">Pourcentage de graisse corporelle (%)</label>
-          <input type="number" id="bodyFatPercentage" formControlName="bodyFatPercentage" class="form-control" min="3" max="50" step="0.1">
-          <div *ngIf="trainingInfoForm.get('bodyFatPercentage')?.invalid && trainingInfoForm.get('bodyFatPercentage')?.touched" class="error-message">
-            <span *ngIf="trainingInfoForm.get('bodyFatPercentage')?.errors?.['min']">Le pourcentage doit être d'au moins 3%</span>
-            <span *ngIf="trainingInfoForm.get('bodyFatPercentage')?.errors?.['max']">Le pourcentage ne peut pas dépasser 50%</span>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="weight">Poids (kg) *</label>
+            <input type="number" id="weight" formControlName="weight" class="form-control" min="30" max="300" step="0.1" placeholder="Ex: 75">
+            <div *ngIf="trainingInfoForm.get('weight')?.invalid && trainingInfoForm.get('weight')?.touched" class="error-message">
+              <span *ngIf="trainingInfoForm.get('weight')?.errors?.['required']">Le poids est obligatoire</span>
+              <span *ngIf="trainingInfoForm.get('weight')?.errors?.['min']">Le poids doit être d'au moins 30 kg</span>
+              <span *ngIf="trainingInfoForm.get('weight')?.errors?.['max']">Le poids ne peut pas dépasser 300 kg</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="height">Taille (cm) *</label>
+            <input type="number" id="height" formControlName="height" class="form-control" min="100" max="250" step="0.1" placeholder="Ex: 180">
+            <div *ngIf="trainingInfoForm.get('height')?.invalid && trainingInfoForm.get('height')?.touched" class="error-message">
+              <span *ngIf="trainingInfoForm.get('height')?.errors?.['required']">La taille est obligatoire</span>
+              <span *ngIf="trainingInfoForm.get('height')?.errors?.['min']">La taille doit être d'au moins 100 cm</span>
+              <span *ngIf="trainingInfoForm.get('height')?.errors?.['max']">La taille ne peut pas dépasser 250 cm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="bodyFatPercentage">Pourcentage de graisse corporelle (%)</label>
+            <input type="number" id="bodyFatPercentage" formControlName="bodyFatPercentage" class="form-control" min="3" max="50" step="0.1" placeholder="Ex: 15">
+            <div *ngIf="trainingInfoForm.get('bodyFatPercentage')?.invalid && trainingInfoForm.get('bodyFatPercentage')?.touched" class="error-message">
+              <span *ngIf="trainingInfoForm.get('bodyFatPercentage')?.errors?.['min']">Le pourcentage doit être d'au moins 3%</span>
+              <span *ngIf="trainingInfoForm.get('bodyFatPercentage')?.errors?.['max']">Le pourcentage ne peut pas dépasser 50%</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Training Experience Section -->
-    <div class="form-section">
-      <h3>Expérience d'entraînement</h3>
+    <!-- Step 2: Training Experience -->
+    <div class="form-step" *ngIf="currentStep === 2">
+      <div class="step-header">
+        <h2>Étape 2 : Expérience d'entraînement</h2>
+        <p>Parlez-nous de votre expérience et de vos sessions</p>
+      </div>
       
-      <div class="form-row">
+      <div class="form-section">
         <div class="form-group">
-          <label for="experienceLevel">Niveau d'expérience *</label>
-          <select id="experienceLevel" formControlName="experienceLevel" class="form-control">
-            <option value="">Sélectionnez votre niveau</option>
-            <option *ngFor="let level of experienceLevelOptions" [value]="level">
+          <label>Niveau d'expérience *</label>
+          <div class="button-group">
+            <button 
+              type="button" 
+              *ngFor="let level of experienceLevelOptions" 
+              [class.selected]="trainingInfoForm.get('experienceLevel')?.value === level"
+              (click)="selectOption('experienceLevel', level)"
+              class="option-button">
               {{ getDisplayName(level, experienceLevelDisplayNames) }}
-            </option>
-          </select>
+            </button>
+          </div>
           <div *ngIf="trainingInfoForm.get('experienceLevel')?.invalid && trainingInfoForm.get('experienceLevel')?.touched" class="error-message">
             Le niveau d'expérience est obligatoire
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="mainGoal">Objectif principal *</label>
-          <select id="mainGoal" formControlName="mainGoal" class="form-control">
-            <option value="">Sélectionnez votre objectif</option>
-            <option *ngFor="let goal of mainGoalOptions" [value]="goal">
-              {{ getDisplayName(goal, mainGoalDisplayNames) }}
-            </option>
-          </select>
-          <div *ngIf="trainingInfoForm.get('mainGoal')?.invalid && trainingInfoForm.get('mainGoal')?.touched" class="error-message">
-            L'objectif principal est obligatoire
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fréquence des sessions *</label>
+            <div class="button-group">
+              <button 
+                type="button" 
+                *ngFor="let frequency of sessionFrequencyOptions" 
+                [class.selected]="trainingInfoForm.get('sessionFrequency')?.value === frequency"
+                (click)="selectOption('sessionFrequency', frequency)"
+                class="option-button">
+                {{ getDisplayName(frequency, sessionFrequencyDisplayNames) }}
+              </button>
+            </div>
+            <div *ngIf="trainingInfoForm.get('sessionFrequency')?.invalid && trainingInfoForm.get('sessionFrequency')?.touched" class="error-message">
+              La fréquence des sessions est obligatoire
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Durée des sessions *</label>
+            <div class="button-group">
+              <button 
+                type="button" 
+                *ngFor="let duration of sessionDurationOptions" 
+                [class.selected]="trainingInfoForm.get('sessionDuration')?.value === duration"
+                (click)="selectOption('sessionDuration', duration)"
+                class="option-button">
+                {{ getDisplayName(duration, sessionDurationDisplayNames) }}
+              </button>
+            </div>
+            <div *ngIf="trainingInfoForm.get('sessionDuration')?.invalid && trainingInfoForm.get('sessionDuration')?.touched" class="error-message">
+              La durée des sessions est obligatoire
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Training Preferences Section -->
-    <div class="form-section">
-      <h3>Préférences d'entraînement</h3>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="sessionFrequency">Fréquence des sessions *</label>
-          <select id="sessionFrequency" formControlName="sessionFrequency" class="form-control">
-            <option value="">Sélectionnez la fréquence</option>
-            <option *ngFor="let frequency of sessionFrequencyOptions" [value]="frequency">
-              {{ getDisplayName(frequency, sessionFrequencyDisplayNames) }}
-            </option>
-          </select>
-          <div *ngIf="trainingInfoForm.get('sessionFrequency')?.invalid && trainingInfoForm.get('sessionFrequency')?.touched" class="error-message">
-            La fréquence des sessions est obligatoire
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="sessionDuration">Durée des sessions *</label>
-          <select id="sessionDuration" formControlName="sessionDuration" class="form-control">
-            <option value="">Sélectionnez la durée</option>
-            <option *ngFor="let duration of sessionDurationOptions" [value]="duration">
-              {{ getDisplayName(duration, sessionDurationDisplayNames) }}
-            </option>
-          </select>
-          <div *ngIf="trainingInfoForm.get('sessionDuration')?.invalid && trainingInfoForm.get('sessionDuration')?.touched" class="error-message">
-            La durée des sessions est obligatoire
-          </div>
-        </div>
+    <!-- Step 3: Goals and Preferences -->
+    <div class="form-step" *ngIf="currentStep === 3">
+      <div class="step-header">
+        <h2>Étape 3 : Objectifs et préférences</h2>
+        <p>Définissez vos objectifs et vos préférences d'entraînement</p>
       </div>
-
-      <div class="form-row">
+      
+      <div class="form-section">
         <div class="form-group">
-          <label for="trainingPreference">Type d'entraînement préféré *</label>
-          <select id="trainingPreference" formControlName="trainingPreference" class="form-control">
-            <option value="">Sélectionnez votre préférence</option>
-            <option *ngFor="let preference of trainingPreferenceOptions" [value]="preference">
+          <label>Objectif principal *</label>
+          <div class="button-group">
+            <button 
+              type="button" 
+              *ngFor="let goal of mainGoalOptions" 
+              [class.selected]="trainingInfoForm.get('mainGoal')?.value === goal"
+              (click)="selectOption('mainGoal', goal)"
+              class="option-button">
+              {{ getDisplayName(goal, mainGoalDisplayNames) }}
+            </button>
+          </div>
+          <div *ngIf="trainingInfoForm.get('mainGoal')?.invalid && trainingInfoForm.get('mainGoal')?.touched" class="error-message">
+            L'objectif principal est obligatoire
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Type d'entraînement préféré *</label>
+          <div class="button-group">
+            <button 
+              type="button" 
+              *ngFor="let preference of trainingPreferenceOptions" 
+              [class.selected]="trainingInfoForm.get('trainingPreference')?.value === preference"
+              (click)="selectOption('trainingPreference', preference)"
+              class="option-button">
               {{ getDisplayName(preference, trainingPreferenceDisplayNames) }}
-            </option>
-          </select>
+            </button>
+          </div>
           <div *ngIf="trainingInfoForm.get('trainingPreference')?.invalid && trainingInfoForm.get('trainingPreference')?.touched" class="error-message">
             La préférence d'entraînement est obligatoire
           </div>
         </div>
+      </div>
+    </div>
 
+    <!-- Step 4: Equipment -->
+    <div class="form-step" *ngIf="currentStep === 4">
+      <div class="step-header">
+        <h2>Étape 4 : Équipement</h2>
+        <p>Quel équipement avez-vous à disposition ?</p>
+      </div>
+      
+      <div class="form-section">
         <div class="form-group">
-          <label for="equipment">Équipement disponible *</label>
-          <select id="equipment" formControlName="equipment" class="form-control">
-            <option value="">Sélectionnez l'équipement</option>
-            <option *ngFor="let equip of equipmentOptions" [value]="equip">
+          <label>Équipement disponible *</label>
+          <div class="button-group">
+            <button 
+              type="button" 
+              *ngFor="let equip of equipmentOptions" 
+              [class.selected]="trainingInfoForm.get('equipment')?.value === equip"
+              (click)="selectOption('equipment', equip)"
+              class="option-button">
               {{ getDisplayName(equip, equipmentDisplayNames) }}
-            </option>
-          </select>
+            </button>
+          </div>
           <div *ngIf="trainingInfoForm.get('equipment')?.invalid && trainingInfoForm.get('equipment')?.touched" class="error-message">
             L'équipement disponible est obligatoire
           </div>
@@ -171,13 +240,38 @@
       {{ error }}
     </div>
 
-    <!-- Submit Button -->
+    <!-- Navigation Buttons -->
     <div class="form-actions">
-      <button type="submit" [disabled]="trainingInfoForm.invalid || isLoading" class="btn btn-primary">
-        <span *ngIf="isLoading" class="spinner"></span>
-        {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+      <button 
+        type="button" 
+        *ngIf="currentStep > 1" 
+        (click)="previousStep()" 
+        class="btn btn-secondary">
+        Précédent
       </button>
-      <button type="button" (click)="router.navigate(['/dashboard'])" class="btn btn-secondary">
+      
+      <button 
+        type="button" 
+        *ngIf="currentStep < 4" 
+        (click)="nextStep()" 
+        [disabled]="!isStepValid(currentStep)"
+        class="btn btn-primary">
+        Suivant
+      </button>
+      
+      <button 
+        type="submit" 
+        *ngIf="currentStep === 4" 
+        [disabled]="trainingInfoForm.invalid || isLoading" 
+        class="btn btn-primary">
+        <span *ngIf="isLoading" class="spinner"></span>
+        {{ isEditMode ? 'Mettre à jour' : 'Terminer' }}
+      </button>
+      
+      <button 
+        type="button" 
+        (click)="router.navigate(['/dashboard'])" 
+        class="btn btn-outline">
         Annuler
       </button>
     </div>

@@ -38,6 +38,7 @@ export class TrainingInfoFormComponent implements OnInit {
   existingTrainingInfo: TrainingInfo | null = null;
   currentUser: any = null;
   authToken: string | null = null;
+  currentStep = 1;
 
   // Display names for dropdowns
   genderOptions = Object.values(Gender);
@@ -203,5 +204,58 @@ export class TrainingInfoFormComponent implements OnInit {
 
   getDisplayName(enumValue: string, displayNames: Record<string, string>): string {
     return displayNames[enumValue] || enumValue;
+  }
+
+  /**
+   * Sélectionne une option pour un champ donné
+   * @param field - Nom du champ
+   * @param value - Valeur sélectionnée
+   */
+  selectOption(field: string, value: string): void {
+    this.trainingInfoForm.get(field)?.setValue(value);
+    this.trainingInfoForm.get(field)?.markAsTouched();
+  }
+
+  /**
+   * Passe à l'étape suivante
+   */
+  nextStep(): void {
+    if (this.currentStep < 4 && this.isStepValid(this.currentStep)) {
+      this.currentStep++;
+    }
+  }
+
+  /**
+   * Retourne à l'étape précédente
+   */
+  previousStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  /**
+   * Vérifie si l'étape actuelle est valide
+   * @param step - Numéro de l'étape
+   * @returns boolean - True si l'étape est valide
+   */
+  isStepValid(step: number): boolean {
+    switch (step) {
+      case 1:
+        return !!(this.trainingInfoForm.get('gender')?.valid && 
+               this.trainingInfoForm.get('weight')?.valid && 
+               this.trainingInfoForm.get('height')?.valid);
+      case 2:
+        return !!(this.trainingInfoForm.get('experienceLevel')?.valid && 
+               this.trainingInfoForm.get('sessionFrequency')?.valid && 
+               this.trainingInfoForm.get('sessionDuration')?.valid);
+      case 3:
+        return !!(this.trainingInfoForm.get('mainGoal')?.valid && 
+               this.trainingInfoForm.get('trainingPreference')?.valid);
+      case 4:
+        return !!this.trainingInfoForm.get('equipment')?.valid;
+      default:
+        return false;
+    }
   }
 } 

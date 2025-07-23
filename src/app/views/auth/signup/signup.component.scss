@@ -98,7 +98,6 @@ button {
       &:not([for="phoneNumber"])::after {
         content: " *";
         color: #e74c3c;
-        font-weight: bold;
       }
     }
 
@@ -117,12 +116,148 @@ button {
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
       }
 
-      &::placeholder {
-        color: #999;
+      &.ng-invalid.ng-touched {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+      }
+    }
+
+    // Styles pour les champs de mot de passe avec bouton de visibilité
+    .password-input-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      input {
+        padding-right: 50px; // Espace pour le bouton
       }
 
-      &.ng-invalid.ng-touched {
-        border-color: #e74c3c;
+      .password-toggle-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        width: auto;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          background: rgba(102, 126, 234, 0.1);
+          color: #667eea;
+        }
+
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .password-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #666;
+        }
+
+        &:hover .password-icon {
+          color: #667eea !important;
+        }
+      }
+    }
+
+    // Indicateur de force du mot de passe
+    .password-strength {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .strength-bar {
+        flex: 1;
+        height: 4px;
+        background: #e1e5e9;
+        border-radius: 2px;
+        overflow: hidden;
+
+        .strength-fill {
+          height: 100%;
+          transition: all 0.3s ease;
+          border-radius: 2px;
+        }
+      }
+
+      .strength-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        min-width: 80px;
+        text-align: right;
+      }
+    }
+
+    // Conditions du mot de passe
+    .password-requirements {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border-left: 3px solid #667eea;
+
+      h4 {
+        margin: 0 0 8px 0;
+        font-size: 0.9rem;
+        color: #333;
+        font-weight: 600;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 6px;
+          font-size: 0.8rem;
+          transition: all 0.2s ease;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          i {
+            font-size: 12px;
+            width: 16px;
+            text-align: center;
+          }
+
+          &.valid {
+            color: #28a745;
+
+            i.fa-check {
+              color: #28a745;
+            }
+          }
+
+          &.invalid {
+            color: #6c757d;
+
+            i.fa-times {
+              color: #dc3545;
+            }
+          }
+        }
       }
     }
 
@@ -134,6 +269,16 @@ button {
       small {
         display: block;
         margin-bottom: 2px;
+      }
+
+      &.global-error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        border: 1px solid #f5c6cb;
+        text-align: center;
       }
     }
   }

@@ -48,8 +48,8 @@ describe('SignupComponent', () => {
   it('should have a valid form with correct data', () => {
     component.signupForm.patchValue({
       email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
       firstName: 'John',
       lastName: 'Doe',
       dateOfBirth: '1990-01-01',
@@ -61,14 +61,107 @@ describe('SignupComponent', () => {
   it('should have invalid form when passwords do not match', () => {
     component.signupForm.patchValue({
       email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'differentpassword',
+      password: 'Password123!',
+      confirmPassword: 'DifferentPassword123!',
       firstName: 'John',
       lastName: 'Doe',
       dateOfBirth: '1990-01-01'
     });
     expect(component.signupForm.valid).toBeFalsy();
     expect(component.signupForm.errors?.['passwordMismatch']).toBeTruthy();
+  });
+
+  it('should validate password requirements', () => {
+    const passwordControl = component.signupForm.get('password');
+    
+    // Test mot de passe trop court
+    passwordControl?.setValue('Pass1!');
+    expect(passwordControl?.errors?.['minlength']).toBeTruthy();
+    
+    // Test mot de passe sans majuscule
+    passwordControl?.setValue('password123!');
+    expect(passwordControl?.errors?.['pattern']).toBeTruthy();
+    
+    // Test mot de passe sans minuscule
+    passwordControl?.setValue('PASSWORD123!');
+    expect(passwordControl?.errors?.['pattern']).toBeTruthy();
+    
+    // Test mot de passe sans chiffre
+    passwordControl?.setValue('Password!');
+    expect(passwordControl?.errors?.['pattern']).toBeTruthy();
+    
+    // Test mot de passe sans caractère spécial
+    passwordControl?.setValue('Password123');
+    expect(passwordControl?.errors?.['pattern']).toBeTruthy();
+    
+    // Test mot de passe valide
+    passwordControl?.setValue('Password123!');
+    expect(passwordControl?.errors).toBeNull();
+  });
+
+  it('should calculate password strength correctly', () => {
+    const passwordControl = component.signupForm.get('password');
+    
+    // Test force très faible
+    passwordControl?.setValue('pass');
+    let strength = component.getPasswordStrength();
+    expect(strength.score).toBe(1);
+    expect(strength.label).toBe('Très faible');
+    
+    // Test force faible
+    passwordControl?.setValue('password');
+    strength = component.getPasswordStrength();
+    expect(strength.score).toBe(2);
+    expect(strength.label).toBe('Faible');
+    
+    // Test force moyenne
+    passwordControl?.setValue('Password');
+    strength = component.getPasswordStrength();
+    expect(strength.score).toBe(3);
+    expect(strength.label).toBe('Moyen');
+    
+    // Test force forte
+    passwordControl?.setValue('Password123');
+    strength = component.getPasswordStrength();
+    expect(strength.score).toBe(4);
+    expect(strength.label).toBe('Fort');
+    
+    // Test force très forte
+    passwordControl?.setValue('Password123!');
+    strength = component.getPasswordStrength();
+    expect(strength.score).toBe(5);
+    expect(strength.label).toBe('Très fort');
+  });
+
+  it('should toggle password visibility', () => {
+    expect(component.showPassword).toBeFalse();
+    expect(component.showConfirmPassword).toBeFalse();
+    
+    component.togglePasswordVisibility();
+    expect(component.showPassword).toBeTrue();
+    
+    component.toggleConfirmPasswordVisibility();
+    expect(component.showConfirmPassword).toBeTrue();
+    
+    component.togglePasswordVisibility();
+    expect(component.showPassword).toBeFalse();
+    
+    component.toggleConfirmPasswordVisibility();
+    expect(component.showConfirmPassword).toBeFalse();
+  });
+
+  it('should get correct password error message', () => {
+    const passwordControl = component.signupForm.get('password');
+    
+    passwordControl?.setValue('');
+    passwordControl?.markAsTouched();
+    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe est obligatoire');
+    
+    passwordControl?.setValue('Pass1!');
+    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe doit contenir au moins 8 caractères');
+    
+    passwordControl?.setValue('password123');
+    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&)');
   });
 
   it('should call authService.createUserWithProfile when form is valid', () => {
@@ -94,8 +187,8 @@ describe('SignupComponent', () => {
 
     component.signupForm.patchValue({
       email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
       firstName: 'John',
       lastName: 'Doe',
       dateOfBirth: '1990-01-01',
@@ -107,8 +200,8 @@ describe('SignupComponent', () => {
     expect(mockAuthService.createUserWithProfile).toHaveBeenCalledWith({
       userData: {
         email: 'test@example.com',
-        password: 'password123',
-        confirmPassword: 'password123'
+        password: 'Password123!',
+        confirmPassword: 'Password123!'
       },
       profileData: {
         firstName: 'John',
@@ -157,8 +250,8 @@ describe('SignupComponent', () => {
 
     component.signupForm.patchValue({
       email: 'test@example.com',
-      password: 'password123',
-      confirmPassword: 'password123',
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
       firstName: 'John',
       lastName: 'Doe',
       dateOfBirth: '1990-01-01',
@@ -170,8 +263,8 @@ describe('SignupComponent', () => {
     expect(mockAuthService.createUserWithProfile).toHaveBeenCalledWith({
       userData: {
         email: 'test@example.com',
-        password: 'password123',
-        confirmPassword: 'password123'
+        password: 'Password123!',
+        confirmPassword: 'Password123!'
       },
       profileData: {
         firstName: 'John',

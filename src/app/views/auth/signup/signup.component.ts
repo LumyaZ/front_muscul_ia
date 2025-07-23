@@ -32,13 +32,19 @@ export class SignupComponent {
   signupForm: FormGroup;
   error: string | null = null;
   isLoading = false;
+  showPassword = false;
+  showConfirmPassword = false;
 
   constructor() {
     // Création du formulaire réactif avec validation
     this.signupForm = this.fb.group({
       // Champs d'authentification
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [
+        Validators.required, 
+        Validators.minLength(8),
+        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+      ]],
       confirmPassword: ['', [Validators.required]],
       
       // Champs du profil utilisateur
@@ -93,6 +99,102 @@ export class SignupComponent {
       }
     }
     return null;
+  }
+
+  /**
+   * Bascule la visibilité du mot de passe
+   */
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  /**
+   * Bascule la visibilité de la confirmation du mot de passe
+   */
+  toggleConfirmPasswordVisibility(): void {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
+  /**
+   * Obtient le message d'erreur pour le mot de passe
+   */
+  getPasswordErrorMessage(): string {
+    const passwordControl = this.signupForm.get('password');
+    if (!passwordControl?.errors) return '';
+
+    if (passwordControl.errors['required']) {
+      return 'Le mot de passe est obligatoire';
+    }
+    if (passwordControl.errors['minlength']) {
+      return 'Le mot de passe doit contenir au moins 8 caractères';
+    }
+    if (passwordControl.errors['pattern']) {
+      return 'Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&)';
+    }
+    return '';
+  }
+
+  /**
+   * Calcule la force du mot de passe
+   */
+  getPasswordStrength(): { score: number; label: string; color: string } {
+    const password = this.signupForm.get('password')?.value || '';
+    let score = 0;
+    
+    if (password.length >= 8) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[@$!%*?&]/.test(password)) score++;
+    
+    const labels = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
+    const colors = ['#dc3545', '#fd7e14', '#ffc107', '#28a745', '#20c997'];
+    
+    return {
+      score: Math.min(score, 5),
+      label: labels[Math.min(score - 1, 4)],
+      color: colors[Math.min(score - 1, 4)]
+    };
+  }
+
+  /**
+   * Vérifie si le mot de passe a au moins 8 caractères
+   */
+  hasMinLength(): boolean {
+    const password = this.signupForm.get('password')?.value || '';
+    return password.length >= 8;
+  }
+
+  /**
+   * Vérifie si le mot de passe contient au moins une minuscule
+   */
+  hasLowercase(): boolean {
+    const password = this.signupForm.get('password')?.value || '';
+    return /[a-z]/.test(password);
+  }
+
+  /**
+   * Vérifie si le mot de passe contient au moins une majuscule
+   */
+  hasUppercase(): boolean {
+    const password = this.signupForm.get('password')?.value || '';
+    return /[A-Z]/.test(password);
+  }
+
+  /**
+   * Vérifie si le mot de passe contient au moins un chiffre
+   */
+  hasNumber(): boolean {
+    const password = this.signupForm.get('password')?.value || '';
+    return /\d/.test(password);
+  }
+
+  /**
+   * Vérifie si le mot de passe contient au moins un caractère spécial
+   */
+  hasSpecialChar(): boolean {
+    const password = this.signupForm.get('password')?.value || '';
+    return /[@$!%*?&]/.test(password);
   }
 
   /**

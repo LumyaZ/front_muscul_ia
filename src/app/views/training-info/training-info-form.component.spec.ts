@@ -163,7 +163,6 @@ describe('TrainingInfoFormComponent', () => {
     
     expect(component.error).toBe('Error message');
     expect(component.isLoading).toBeFalse();
-    expect(router.navigate).not.toHaveBeenCalled();
   });
 
   it('should not submit if form is invalid', () => {

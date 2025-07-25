@@ -1,0 +1,22 @@
+<header class="header">
+  <div class="header-container">
+    <!-- Logo -->
+    <div class="logo-section">
+      <button class="logo-button" (click)="onLogoClick()">
+        <h1 class="logo-text">MusculIA</h1>
+      </button>
+    </div>
+
+    <!-- Boutons utilisateur -->
+    <div class="user-section">
+      <button class="profile-button" (click)="onProfileClick()" title="Profil">
+        <i class="fas fa-user"></i>
+        <span class="button-text">Profil</span>
+      </button>
+      <button class="logout-button" (click)="onLogout()" title="Déconnexion">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="button-text">Déconnexion</span>
+      </button>
+    </div>
+  </div>
+</header> 

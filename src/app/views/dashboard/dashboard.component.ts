@@ -4,6 +4,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user.model';
+import { HeaderComponent } from '../../components/header/header.component';
+import { NavBarComponent } from '../../components/nav-bar/nav-bar.component';
 
 /**
  * Dashboard component for authenticated users.
@@ -13,7 +15,7 @@ import { User } from '../../models/user.model';
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, HeaderComponent, NavBarComponent],
   standalone: true,
 })
 export class DashboardComponent implements OnInit {

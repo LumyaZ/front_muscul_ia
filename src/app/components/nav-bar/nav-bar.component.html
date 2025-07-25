@@ -1,0 +1,16 @@
+<nav class="nav-bar">
+  <div class="nav-container">
+    <ul class="nav-list">
+      <li *ngFor="let item of navItems" class="nav-item">
+        <button 
+          class="nav-button" 
+          [class]="getActiveClass(item)"
+          (click)="onNavItemClick(item)"
+          [attr.aria-label]="item.label">
+          <i [class]="item.icon" class="nav-icon"></i>
+          <span class="nav-label">{{ item.label }}</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+</nav> 

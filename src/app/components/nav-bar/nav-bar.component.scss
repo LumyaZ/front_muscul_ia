@@ -1,0 +1,175 @@
+.nav-bar {
+  background: white;
+  border-top: 1px solid #e1e5e9;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  height: 70px;
+
+  @media (max-width: 768px) {
+    height: 65px;
+  }
+
+  @media (max-width: 480px) {
+    height: 60px;
+  }
+}
+
+.nav-container {
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+
+  @media (max-width: 768px) {
+    padding: 0 10px;
+  }
+}
+
+.nav-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.nav-item {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-button {
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+  padding: 8px 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #666;
+  font-weight: 500;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  position: relative;
+  border-top: 3px solid transparent;
+  min-height: 44px;
+
+  @media (max-width: 480px) {
+    padding: 6px 2px;
+    gap: 3px;
+    font-size: 0.75rem;
+  }
+
+  &:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+  }
+
+  &.active {
+    color: #667eea;
+    border-top-color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+
+    .nav-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+.nav-icon {
+  font-size: 1.3rem;
+  transition: transform 0.3s ease;
+
+  @media (max-width: 480px) {
+    font-size: 1.1rem;
+  }
+}
+
+.nav-label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.1;
+  white-space: nowrap;
+
+  @media (max-width: 480px) {
+    font-size: 0.65rem;
+  }
+}
+
+// Animation pour les transitions
+.nav-button {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+
+  &.active::before {
+    opacity: 1;
+  }
+}
+
+// Effet de ripple au clic
+.nav-button {
+  overflow: hidden;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(102, 126, 234, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+
+  &:active::after {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+// Ajout d'espace en bas pour éviter que le contenu soit caché par la navbar mobile
+@media (max-width: 768px) {
+  body {
+    padding-bottom: 80px;
+  }
+} 

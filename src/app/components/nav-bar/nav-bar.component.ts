@@ -23,27 +23,27 @@ export class NavBarComponent {
     {
       label: 'Accueil',
       icon: 'fas fa-home',
-      route: '/dashboard'
+      route: '/dashboard/home'
     },
     {
       label: 'Entraînements',
       icon: 'fas fa-dumbbell',
-      route: '/workouts'
+      route: '/dashboard/trainings'
     },
     {
-      label: 'Progression',
-      icon: 'fas fa-chart-line',
-      route: '/progress'
+      label: 'Enregistrer',
+      icon: 'fas fa-plus-circle',
+      route: '/dashboard/record'
     },
     {
-      label: 'Profil',
+      label: 'Programmes',
+      icon: 'fas fa-list-alt',
+      route: '/dashboard/programs'
+    },
+    {
+      label: 'Vous',
       icon: 'fas fa-user',
-      route: '/profile'
-    },
-    {
-      label: 'Plus',
-      icon: 'fas fa-ellipsis-h',
-      route: '/more'
+      route: '/dashboard/profile'
     }
   ];
 
@@ -67,13 +67,8 @@ export class NavBarComponent {
     // Navigation vers les pages correspondantes
     console.log(`Navigation vers: ${item.route}`);
     
-    // Navigation active pour les routes existantes
-    if (item.route === '/dashboard' || item.route === '/profile') {
-      this.router.navigate([item.route]);
-    } else {
-      // Pour les autres routes, afficher un message temporaire
-      console.log(`Page ${item.label} en cours de développement`);
-    }
+    // Navigation vers toutes les pages du dashboard
+    this.router.navigate([item.route]);
   }
 
   getActiveClass(item: NavItem): string {

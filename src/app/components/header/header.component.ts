@@ -59,7 +59,7 @@ export class HeaderComponent implements OnInit {
   onLogoClick(): void {
     // Navigation vers le dashboard ou la page d'accueil
     if (this.currentUser) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/dashboard/home']);
     } else {
       this.router.navigate(['/']);
     }

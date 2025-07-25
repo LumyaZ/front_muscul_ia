@@ -1,0 +1,81 @@
+<div class="trainings-container">
+  <!-- Header Component -->
+  <app-header></app-header>
+
+  <main class="trainings-content">
+    <div class="page-header">
+      <h1>Mes Entraînements</h1>
+      <p>Historique de vos sessions d'entraînement</p>
+    </div>
+
+    <div class="trainings-section">
+      <div class="section-header">
+        <h2>Entraînements récents</h2>
+        <button class="filter-btn">
+          <i class="fas fa-filter"></i>
+          Filtrer
+        </button>
+      </div>
+
+      <div class="trainings-list">
+        <!-- Placeholder pour les entraînements -->
+        <div class="training-item">
+          <div class="training-info">
+            <h3>Entraînement Haut du Corps</h3>
+            <p class="training-date">15 Janvier 2024</p>
+            <p class="training-duration">Durée: 45 minutes</p>
+          </div>
+          <div class="training-actions">
+            <button class="view-btn">
+              <i class="fas fa-eye"></i>
+              Voir
+            </button>
+          </div>
+        </div>
+
+        <div class="training-item">
+          <div class="training-info">
+            <h3>Entraînement Bas du Corps</h3>
+            <p class="training-date">12 Janvier 2024</p>
+            <p class="training-duration">Durée: 50 minutes</p>
+          </div>
+          <div class="training-actions">
+            <button class="view-btn">
+              <i class="fas fa-eye"></i>
+              Voir
+            </button>
+          </div>
+        </div>
+
+        <div class="training-item">
+          <div class="training-info">
+            <h3>Cardio HIIT</h3>
+            <p class="training-date">10 Janvier 2024</p>
+            <p class="training-duration">Durée: 30 minutes</p>
+          </div>
+          <div class="training-actions">
+            <button class="view-btn">
+              <i class="fas fa-eye"></i>
+              Voir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-trainings" *ngIf="false">
+        <div class="empty-state">
+          <i class="fas fa-dumbbell"></i>
+          <h3>Aucun entraînement enregistré</h3>
+          <p>Commencez par enregistrer votre premier entraînement</p>
+          <button class="primary-btn">
+            <i class="fas fa-plus"></i>
+            Enregistrer un entraînement
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Navigation Bar Component -->
+  <app-nav-bar [currentRoute]="'/dashboard/trainings'"></app-nav-bar>
+</div> 

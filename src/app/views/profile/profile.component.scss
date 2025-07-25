@@ -230,6 +230,109 @@
   }
 }
 
+// Catégories d'entraînement
+.training-category {
+  margin-bottom: 30px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+    padding: 15px;
+  }
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #dee2e6;
+
+  @media (max-width: 768px) {
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+.category-title {
+  color: #495057;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  i {
+    color: #667eea;
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+}
+
+.category-edit-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  i {
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 768px) {
+    align-self: flex-end;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+}
+
+.category-content {
+  .info-row {
+    border-bottom: 1px solid #e9ecef;
+    padding: 10px 0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    .value {
+      color: #495057;
+      font-weight: 600;
+    }
+  }
+}
+
 // Pas de données
 .no-data {
   text-align: center;

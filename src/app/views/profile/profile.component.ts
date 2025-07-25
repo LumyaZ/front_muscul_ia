@@ -6,12 +6,21 @@ import { UserProfileService } from '../../services/user-profile.service';
 import { TrainingInfoService } from '../../services/training-info.service';
 import { User } from '../../models/user.model';
 import { UserProfile } from '../../models/user-profile.model';
-import { TrainingInfo } from '../../models/training-info.model';
+import { TrainingInfo, 
+  GenderDisplayNames,
+  ExperienceLevelDisplayNames,
+  SessionFrequencyDisplayNames,
+  SessionDurationDisplayNames,
+  MainGoalDisplayNames,
+  TrainingPreferenceDisplayNames,
+  EquipmentDisplayNames
+} from '../../models/training-info.model';
+import { TrainingEditModalComponent, TrainingCategory } from '../../components/training-edit-modal/training-edit-modal.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TrainingEditModalComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
@@ -29,6 +38,19 @@ export class ProfileComponent implements OnInit {
   // États de chargement
   isLoading = true;
   error: string | null = null;
+
+  // Modal states
+  isModalOpen = false;
+  selectedCategory: TrainingCategory = 'personal';
+
+  // Display name mappings for translations
+  genderDisplayNames = GenderDisplayNames;
+  experienceLevelDisplayNames = ExperienceLevelDisplayNames;
+  sessionFrequencyDisplayNames = SessionFrequencyDisplayNames;
+  sessionDurationDisplayNames = SessionDurationDisplayNames;
+  mainGoalDisplayNames = MainGoalDisplayNames;
+  trainingPreferenceDisplayNames = TrainingPreferenceDisplayNames;
+  equipmentDisplayNames = EquipmentDisplayNames;
 
   ngOnInit(): void {
     this.loadUserData();
@@ -83,8 +105,49 @@ export class ProfileComponent implements OnInit {
     console.log('Édition du profil');
   }
 
-  editTrainingInfo(): void {
-    this.router.navigate(['/training-info']);
+  /**
+   * Edit a specific training category.
+   * Modifier une catégorie d'entraînement spécifique.
+   *
+   * @param category - Catégorie à modifier ('personal', 'experience', 'goals', 'equipment')
+   */
+  editTrainingCategory(category: TrainingCategory): void {
+    console.log('Opening modal for category:', category);
+    console.log('Current training info:', this.trainingInfo);
+    this.selectedCategory = category;
+    this.isModalOpen = true;
+  }
+
+  /**
+   * Close training edit modal.
+   * Fermer la modale d'édition d'entraînement.
+   */
+  closeTrainingModal(): void {
+    this.isModalOpen = false;
+  }
+
+  /**
+   * Handle training info update.
+   * Gérer la mise à jour des informations d'entraînement.
+   *
+   * @param updatedTrainingInfo - Informations d'entraînement mises à jour
+   */
+  onTrainingUpdated(updatedTrainingInfo: TrainingInfo): void {
+    this.trainingInfo = updatedTrainingInfo;
+    this.isModalOpen = false;
+  }
+
+  /**
+   * Get display name for enum values.
+   * Obtenir le nom d'affichage pour les valeurs enum.
+   *
+   * @param enumValue - Valeur enum
+   * @param displayNames - Mapping des noms d'affichage
+   * @returns string - Nom traduit
+   */
+  getDisplayName(enumValue: string | undefined, displayNames: Record<string, string>): string {
+    if (!enumValue) return '';
+    return displayNames[enumValue] || enumValue;
   }
 
   logout(): void {

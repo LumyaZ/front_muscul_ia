@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TrainingInfoService } from '../../services/training-info.service';
 import { 
@@ -61,7 +61,8 @@ export class TrainingInfoFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private trainingInfoService: TrainingInfoService,
-    public router: Router
+    public router: Router,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {

@@ -26,9 +26,7 @@
     <section class="profile-section auth-section">
       <div class="section-header">
         <h2><i class="fas fa-user-shield"></i> Informations d'authentification</h2>
-        <button class="edit-button" (click)="editProfile()">
-          <i class="fas fa-edit"></i>
-        </button>
+        
       </div>
       <div class="section-content">
         <div class="info-row">
@@ -87,65 +85,114 @@
     <section class="profile-section training-section">
       <div class="section-header">
         <h2><i class="fas fa-dumbbell"></i> Informations d'entraînement</h2>
-        <button class="edit-button" (click)="editTrainingInfo()">
-          <i class="fas fa-edit"></i>
-        </button>
       </div>
-      <div class="section-content" *ngIf="trainingInfo; else noTrainingInfo">
-        <div class="info-row">
-          <span class="label">Genre :</span>
-          <span class="value">{{ trainingInfo.gender }}</span>
+      <div class="section-content" *ngIf="trainingInfo">
+          
+        <!-- Catégorie 1: Informations personnelles -->
+        <div class="training-category">
+          <div class="category-header">
+            <h3 class="category-title">
+              <i class="fas fa-user-circle"></i> Informations personnelles
+            </h3>
+            <button class="category-edit-button" (click)="editTrainingCategory('personal')">
+              <i class="fas fa-edit"></i>
+              Modifier
+            </button>
+          </div>
+          <div class="category-content">
+            <div class="info-row">
+              <span class="label">Genre :</span>
+              <span class="value">{{ getDisplayName(trainingInfo.gender, genderDisplayNames) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Poids :</span>
+              <span class="value">{{ trainingInfo.weight }} kg</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Taille :</span>
+              <span class="value">{{ trainingInfo.height }} cm</span>
+            </div>
+            <div class="info-row">
+              <span class="label">IMC :</span>
+              <span class="value">{{ trainingInfo.bmi | number:'1.1' }}</span>
+            </div>
+            <div class="info-row" *ngIf="trainingInfo.bodyFatPercentage">
+              <span class="label">% de graisse corporelle :</span>
+              <span class="value">{{ trainingInfo.bodyFatPercentage }}%</span>
+            </div>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="label">Poids :</span>
-          <span class="value">{{ trainingInfo.weight }} kg</span>
+
+        <!-- Catégorie 2: Expérience d'entraînement -->
+        <div class="training-category">
+          <div class="category-header">
+            <h3 class="category-title">
+              <i class="fas fa-chart-line"></i> Expérience d'entraînement
+            </h3>
+            <button class="category-edit-button" (click)="editTrainingCategory('experience')">
+              <i class="fas fa-edit"></i>
+              Modifier
+            </button>
+          </div>
+          <div class="category-content">
+            <div class="info-row">
+              <span class="label">Niveau d'expérience :</span>
+              <span class="value">{{ getDisplayName(trainingInfo.experienceLevel, experienceLevelDisplayNames) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Fréquence d'entraînement :</span>
+              <span class="value">{{ getDisplayName(trainingInfo.sessionFrequency, sessionFrequencyDisplayNames) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Durée des sessions :</span>
+              <span class="value">{{ getDisplayName(trainingInfo.sessionDuration, sessionDurationDisplayNames) }}</span>
+            </div>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="label">Taille :</span>
-          <span class="value">{{ trainingInfo.height }} cm</span>
+
+        <!-- Catégorie 3: Objectifs et préférences -->
+        <div class="training-category">
+          <div class="category-header">
+            <h3 class="category-title">
+              <i class="fas fa-bullseye"></i> Objectifs et préférences
+            </h3>
+            <button class="category-edit-button" (click)="editTrainingCategory('goals')">
+              <i class="fas fa-edit"></i>
+              Modifier
+            </button>
+          </div>
+          <div class="category-content">
+            <div class="info-row">
+              <span class="label">Objectif principal :</span>
+              <span class="value">{{ getDisplayName(trainingInfo.mainGoal, mainGoalDisplayNames) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Préférence d'entraînement :</span>
+              <span class="value">{{ getDisplayName(trainingInfo.trainingPreference, trainingPreferenceDisplayNames) }}</span>
+            </div>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="label">IMC :</span>
-          <span class="value">{{ trainingInfo.bmi | number:'1.1' }}</span>
+
+        <!-- Catégorie 4: Équipement -->
+        <div class="training-category">
+          <div class="category-header">
+            <h3 class="category-title">
+              <i class="fas fa-tools"></i> Équipement
+            </h3>
+            <button class="category-edit-button" (click)="editTrainingCategory('equipment')">
+              <i class="fas fa-edit"></i>
+              Modifier
+            </button>
+          </div>
+          <div class="category-content">
+            <div class="info-row">
+              <span class="label">Équipement disponible :</span>
+              <span class="value">{{ getDisplayName(trainingInfo.equipment, equipmentDisplayNames) }}</span>
+            </div>
+          </div>
         </div>
-        <div class="info-row" *ngIf="trainingInfo.bodyFatPercentage">
-          <span class="label">% de graisse corporelle :</span>
-          <span class="value">{{ trainingInfo.bodyFatPercentage }}%</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Niveau d'expérience :</span>
-          <span class="value">{{ trainingInfo.experienceLevel }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Fréquence d'entraînement :</span>
-          <span class="value">{{ trainingInfo.sessionFrequency }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Durée des sessions :</span>
-          <span class="value">{{ trainingInfo.sessionDuration }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Objectif principal :</span>
-          <span class="value">{{ trainingInfo.mainGoal }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Préférence d'entraînement :</span>
-          <span class="value">{{ trainingInfo.trainingPreference }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Équipement disponible :</span>
-          <span class="value">{{ trainingInfo.equipment }}</span>
-        </div>
+
       </div>
-      <ng-template #noTrainingInfo>
-        <div class="no-data">
-          <p>Aucune information d'entraînement trouvée</p>
-          <button class="create-button" (click)="editTrainingInfo()">
-            <i class="fas fa-plus"></i>
-            Ajouter mes informations d'entraînement
-          </button>
-        </div>
-      </ng-template>
     </section>
 
     <!-- Bouton de déconnexion -->
@@ -156,4 +203,13 @@
       </button>
     </div>
   </div>
+
+  <!-- Training Edit Modal -->
+  <app-training-edit-modal
+    [isOpen]="isModalOpen"
+    [category]="selectedCategory"
+    [currentTrainingInfo]="trainingInfo"
+    (closeModal)="closeTrainingModal()"
+    (trainingUpdated)="onTrainingUpdated($event)">
+  </app-training-edit-modal>
 </div>

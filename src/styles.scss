@@ -13,3 +13,8 @@ body {
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+/* Modal body lock */
+body.modal-open {
+  overflow: hidden;
+}

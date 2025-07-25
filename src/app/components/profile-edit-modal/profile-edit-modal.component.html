@@ -1,0 +1,80 @@
+<!-- Modal Backdrop -->
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <i class="fas fa-user-edit"></i>
+        Modifier les informations personnelles
+      </h2>
+      <button class="close-button" (click)="onClose()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="modal-content">
+      
+      <!-- Personal Information -->
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">Prénom *</label>
+            <input type="text" id="firstName" formControlName="firstName" class="form-control" placeholder="Ex: Jean">
+            <div *ngIf="editForm.get('firstName')?.invalid && editForm.get('firstName')?.touched" class="error-message">
+              <span *ngIf="editForm.get('firstName')?.errors?.['required']">Le prénom est requis</span>
+              <span *ngIf="editForm.get('firstName')?.errors?.['minlength']">Le prénom doit contenir au moins 2 caractères</span>
+              <span *ngIf="editForm.get('firstName')?.errors?.['maxlength']">Le prénom ne peut pas dépasser 50 caractères</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Nom *</label>
+            <input type="text" id="lastName" formControlName="lastName" class="form-control" placeholder="Ex: Dupont">
+            <div *ngIf="editForm.get('lastName')?.invalid && editForm.get('lastName')?.touched" class="error-message">
+              <span *ngIf="editForm.get('lastName')?.errors?.['required']">Le nom est requis</span>
+              <span *ngIf="editForm.get('lastName')?.errors?.['minlength']">Le nom doit contenir au moins 2 caractères</span>
+              <span *ngIf="editForm.get('lastName')?.errors?.['maxlength']">Le nom ne peut pas dépasser 50 caractères</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="dateOfBirth">Date de naissance *</label>
+          <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="form-control">
+          <div *ngIf="editForm.get('dateOfBirth')?.invalid && editForm.get('dateOfBirth')?.touched" class="error-message">
+            <span *ngIf="editForm.get('dateOfBirth')?.errors?.['required']">La date de naissance est requise</span>
+            <span *ngIf="editForm.get('dateOfBirth')?.errors?.['invalidDate']">La date de naissance n'est pas valide</span>
+            <span *ngIf="editForm.get('dateOfBirth')?.errors?.['tooYoung']">Vous devez avoir au moins 13 ans</span>
+            <span *ngIf="editForm.get('dateOfBirth')?.errors?.['tooOld']">La date de naissance ne peut pas être dans le futur</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">Numéro de téléphone</label>
+          <input type="tel" id="phoneNumber" formControlName="phoneNumber" class="form-control" placeholder="Ex: 06 12 34 56 78">
+          <div *ngIf="editForm.get('phoneNumber')?.invalid && editForm.get('phoneNumber')?.touched" class="error-message">
+            <span *ngIf="editForm.get('phoneNumber')?.errors?.['pattern']">Le format du numéro de téléphone n'est pas valide</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Display -->
+      <div *ngIf="error" class="error-alert">
+        {{ error }}
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="modal-actions">
+        <button type="button" (click)="onClose()" class="btn btn-secondary">
+          Annuler
+        </button>
+        <button 
+          type="submit" 
+          [disabled]="editForm.invalid || isLoading" 
+          class="btn btn-primary">
+          <span *ngIf="isLoading" class="spinner"></span>
+          {{ isLoading ? 'Mise à jour...' : 'Mettre à jour' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div> 

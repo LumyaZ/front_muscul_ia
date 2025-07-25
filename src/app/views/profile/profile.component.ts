@@ -16,11 +16,12 @@ import { TrainingInfo,
   EquipmentDisplayNames
 } from '../../models/training-info.model';
 import { TrainingEditModalComponent, TrainingCategory } from '../../components/training-edit-modal/training-edit-modal.component';
+import { ProfileEditModalComponent } from '../../components/profile-edit-modal/profile-edit-modal.component';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, TrainingEditModalComponent],
+  imports: [CommonModule, TrainingEditModalComponent, ProfileEditModalComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
@@ -42,6 +43,7 @@ export class ProfileComponent implements OnInit {
   // Modal states
   isModalOpen = false;
   selectedCategory: TrainingCategory = 'personal';
+  isProfileModalOpen = false;
 
   // Display name mappings for translations
   genderDisplayNames = GenderDisplayNames;
@@ -101,8 +103,8 @@ export class ProfileComponent implements OnInit {
   }
 
   editProfile(): void {
-    // TODO: Navigation vers la page d'édition du profil
-    console.log('Édition du profil');
+    console.log('Opening profile edit modal');
+    this.isProfileModalOpen = true;
   }
 
   /**
@@ -135,6 +137,25 @@ export class ProfileComponent implements OnInit {
   onTrainingUpdated(updatedTrainingInfo: TrainingInfo): void {
     this.trainingInfo = updatedTrainingInfo;
     this.isModalOpen = false;
+  }
+
+  /**
+   * Close profile edit modal.
+   * Fermer la modale d'édition du profil.
+   */
+  closeProfileModal(): void {
+    this.isProfileModalOpen = false;
+  }
+
+  /**
+   * Handle profile update.
+   * Gérer la mise à jour du profil.
+   *
+   * @param updatedProfile - Profil mis à jour
+   */
+  onProfileUpdated(updatedProfile: UserProfile): void {
+    this.userProfile = updatedProfile;
+    this.isProfileModalOpen = false;
   }
 
   /**

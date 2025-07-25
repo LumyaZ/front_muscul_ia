@@ -212,4 +212,12 @@
     (closeModal)="closeTrainingModal()"
     (trainingUpdated)="onTrainingUpdated($event)">
   </app-training-edit-modal>
+
+  <!-- Profile Edit Modal -->
+  <app-profile-edit-modal
+    [isOpen]="isProfileModalOpen"
+    [currentProfile]="userProfile"
+    (closeModal)="closeProfileModal()"
+    (profileUpdated)="onProfileUpdated($event)">
+  </app-profile-edit-modal>
 </div>

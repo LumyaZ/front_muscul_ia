@@ -225,10 +225,9 @@ export class SignupComponent {
       this.authService.createUserWithProfile(request).subscribe({
         next: (response) => {
           this.isLoading = false;
-          console.log('User and profile created successfully:', response);
           
-          // Générer un token simple (en production, le back devrait le fournir)
-          const token = this.generateToken();
+          // Utiliser le token JWT du backend
+          const token = response.token;
           
           // Sauvegarder les données d'authentification
           this.saveAuthData(response.user, token);
@@ -245,15 +244,7 @@ export class SignupComponent {
     }
   }
 
-  /**
-   * Generate a simple token (in production, this should come from the backend)
-   * Générer un token simple (en production, cela devrait venir du backend)
-   */
-  private generateToken(): string {
-    return (
-      'token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
-    );
-  }
+
 
   /**
    * Save authentication data to localStorage

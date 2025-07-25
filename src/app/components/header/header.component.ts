@@ -34,8 +34,8 @@ export class HeaderComponent implements OnInit {
 
   onProfileClick(): void {
     if (this.currentUser) {
-      // TODO: Navigation vers la page de profil
-      console.log('Navigation vers le profil');
+      // Navigation vers la page de profil
+      this.router.navigate(['/profile']);
     } else {
       // Si pas connecté, rediriger vers la connexion
       this.router.navigate(['/login']);
@@ -49,8 +49,8 @@ export class HeaderComponent implements OnInit {
 
   onLogout(): void {
     // Supprimer les données de session
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('current_user');
     
     // Rediriger vers la page de connexion
     this.router.navigate(['/login']);

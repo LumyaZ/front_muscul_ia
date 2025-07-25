@@ -1,0 +1,159 @@
+<div class="profile-container">
+  <!-- Bouton retour -->
+  <div class="back-button-container">
+    <button class="back-button" (click)="goBackToDashboard()">
+      <i class="fas fa-arrow-left"></i>
+      <span>Retour au Dashboard</span>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Chargement de votre profil...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-container">
+    <p class="error-message">{{ error }}</p>
+  </div>
+
+  <!-- Contenu principal -->
+  <div *ngIf="!isLoading && !error" class="profile-content">
+    <h1 class="profile-title">Mon Profil</h1>
+
+    <!-- Section Informations d'authentification -->
+    <section class="profile-section auth-section">
+      <div class="section-header">
+        <h2><i class="fas fa-user-shield"></i> Informations d'authentification</h2>
+        <button class="edit-button" (click)="editProfile()">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+      <div class="section-content">
+        <div class="info-row">
+          <span class="label">Email :</span>
+          <span class="value">{{ user?.email }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Compte créé le :</span>
+          <span class="value">{{ user?.creationDate | date: 'dd/MM/yyyy à HH:mm' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section Profil utilisateur -->
+    <section class="profile-section user-section">
+      <div class="section-header">
+        <h2><i class="fas fa-user"></i> Informations personnelles</h2>
+        <button class="edit-button" (click)="editProfile()">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+      <div class="section-content" *ngIf="userProfile; else noProfile">
+        <div class="info-row">
+          <span class="label">Prénom :</span>
+          <span class="value">{{ userProfile.firstName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Nom :</span>
+          <span class="value">{{ userProfile.lastName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Date de naissance :</span>
+          <span class="value">{{ userProfile.dateOfBirth | date: 'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Âge :</span>
+          <span class="value">{{ userProfile.age }} ans</span>
+        </div>
+        <div class="info-row" *ngIf="userProfile.phoneNumber">
+          <span class="label">Téléphone :</span>
+          <span class="value">{{ userProfile.phoneNumber }}</span>
+        </div>
+      </div>
+      <ng-template #noProfile>
+        <div class="no-data">
+          <p>Aucun profil utilisateur trouvé</p>
+          <button class="create-button" (click)="editProfile()">
+            <i class="fas fa-plus"></i>
+            Créer un profil
+          </button>
+        </div>
+      </ng-template>
+    </section>
+
+    <!-- Section Informations d'entraînement -->
+    <section class="profile-section training-section">
+      <div class="section-header">
+        <h2><i class="fas fa-dumbbell"></i> Informations d'entraînement</h2>
+        <button class="edit-button" (click)="editTrainingInfo()">
+          <i class="fas fa-edit"></i>
+        </button>
+      </div>
+      <div class="section-content" *ngIf="trainingInfo; else noTrainingInfo">
+        <div class="info-row">
+          <span class="label">Genre :</span>
+          <span class="value">{{ trainingInfo.gender }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Poids :</span>
+          <span class="value">{{ trainingInfo.weight }} kg</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Taille :</span>
+          <span class="value">{{ trainingInfo.height }} cm</span>
+        </div>
+        <div class="info-row">
+          <span class="label">IMC :</span>
+          <span class="value">{{ trainingInfo.bmi | number:'1.1' }}</span>
+        </div>
+        <div class="info-row" *ngIf="trainingInfo.bodyFatPercentage">
+          <span class="label">% de graisse corporelle :</span>
+          <span class="value">{{ trainingInfo.bodyFatPercentage }}%</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Niveau d'expérience :</span>
+          <span class="value">{{ trainingInfo.experienceLevel }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Fréquence d'entraînement :</span>
+          <span class="value">{{ trainingInfo.sessionFrequency }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Durée des sessions :</span>
+          <span class="value">{{ trainingInfo.sessionDuration }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Objectif principal :</span>
+          <span class="value">{{ trainingInfo.mainGoal }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Préférence d'entraînement :</span>
+          <span class="value">{{ trainingInfo.trainingPreference }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Équipement disponible :</span>
+          <span class="value">{{ trainingInfo.equipment }}</span>
+        </div>
+      </div>
+      <ng-template #noTrainingInfo>
+        <div class="no-data">
+          <p>Aucune information d'entraînement trouvée</p>
+          <button class="create-button" (click)="editTrainingInfo()">
+            <i class="fas fa-plus"></i>
+            Ajouter mes informations d'entraînement
+          </button>
+        </div>
+      </ng-template>
+    </section>
+
+    <!-- Bouton de déconnexion -->
+    <div class="logout-container">
+      <button class="logout-button" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        Se déconnecter
+      </button>
+    </div>
+  </div>
+</div>

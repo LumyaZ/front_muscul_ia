@@ -50,8 +50,8 @@ describe('HeaderComponent', () => {
     
     component.onLogout();
     
-    expect(localStorage.removeItem).toHaveBeenCalledWith('authToken');
-    expect(localStorage.removeItem).toHaveBeenCalledWith('currentUser');
+    expect(localStorage.removeItem).toHaveBeenCalledWith('auth_token');
+    expect(localStorage.removeItem).toHaveBeenCalledWith('current_user');
     expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 
@@ -79,11 +79,10 @@ describe('HeaderComponent', () => {
 
   it('should handle profile click when user is connected', () => {
     component.currentUser = { id: 1, email: 'test@example.com' };
-    spyOn(console, 'log');
     
     component.onProfileClick();
     
-    expect(console.log).toHaveBeenCalledWith('Navigation vers le profil');
+    expect(router.navigate).toHaveBeenCalledWith(['/profile']);
   });
 
   it('should navigate to login when profile click and user is not connected', () => {

@@ -64,11 +64,16 @@ export class NavBarComponent {
   }
 
   onNavItemClick(item: NavItem): void {
-    // TODO: Navigation vers les pages correspondantes
+    // Navigation vers les pages correspondantes
     console.log(`Navigation vers: ${item.route}`);
     
-    // Pour l'instant, on simule la navigation
-    // this.router.navigate([item.route]);
+    // Navigation active pour les routes existantes
+    if (item.route === '/dashboard' || item.route === '/profile') {
+      this.router.navigate([item.route]);
+    } else {
+      // Pour les autres routes, afficher un message temporaire
+      console.log(`Page ${item.label} en cours de développement`);
+    }
   }
 
   getActiveClass(item: NavItem): string {

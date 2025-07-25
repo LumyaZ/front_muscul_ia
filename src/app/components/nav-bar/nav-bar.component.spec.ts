@@ -32,11 +32,11 @@ describe('NavBarComponent', () => {
 
   it('should have correct navigation items structure', () => {
     const expectedItems = [
-      { label: 'Dashboard', icon: 'fas fa-tachometer-alt', route: '/dashboard' },
+      { label: 'Accueil', icon: 'fas fa-home', route: '/dashboard' },
       { label: 'Entraînements', icon: 'fas fa-dumbbell', route: '/workouts' },
       { label: 'Progression', icon: 'fas fa-chart-line', route: '/progress' },
-      { label: 'Nutrition', icon: 'fas fa-apple-alt', route: '/nutrition' },
-      { label: 'Communauté', icon: 'fas fa-users', route: '/community' }
+      { label: 'Profil', icon: 'fas fa-user', route: '/profile' },
+      { label: 'Plus', icon: 'fas fa-ellipsis-h', route: '/more' }
     ];
 
     component.navItems.forEach((item, index) => {

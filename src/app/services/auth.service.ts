@@ -28,56 +28,50 @@ export interface AuthResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-
-  private apiUrl = environment.apiUrl + '/auth';
+  private readonly apiUrl = environment.apiUrl + '/auth';
 
   /**
-   * Login user with email and password
-   * Connexion utilisateur avec email et mot de passe
+   * Login user with email and password.
+   * Connexion utilisateur avec email et mot de passe.
+   * 
+   * @param request - Données de connexion
+   * @returns Observable - Réponse avec utilisateur et token JWT
    */
-  login(request: LoginRequest): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/login`, request).pipe(
-      tap((user) => {
-        // Générer un token simple (en production, le back devrait le fournir)
-        const token = this.generateToken();
-        // Sauvegarder dans localStorage
-        this.saveAuthData(user, token);
-        // Naviguer vers le dashboard
+  login(request: LoginRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, request).pipe(
+      tap((response) => {
+        // Sauvegarder le token JWT retourné par le backend
+        this.saveAuthData(response.user, response.token);
         this.router.navigate(['/dashboard']);
       }),
     );
   }
 
   /**
-   * Register a new user
-   * Inscription d'un nouvel utilisateur
+   * Register a new user.
+   * Inscription d'un nouvel utilisateur.
+   * 
+   * @param request - Données d'inscription
+   * @returns Observable - Réponse avec utilisateur et token JWT
    */
-  signup(request: RegisterRequest): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/register`, request).pipe(
-      tap((user) => {
-        // Générer un token simple (en production, le back devrait le fournir)
-        const token = this.generateToken();
-        // Sauvegarder dans localStorage
-        this.saveAuthData(user, token);
-        // Naviguer vers le dashboard
+  signup(request: RegisterRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, request).pipe(
+      tap((response) => {
+        // Sauvegarder le token JWT retourné par le backend
+        this.saveAuthData(response.user, response.token);
         this.router.navigate(['/dashboard']);
       }),
     );
   }
 
-  /**
-   * Generate a simple token (in production, this should come from the backend)
-   * Générer un token simple (en production, cela devrait venir du backend)
-   */
-  private generateToken(): string {
-    return (
-      'token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
-    );
-  }
+
 
   /**
-   * Save authentication data to localStorage
-   * Sauvegarder les données d'authentification dans localStorage
+   * Save authentication data to localStorage.
+   * Sauvegarder les données d'authentification dans localStorage.
+   * 
+   * @param user - Données utilisateur
+   * @param token - Token JWT
    */
   private saveAuthData(user: User, token: string): void {
     localStorage.setItem('auth_token', token);
@@ -94,8 +88,10 @@ export class AuthService {
   }
 
   /**
-   * Get current token from localStorage
-   * Récupérer le token actuel depuis localStorage
+   * Get current token from localStorage.
+   * Récupérer le token actuel depuis localStorage.
+   * 
+   * @returns string | null - Token JWT ou null
    */
   getToken(): string | null {
     return localStorage.getItem('auth_token');
@@ -123,8 +119,8 @@ export class AuthService {
    * Create a new user with profile in one request
    * Créer un nouvel utilisateur avec profil en une seule requête
    */
-  createUserWithProfile(request: CreateUserWithProfileRequest): Observable<CreateUserWithProfileResponse> {
-    return this.http.post<CreateUserWithProfileResponse>(`${this.apiUrl}/create-user-with-profile`, request);
+  createUserWithProfile(request: CreateUserWithProfileRequest): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/create-user-with-profile`, request);
   }
 
   /**

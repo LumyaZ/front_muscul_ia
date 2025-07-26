@@ -55,6 +55,10 @@ export const routes: Routes = [
         loadComponent: () => import('./views/dashboard/program-details/program-details.component').then(m => m.ProgramDetailsComponent)
       },
       {
+        path: 'programs/:id/add-exercise',
+        loadComponent: () => import('./views/dashboard/add-exercise-to-program/add-exercise-to-program.component').then(m => m.AddExerciseToProgramComponent)
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./views/dashboard/profile/profile.component').then(m => m.ProfileComponent)
       }

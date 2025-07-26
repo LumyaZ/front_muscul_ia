@@ -349,11 +349,51 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 
-  h2 {
-    margin: 0 0 25px 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: white;
+  .exercises-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .add-exercise-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: linear-gradient(45deg, #2196F3, #1976D2);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+      backdrop-filter: blur(10px);
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
+        background: linear-gradient(45deg, #1976D2, #1565C0);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      span {
+        font-size: 1.1rem;
+      }
+    }
   }
 
   .exercises-list {
@@ -537,6 +577,17 @@
 
   .exercises-section {
     padding: 20px;
+
+    .exercises-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 15px;
+
+      .add-exercise-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
 
     .exercise-card {
       padding: 15px;

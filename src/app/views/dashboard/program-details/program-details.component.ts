@@ -422,6 +422,20 @@ export class ProgramDetailsComponent implements OnInit {
   }
 
   /**
+   * Navigates to the add exercise to program page.
+   * Navigue vers la page d'ajout d'exercice au programme.
+   * 
+   * This method navigates to a page where users can add new exercises
+   * to the current training program.
+   * 
+   * Cette méthode navigue vers une page où les utilisateurs peuvent
+   * ajouter de nouveaux exercices au programme d'entraînement actuel.
+   */
+  addExerciseToProgram(): void {
+    this.router.navigate(['/dashboard/programs', this.programId, 'add-exercise']);
+  }
+
+  /**
    * Gets the total number of exercises in the program.
    * Obtient le nombre total d'exercices dans le programme.
    * 

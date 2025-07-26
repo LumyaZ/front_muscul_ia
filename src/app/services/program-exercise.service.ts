@@ -214,4 +214,28 @@ export class ProgramExerciseService {
   getProgramExerciseById(id: number): Observable<ProgramExercise> {
     return this.http.get<ProgramExercise>(`${this.apiUrl}/${id}`);
   }
+
+  /**
+   * Add an exercise to a training program.
+   * Ajouter un exercice à un programme d'entraînement.
+   * 
+   * This method adds a new exercise to an existing training program
+   * with specific parameters like sets, reps, duration, and rest periods.
+   * It creates a new program exercise entry that links an exercise
+   * to a training program with program-specific settings.
+   * 
+   * Cette méthode ajoute un nouvel exercice à un programme d'entraînement
+   * existant avec des paramètres spécifiques comme les séries, répétitions,
+   * durée et périodes de repos. Elle crée une nouvelle entrée d'exercice
+   * de programme qui lie un exercice à un programme d'entraînement avec
+   * des paramètres spécifiques au programme.
+   * 
+   * @param programId - ID of the training program to add the exercise to
+   * @param exerciseData - Exercise data including parameters and settings
+   * @returns Observable<ProgramExercise> - Created program exercise
+   * @throws Error - If program or exercise doesn't exist, or validation fails
+   */
+  addExerciseToProgram(programId: number, exerciseData: any): Observable<ProgramExercise> {
+    return this.http.post<ProgramExercise>(`${this.apiUrl}/program/${programId}`, exerciseData);
+  }
 } 

@@ -144,7 +144,13 @@
 
       <!-- Liste des exercices -->
       <div class="exercises-section">
-        <h2>Exercices du programme</h2>
+        <div class="exercises-header">
+          <h2>Exercices du programme</h2>
+          <button class="add-exercise-btn" (click)="addExerciseToProgram()">
+            <span>➕</span>
+            Ajouter un exercice
+          </button>
+        </div>
         <div class="exercises-list">
           <div 
             *ngFor="let programExercise of program.exercises; let i = index" 

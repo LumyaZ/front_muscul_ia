@@ -3,125 +3,166 @@
   <app-header></app-header>
 
   <main class="programs-content">
-    <div class="page-header">
-      <h1>Mes Programmes</h1>
-      <p>Gérez vos programmes d'entraînement personnalisés</p>
+    <!-- En-tête avec titre et bouton d'ajout -->
+    <div class="header">
+      <div class="title-section">
+        <h1>Programmes d'entraînement</h1>
+        <p>Découvrez et choisissez parmi nos programmes d'entraînement</p>
+      </div>
+      <button class="add-program-btn" (click)="loadPrograms()">
+        <span>🔄</span>
+        Actualiser
+      </button>
     </div>
 
-    <div class="programs-section">
-      <div class="section-header">
-        <h2>Programmes disponibles</h2>
-        <button class="create-btn">
-          <i class="fas fa-plus"></i>
-          Créer un programme
+    <!-- Filtres et recherche -->
+    <div class="filters-section">
+      <div class="search-bar">
+        <input 
+          type="text" 
+          placeholder="Rechercher un programme..." 
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          class="search-input"
+        >
+      </div>
+
+      <div class="filters">
+        <select [(ngModel)]="selectedDifficulty" (change)="onFilterChange()" class="filter-select">
+          <option value="">Toutes les difficultés</option>
+          <option *ngFor="let difficulty of difficultyLevels" [value]="difficulty">
+            {{ difficulty }}
+          </option>
+        </select>
+
+        <select [(ngModel)]="selectedAudience" (change)="onFilterChange()" class="filter-select">
+          <option value="">Tous les publics</option>
+          <option *ngFor="let audience of audiences" [value]="audience">
+            {{ audience }}
+          </option>
+        </select>
+
+        <button class="clear-filters-btn" (click)="clearFilters()">
+          Effacer les filtres
         </button>
       </div>
+    </div>
 
-      <div class="programs-grid">
-        <!-- Programme 1 -->
-        <div class="program-card">
-          <div class="program-header">
-            <h3>Programme Débutant</h3>
-            <span class="program-badge beginner">Débutant</span>
-          </div>
-          <div class="program-content">
-            <p class="program-description">Programme complet pour débuter en musculation</p>
-            <div class="program-stats">
-              <div class="stat">
-                <i class="fas fa-calendar"></i>
-                <span>12 semaines</span>
-              </div>
-              <div class="stat">
-                <i class="fas fa-dumbbell"></i>
-                <span>3x/semaine</span>
-              </div>
+    <!-- État de chargement -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Chargement des programmes...</p>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="error" class="error-message">
+      <p>{{ error }}</p>
+      <button (click)="loadPrograms()">Réessayer</button>
+    </div>
+
+    <!-- Résultats -->
+    <div *ngIf="!loading && !error" class="results-section">
+      <div class="results-info">
+        <p>{{ getTotalPrograms() }} programme(s) trouvé(s) dans {{ categoryGroups.length }} catégorie(s)</p>
+      </div>
+
+      <!-- Catégories de programmes -->
+      <div class="categories-container">
+        <div 
+          *ngFor="let categoryGroup of categoryGroups; let i = index" 
+          class="category-section"
+          [style.background]="getCategoryColor(categoryGroup.category)"
+        >
+          <!-- En-tête de catégorie -->
+          <div class="category-header">
+            <div class="category-info">
+              <span class="category-icon">{{ categoryGroup.icon }}</span>
+              <h2 class="category-title">{{ categoryGroup.category }}</h2>
+              <span class="program-count">{{ categoryGroup.programs.length }} programme(s)</span>
+            </div>
+            
+            <!-- Boutons de navigation -->
+            <div class="category-nav">
+              <button 
+                class="nav-btn nav-left" 
+                (click)="scrollLeft(i)"
+                [disabled]="categoryGroup.programs.length <= 3"
+              >
+                ‹
+              </button>
+              <button 
+                class="nav-btn nav-right" 
+                (click)="scrollRight(i)"
+                [disabled]="categoryGroup.programs.length <= 3"
+              >
+                ›
+              </button>
             </div>
           </div>
-          <div class="program-actions">
-            <button class="btn btn-secondary">
-              <i class="fas fa-eye"></i>
-              Voir
-            </button>
-            <button class="btn btn-primary">
-              <i class="fas fa-play"></i>
-              Commencer
-            </button>
-          </div>
-        </div>
 
-        <!-- Programme 2 -->
-        <div class="program-card">
-          <div class="program-header">
-            <h3>Programme Intermédiaire</h3>
-            <span class="program-badge intermediate">Intermédiaire</span>
-          </div>
-          <div class="program-content">
-            <p class="program-description">Programme pour progresser en force et masse</p>
-            <div class="program-stats">
-              <div class="stat">
-                <i class="fas fa-calendar"></i>
-                <span>8 semaines</span>
-              </div>
-              <div class="stat">
-                <i class="fas fa-dumbbell"></i>
-                <span>4x/semaine</span>
+          <!-- Grille horizontale des programmes -->
+          <div class="programs-scroll-container" [id]="'category-' + i">
+            <div class="programs-row">
+              <div 
+                *ngFor="let program of categoryGroup.programs" 
+                class="program-card"
+                [class.private]="!program.isPublic"
+              >
+                <!-- En-tête de la carte -->
+                <div class="card-header">
+                  <div class="difficulty-badge" [style.background-color]="getDifficultyColor(program.difficultyLevel)">
+                    {{ program.difficultyLevel }}
+                  </div>
+                  <div *ngIf="!program.isPublic" class="private-badge">
+                    Privé
+                  </div>
+                </div>
+
+                <!-- Contenu de la carte -->
+                <div class="card-content">
+                  <h3 class="program-name">{{ program.name }}</h3>
+                  <p class="program-description">{{ program.description }}</p>
+                  
+                  <div class="program-details">
+                    <div class="detail-item">
+                      <span class="detail-label">📅</span>
+                      <span>{{ program.durationWeeks }} semaines</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">🔄</span>
+                      <span>{{ program.sessionsPerWeek }}x/semaine</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">⏱️</span>
+                      <span>{{ formatDuration(program.estimatedDurationMinutes) }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">👥</span>
+                      <span>{{ program.targetAudience }}</span>
+                    </div>
+                  </div>
+
+                  <div class="equipment-section">
+                    <span class="equipment-label">Équipement :</span>
+                    <span class="equipment-text">{{ program.equipmentRequired }}</span>
+                  </div>
+                </div>
+
+                <!-- Actions de la carte -->
+                <div class="card-actions">
+                  <button class="view-btn" (click)="viewProgram(program.id)">Voir le programme</button>
+                  <button class="start-btn" (click)="startProgram(program.id)">Commencer</button>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="program-actions">
-            <button class="btn btn-secondary">
-              <i class="fas fa-eye"></i>
-              Voir
-            </button>
-            <button class="btn btn-primary">
-              <i class="fas fa-play"></i>
-              Commencer
-            </button>
-          </div>
-        </div>
-
-        <!-- Programme 3 -->
-        <div class="program-card">
-          <div class="program-header">
-            <h3>Programme Cardio</h3>
-            <span class="program-badge cardio">Cardio</span>
-          </div>
-          <div class="program-content">
-            <p class="program-description">Programme d'endurance et de perte de poids</p>
-            <div class="program-stats">
-              <div class="stat">
-                <i class="fas fa-calendar"></i>
-                <span>6 semaines</span>
-              </div>
-              <div class="stat">
-                <i class="fas fa-dumbbell"></i>
-                <span>5x/semaine</span>
-              </div>
-            </div>
-          </div>
-          <div class="program-actions">
-            <button class="btn btn-secondary">
-              <i class="fas fa-eye"></i>
-              Voir
-            </button>
-            <button class="btn btn-primary">
-              <i class="fas fa-play"></i>
-              Commencer
-            </button>
           </div>
         </div>
       </div>
 
-      <div class="no-programs" *ngIf="false">
-        <div class="empty-state">
-          <i class="fas fa-dumbbell"></i>
-          <h3>Aucun programme créé</h3>
-          <p>Créez votre premier programme d'entraînement personnalisé</p>
-          <button class="primary-btn">
-            <i class="fas fa-plus"></i>
-            Créer un programme
-          </button>
-        </div>
+      <!-- Message si aucun résultat -->
+      <div *ngIf="categoryGroups.length === 0" class="no-results">
+        <p>Aucun programme ne correspond à vos critères de recherche.</p>
+        <button (click)="clearFilters()">Effacer les filtres</button>
       </div>
     </div>
   </main>

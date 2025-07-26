@@ -1,0 +1,203 @@
+<div class="program-details-container">
+  <!-- Header Component -->
+  <app-header></app-header>
+
+  <main class="program-details-content">
+    <!-- Bouton retour -->
+    <div class="back-button">
+      <button class="back-btn" (click)="goBack()">
+        <span>‹</span>
+        Retour aux programmes
+      </button>
+    </div>
+
+    <!-- État de chargement -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Chargement du programme...</p>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="error" class="error-message">
+      <p>{{ error }}</p>
+      <button (click)="loadProgramDetails()">Réessayer</button>
+    </div>
+
+    <!-- Détails du programme -->
+    <div *ngIf="!loading && !error && program" class="program-details">
+      <!-- En-tête du programme -->
+      <div class="program-header" [style.background]="getCategoryColor(program.category)">
+        <div class="header-content">
+          <div class="program-info">
+            <div class="category-badge">
+              <span class="category-icon">{{ getCategoryIcon(program.category) }}</span>
+              <span class="category-name">{{ program.category }}</span>
+            </div>
+            <h1 class="program-title">{{ program.name }}</h1>
+            <p class="program-description">{{ program.description }}</p>
+            
+            <div class="program-meta">
+              <div class="meta-item">
+                <span class="meta-label">Difficulté</span>
+                <span class="difficulty-badge" [style.background-color]="getDifficultyColor(program.difficultyLevel)">
+                  {{ program.difficultyLevel }}
+                </span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Durée</span>
+                <span class="meta-value">{{ program.durationWeeks }} semaines</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Fréquence</span>
+                <span class="meta-value">{{ program.sessionsPerWeek }}x/semaine</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">Temps estimé</span>
+                <span class="meta-value">{{ formatDuration(program.estimatedDurationMinutes) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="program-actions">
+            <button class="start-program-btn" (click)="startProgram()">
+              <span>▶️</span>
+              Commencer le programme
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques du programme -->
+      <div class="program-stats">
+        <div class="stat-card">
+          <div class="stat-icon">🏋️</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ getTotalExercises() }}</span>
+            <span class="stat-label">Exercices</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔄</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ getTotalSets() }}</span>
+            <span class="stat-label">Séries totales</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ getEstimatedTotalTime() }}</span>
+            <span class="stat-label">Temps estimé</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ program.targetAudience }}</span>
+            <span class="stat-label">Public cible</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informations détaillées -->
+      <div class="program-details-grid">
+        <div class="detail-section">
+          <h2>Informations générales</h2>
+          <div class="detail-content">
+            <div class="detail-item">
+              <span class="detail-label">Équipement requis :</span>
+              <span class="detail-value">{{ program.equipmentRequired }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Créé le :</span>
+              <span class="detail-value">{{ program.createdAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Dernière mise à jour :</span>
+              <span class="detail-value">{{ program.updatedAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h2>Conseils d'entraînement</h2>
+          <div class="tips-content">
+            <div class="tip-item">
+              <span class="tip-icon">💡</span>
+              <span class="tip-text">Échauffez-vous bien avant chaque séance</span>
+            </div>
+            <div class="tip-item">
+              <span class="tip-icon">💧</span>
+              <span class="tip-text">Restez hydraté pendant l'entraînement</span>
+            </div>
+            <div class="tip-item">
+              <span class="tip-icon">🎯</span>
+              <span class="tip-text">Respectez les temps de repos entre les séries</span>
+            </div>
+            <div class="tip-item">
+              <span class="tip-icon">📈</span>
+              <span class="tip-text">Augmentez progressivement l'intensité</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Liste des exercices -->
+      <div class="exercises-section">
+        <h2>Exercices du programme</h2>
+        <div class="exercises-list">
+          <div 
+            *ngFor="let programExercise of program.exercises; let i = index" 
+            class="exercise-card"
+            [class.optional]="programExercise.isOptional"
+          >
+            <div class="exercise-header">
+              <div class="exercise-order">
+                <span class="order-number">{{ programExercise.orderInProgram }}</span>
+              </div>
+              <div class="exercise-info">
+                <h3 class="exercise-name">{{ programExercise.exercise.name }}</h3>
+                <p class="exercise-description">{{ programExercise.exercise.description }}</p>
+                <div class="exercise-meta">
+                  <span class="muscle-group">{{ programExercise.exercise.muscleGroup }}</span>
+                  <span class="equipment">{{ programExercise.exercise.equipmentNeeded }}</span>
+                </div>
+              </div>
+              <div *ngIf="programExercise.isOptional" class="optional-badge">
+                Optionnel
+              </div>
+            </div>
+
+            <div class="exercise-details">
+              <div class="detail-row">
+                <div class="detail-col">
+                  <span class="detail-label">Séries</span>
+                  <span class="detail-value">{{ programExercise.setsCount }}</span>
+                </div>
+                <div class="detail-col" *ngIf="programExercise.repsCount">
+                  <span class="detail-label">Répétitions</span>
+                  <span class="detail-value">{{ programExercise.repsCount }}</span>
+                </div>
+                <div class="detail-col" *ngIf="programExercise.durationSeconds">
+                  <span class="detail-label">Durée</span>
+                  <span class="detail-value">{{ formatExerciseDuration(programExercise.durationSeconds) }}</span>
+                </div>
+                <div class="detail-col" *ngIf="programExercise.weightKg">
+                  <span class="detail-label">Poids</span>
+                  <span class="detail-value">{{ programExercise.weightKg }} kg</span>
+                </div>
+                <div class="detail-col">
+                  <span class="detail-label">Repos</span>
+                  <span class="detail-value">{{ formatRestDuration(programExercise.restDurationSeconds) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Navigation Bar Component -->
+  <app-nav-bar [currentRoute]="'/dashboard/programs'"></app-nav-bar>
+</div> 

@@ -51,12 +51,16 @@ export const routes: Routes = [
         loadComponent: () => import('./views/dashboard/programs/programs.component').then(m => m.ProgramsComponent)
       },
       {
-        path: 'programs/:id',
-        loadComponent: () => import('./views/dashboard/program-details/program-details.component').then(m => m.ProgramDetailsComponent)
+        path: 'programs/create',
+        loadComponent: () => import('./views/dashboard/create-program/create-program.component').then(m => m.CreateProgramComponent)
       },
       {
         path: 'programs/:id/add-exercise',
         loadComponent: () => import('./views/dashboard/add-exercise-to-program/add-exercise-to-program.component').then(m => m.AddExerciseToProgramComponent)
+      },
+      {
+        path: 'programs/:id',
+        loadComponent: () => import('./views/dashboard/program-details/program-details.component').then(m => m.ProgramDetailsComponent)
       },
       {
         path: 'profile',

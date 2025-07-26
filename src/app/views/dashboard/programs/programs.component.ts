@@ -288,6 +288,20 @@ export class ProgramsComponent implements OnInit {
     this.router.navigate(['/dashboard/programs', programId]);
   }
 
+  /**
+   * Navigates to the create new program page.
+   * Navigue vers la page de création d'un nouveau programme.
+   * 
+   * This method navigates to a page where users can create
+   * a new training program from scratch.
+   * 
+   * Cette méthode navigue vers une page où les utilisateurs peuvent
+   * créer un nouveau programme d'entraînement à partir de zéro.
+   */
+  createNewProgram(): void {
+    this.router.navigate(['/dashboard/programs/create']);
+  }
+
   startProgram(programId: number): void {
     // TODO: Implémenter la logique pour démarrer le programme
     console.log('Démarrage du programme:', programId);

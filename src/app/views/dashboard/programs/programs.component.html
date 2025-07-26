@@ -3,16 +3,22 @@
   <app-header></app-header>
 
   <main class="programs-content">
-    <!-- En-tête avec titre et bouton d'ajout -->
+    <!-- En-tête avec titre et boutons d'action -->
     <div class="header">
       <div class="title-section">
         <h1>Programmes d'entraînement</h1>
         <p>Découvrez et choisissez parmi nos programmes d'entraînement</p>
       </div>
-      <button class="add-program-btn" (click)="loadPrograms()">
-        <span>🔄</span>
-        Actualiser
-      </button>
+      <div class="header-actions">
+        <button class="create-program-btn" (click)="createNewProgram()">
+          <span>➕</span>
+          Créer un programme
+        </button>
+        <button class="refresh-btn" (click)="loadPrograms()">
+          <span>🔄</span>
+          Actualiser
+        </button>
+      </div>
     </div>
 
     <!-- Filtres et recherche -->

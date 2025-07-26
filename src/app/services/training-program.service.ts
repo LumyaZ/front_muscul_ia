@@ -142,6 +142,23 @@ export class TrainingProgramService {
   }
 
   /**
+   * Create a new training program without exercises.
+   * Créer un nouveau programme d'entraînement sans exercices.
+   * 
+   * This method creates a basic training program structure that can
+   * be populated with exercises later.
+   * 
+   * Cette méthode crée une structure de programme d'entraînement de base
+   * qui peut être remplie d'exercices plus tard.
+   * 
+   * @param programData - Basic program data without exercises
+   * @returns Observable<TrainingProgram> - Created program
+   */
+  createTrainingProgram(programData: any): Observable<TrainingProgram> {
+    return this.http.post<TrainingProgram>(this.apiUrl, programData);
+  }
+
+  /**
    * Update an existing training program.
    * Mettre à jour un programme d'entraînement existant.
    * 

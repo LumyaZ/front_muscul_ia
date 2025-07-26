@@ -1,0 +1,113 @@
+name: CI/CD Pipeline - Frontend
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: front_muscul_ia/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd front_muscul_ia
+        npm ci
+    
+    - name: Run linting
+      run: |
+        cd front_muscul_ia
+        npm run lint
+    
+    - name: Run unit tests
+      run: |
+        cd front_muscul_ia
+        npm run test -- --watch=false --coverage
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./front_muscul_ia/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: front_muscul_ia/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        cd front_muscul_ia
+        npm ci
+    
+    - name: Build application
+      run: |
+        cd front_muscul_ia
+        npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-dist
+        path: front_muscul_ia/dist/
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-dist
+    
+    - name: Deploy to staging
+      run: |
+        echo "Deploying frontend to staging environment..."
+        # Add your staging deployment commands here
+        # Example: AWS S3, Netlify, Vercel, etc.
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: frontend-dist
+    
+    - name: Deploy to production
+      run: |
+        echo "Deploying frontend to production environment..."
+        # Add your production deployment commands here
+        # Example: AWS S3, Netlify, Vercel, etc. 

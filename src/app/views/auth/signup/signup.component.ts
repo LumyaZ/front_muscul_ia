@@ -13,8 +13,23 @@ import { AuthService } from '../../../services/auth.service';
 import { UserProfileService } from '../../../services/user-profile.service';
 
 /**
- * Signup component for user registration with profile information.
- * Composant d'inscription pour l'enregistrement utilisateur avec informations de profil.
+ * Component for user registration with comprehensive profile information.
+ * Composant pour l'enregistrement utilisateur avec informations de profil complètes.
+ * 
+ * This component handles user registration including authentication data and
+ * profile information. It provides a comprehensive reactive form with validation
+ * for email, password strength, profile details, and age verification. The
+ * component integrates with both authentication and user profile services.
+ * 
+ * Ce composant gère l'enregistrement utilisateur incluant les données
+ * d'authentification et les informations de profil. Il fournit un formulaire
+ * réactif complet avec validation pour email, force du mot de passe, détails
+ * du profil et vérification de l'âge. Le composant s'intègre avec les services
+ * d'authentification et de profil utilisateur.
+ * 
+ * @author Muscul IA Team
+ * @version 1.0
+ * @since 2024-01-01
  */
 @Component({
   selector: 'app-signup',
@@ -24,21 +39,75 @@ import { UserProfileService } from '../../../services/user-profile.service';
   standalone: true,
 })
 export class SignupComponent {
+  
+  /**
+   * Form builder service for creating reactive forms.
+   * Service de construction de formulaires pour créer des formulaires réactifs.
+   */
   private fb = inject(FormBuilder);
+  
+  /**
+   * Authentication service for registration operations.
+   * Service d'authentification pour les opérations d'enregistrement.
+   */
   private authService = inject(AuthService);
+  
+  /**
+   * User profile service for profile creation.
+   * Service de profil utilisateur pour la création de profil.
+   */
   private userProfileService = inject(UserProfileService);
+  
+  /**
+   * Angular router for navigation.
+   * Routeur Angular pour la navigation.
+   */
   private router = inject(Router);
 
+  /**
+   * Reactive form for user registration with authentication and profile fields.
+   * Formulaire réactif pour l'enregistrement utilisateur avec champs d'authentification et profil.
+   */
   signupForm: FormGroup;
+  
+  /**
+   * Error message to display if registration fails.
+   * Message d'erreur à afficher si l'enregistrement échoue.
+   */
   error: string | null = null;
+  
+  /**
+   * Loading state indicator during registration process.
+   * Indicateur d'état de chargement pendant le processus d'enregistrement.
+   */
   isLoading = false;
+  
+  /**
+   * Flag to toggle password visibility.
+   * Indicateur pour basculer la visibilité du mot de passe.
+   */
   showPassword = false;
+  
+  /**
+   * Flag to toggle confirm password visibility.
+   * Indicateur pour basculer la visibilité de la confirmation du mot de passe.
+   */
   showConfirmPassword = false;
 
+  /**
+   * Constructor for SignupComponent.
+   * Constructeur pour SignupComponent.
+   * 
+   * Initializes the reactive form with comprehensive validation including
+   * authentication fields, profile information, and custom validators.
+   * 
+   * Initialise le formulaire réactif avec validation complète incluant
+   * les champs d'authentification, les informations de profil et les validateurs personnalisés.
+   */
   constructor() {
-    // Création du formulaire réactif avec validation
+    // Create reactive form with validation
     this.signupForm = this.fb.group({
-      // Champs d'authentification
+      // Authentication fields
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required, 
@@ -47,7 +116,7 @@ export class SignupComponent {
       ]],
       confirmPassword: ['', [Validators.required]],
       
-      // Champs du profil utilisateur
+      // User profile fields
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       dateOfBirth: ['', [Validators.required]],
@@ -56,9 +125,17 @@ export class SignupComponent {
   }
 
   /**
-   * Validateur personnalisé pour vérifier que les mots de passe correspondent
-   * @param control - Contrôle du formulaire
-   * @returns object | null - Erreur ou null si valide
+   * Custom validator to ensure password and confirm password match.
+   * Validateur personnalisé pour s'assurer que le mot de passe et sa confirmation correspondent.
+   * 
+   * This validator checks if the password and confirmPassword fields have
+   * the same value and returns an error if they don't match.
+   * 
+   * Ce validateur vérifie si les champs password et confirmPassword ont
+   * la même valeur et retourne une erreur s'ils ne correspondent pas.
+   * 
+   * @param control - Form control containing password fields
+   * @returns Record<string, boolean> | null - Error object or null if valid
    */
   passwordMatchValidator(
     control: AbstractControl,
@@ -77,9 +154,17 @@ export class SignupComponent {
   }
 
   /**
-   * Validateur pour vérifier que la date de naissance n'est pas dans le futur
-   * @param control - Contrôle du formulaire
-   * @returns object | null - Erreur ou null si valide
+   * Validator to ensure date of birth is not in the future and user is old enough.
+   * Validateur pour s'assurer que la date de naissance n'est pas dans le futur et que l'utilisateur est assez âgé.
+   * 
+   * This validator checks that the selected date is not in the future and
+   * that the user is at least 13 years old.
+   * 
+   * Ce validateur vérifie que la date sélectionnée n'est pas dans le futur
+   * et que l'utilisateur a au moins 13 ans.
+   * 
+   * @param control - Form control containing date of birth
+   * @returns Record<string, boolean> | null - Error object or null if valid
    */
   dateOfBirthValidator(control: AbstractControl): Record<string, boolean> | null {
     if (control.value) {
@@ -90,7 +175,7 @@ export class SignupComponent {
         return { futureDate: true };
       }
       
-      // Vérifier que l'utilisateur a au moins 13 ans
+      // Check that user is at least 13 years old
       const minAge = new Date();
       minAge.setFullYear(today.getFullYear() - 13);
       
@@ -102,21 +187,24 @@ export class SignupComponent {
   }
 
   /**
-   * Bascule la visibilité du mot de passe
+   * Toggles password visibility.
+   * Bascule la visibilité du mot de passe.
    */
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   /**
-   * Bascule la visibilité de la confirmation du mot de passe
+   * Toggles confirm password visibility.
+   * Bascule la visibilité de la confirmation du mot de passe.
    */
   toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   /**
-   * Obtient le message d'erreur pour le mot de passe
+   * Gets the error message for the password field.
+   * Obtient le message d'erreur pour le champ mot de passe.
    */
   getPasswordErrorMessage(): string {
     const passwordControl = this.signupForm.get('password');
@@ -135,7 +223,8 @@ export class SignupComponent {
   }
 
   /**
-   * Calcule la force du mot de passe
+   * Calculates password strength.
+   * Calcule la force du mot de passe.
    */
   getPasswordStrength(): { score: number; label: string; color: string } {
     const password = this.signupForm.get('password')?.value || '';
@@ -158,7 +247,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe a au moins 8 caractères
+   * Checks if password has at least 8 characters.
+   * Vérifie si le mot de passe a au moins 8 caractères.
    */
   hasMinLength(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -166,7 +256,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe contient au moins une minuscule
+   * Checks if password contains at least one lowercase letter.
+   * Vérifie si le mot de passe contient au moins une minuscule.
    */
   hasLowercase(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -174,7 +265,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe contient au moins une majuscule
+   * Checks if password contains at least one uppercase letter.
+   * Vérifie si le mot de passe contient au moins une majuscule.
    */
   hasUppercase(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -182,7 +274,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe contient au moins un chiffre
+   * Checks if password contains at least one number.
+   * Vérifie si le mot de passe contient au moins un chiffre.
    */
   hasNumber(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -190,7 +283,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe contient au moins un caractère spécial
+   * Checks if password contains at least one special character.
+   * Vérifie si le mot de passe contient au moins un caractère spécial.
    */
   hasSpecialChar(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -198,14 +292,15 @@ export class SignupComponent {
   }
 
   /**
-   * Soumet le formulaire d'inscription
+   * Submits the registration form.
+   * Soumet le formulaire d'inscription.
    */
   onSubmit(): void {
     if (this.signupForm.valid) {
       this.isLoading = true;
       this.error = null;
 
-      // Préparer les données pour l'endpoint combiné
+      // Prepare data for combined endpoint
       const request = {
         userData: {
           email: this.signupForm.get('email')?.value,
@@ -226,13 +321,13 @@ export class SignupComponent {
         next: (response) => {
           this.isLoading = false;
           
-          // Utiliser le token JWT du backend
+          // Use JWT token from backend
           const token = response.token;
           
-          // Sauvegarder les données d'authentification
+          // Save authentication data
           this.saveAuthData(response.user, token);
           
-          // Rediriger vers la page training-info
+          // Redirect to training-info page
           this.router.navigate(['/training-info']);
         },
         error: (error) => {
@@ -256,14 +351,16 @@ export class SignupComponent {
   }
 
   /**
-   * Redirige vers la page de connexion
+   * Redirects to the login page.
+   * Redirige vers la page de connexion.
    */
   goToLogin(): void {
     this.router.navigate(['/login']);
   }
 
   /**
-   * Calcule l'âge à partir de la date de naissance
+   * Calculates age from date of birth.
+   * Calcule l'âge à partir de la date de naissance.
    * @param dateOfBirth - Date de naissance
    * @returns number - Âge calculé
    */
@@ -281,6 +378,7 @@ export class SignupComponent {
   }
 
   /**
+   * Returns the maximum date for date of birth (today).
    * Retourne la date maximale pour la date de naissance (aujourd'hui)
    * @returns string - Date au format YYYY-MM-DD
    */

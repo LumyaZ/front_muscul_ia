@@ -408,6 +408,7 @@ describe('TrainingEditModalComponent', () => {
 
       // When
       component.isOpen = true;
+      component.ngOnChanges();
 
       // Then
       expect(component.ngOnChanges).toHaveBeenCalled();
@@ -419,6 +420,7 @@ describe('TrainingEditModalComponent', () => {
 
       // When
       component.isOpen = false;
+      component.ngOnChanges();
 
       // Then
       expect(component.ngOnChanges).toHaveBeenCalled();

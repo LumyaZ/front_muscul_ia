@@ -18,6 +18,25 @@ import { TrainingInfo,
 import { TrainingEditModalComponent, TrainingCategory } from '../../components/training-edit-modal/training-edit-modal.component';
 import { ProfileEditModalComponent } from '../../components/profile-edit-modal/profile-edit-modal.component';
 
+/**
+ * Component for displaying and managing user profile information.
+ * Composant pour afficher et gérer les informations du profil utilisateur.
+ * 
+ * This component handles the display and editing of user profile data including
+ * personal information, training preferences, and profile management. It provides
+ * functionality to view profile details, edit personal information, and manage
+ * training preferences through modal dialogs.
+ * 
+ * Ce composant gère l'affichage et l'édition des données de profil utilisateur
+ * incluant les informations personnelles, les préférences d'entraînement et la
+ * gestion du profil. Il fournit des fonctionnalités pour voir les détails du
+ * profil, éditer les informations personnelles et gérer les préférences
+ * d'entraînement via des dialogues modaux.
+ * 
+ * @author Muscul IA Team
+ * @version 1.0
+ * @since 2024-01-01
+ */
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -31,47 +50,129 @@ export class ProfileComponent implements OnInit {
   private userProfileService = inject(UserProfileService);
   private trainingInfoService = inject(TrainingInfoService);
 
-  // Données utilisateur
+  /**
+   * Current authenticated user data.
+   * Données de l'utilisateur actuellement authentifié.
+   */
   user: User | null = null;
+
+  /**
+   * User profile information including personal details.
+   * Informations du profil utilisateur incluant les détails personnels.
+   */
   userProfile: UserProfile | null = null;
+
+  /**
+   * User training information and preferences.
+   * Informations et préférences d'entraînement de l'utilisateur.
+   */
   trainingInfo: TrainingInfo | null = null;
 
-  // États de chargement
+  /**
+   * Loading state indicator.
+   * Indicateur d'état de chargement.
+   */
   isLoading = true;
+
+  /**
+   * Error message if any operation fails.
+   * Message d'erreur si une opération échoue.
+   */
   error: string | null = null;
 
-  // Modal states
+  /**
+   * Flag indicating if training edit modal is open.
+   * Indicateur indiquant si la modale d'édition d'entraînement est ouverte.
+   */
   isModalOpen = false;
+
+  /**
+   * Currently selected training category for editing.
+   * Catégorie d'entraînement actuellement sélectionnée pour l'édition.
+   */
   selectedCategory: TrainingCategory = 'personal';
+
+  /**
+   * Flag indicating if profile edit modal is open.
+   * Indicateur indiquant si la modale d'édition de profil est ouverte.
+   */
   isProfileModalOpen = false;
 
-  // Display name mappings for translations
+  /**
+   * Display name mappings for gender translations.
+   * Mappings des noms d'affichage pour les traductions de genre.
+   */
   genderDisplayNames = GenderDisplayNames;
+
+  /**
+   * Display name mappings for experience level translations.
+   * Mappings des noms d'affichage pour les traductions de niveau d'expérience.
+   */
   experienceLevelDisplayNames = ExperienceLevelDisplayNames;
+
+  /**
+   * Display name mappings for session frequency translations.
+   * Mappings des noms d'affichage pour les traductions de fréquence de sessions.
+   */
   sessionFrequencyDisplayNames = SessionFrequencyDisplayNames;
+
+  /**
+   * Display name mappings for session duration translations.
+   * Mappings des noms d'affichage pour les traductions de durée de sessions.
+   */
   sessionDurationDisplayNames = SessionDurationDisplayNames;
+
+  /**
+   * Display name mappings for main goal translations.
+   * Mappings des noms d'affichage pour les traductions d'objectif principal.
+   */
   mainGoalDisplayNames = MainGoalDisplayNames;
+
+  /**
+   * Display name mappings for training preference translations.
+   * Mappings des noms d'affichage pour les traductions de préférence d'entraînement.
+   */
   trainingPreferenceDisplayNames = TrainingPreferenceDisplayNames;
+
+  /**
+   * Display name mappings for equipment translations.
+   * Mappings des noms d'affichage pour les traductions d'équipement.
+   */
   equipmentDisplayNames = EquipmentDisplayNames;
 
+  /**
+   * Lifecycle hook that is called after data-bound properties are initialized.
+   * Hook de cycle de vie appelé après l'initialisation des propriétés liées aux données.
+   */
   ngOnInit(): void {
     this.loadUserData();
   }
 
+  /**
+   * Load user data including profile and training information.
+   * Charger les données utilisateur incluant le profil et les informations d'entraînement.
+   * 
+   * This method checks authentication, loads user profile, and retrieves
+   * training preferences. It handles errors gracefully and sets loading states.
+   * 
+   * Cette méthode vérifie l'authentification, charge le profil utilisateur et
+   * récupère les préférences d'entraînement. Elle gère les erreurs gracieusement
+   * et définit les états de chargement.
+   */
   private loadUserData(): void {
     this.isLoading = true;
     this.error = null;
 
-    // Vérifier l'authentification
+    // Check authentication
     if (!this.authService.isAuthenticated()) {
       this.router.navigate(['/login']);
       return;
     }
 
-    // Récupérer l'utilisateur connecté
+    // Get current user
     this.user = this.authService.getCurrentUser();
 
-    // Charger le profil utilisateur
+    // Load user profile
     this.userProfileService.getMyProfile().subscribe({
       next: (profile: UserProfile) => {
         this.userProfile = profile;
@@ -83,7 +184,7 @@ export class ProfileComponent implements OnInit {
       }
     });
 
-    // Charger les informations d'entraînement
+    // Load training information
     this.trainingInfoService.getTrainingInfo().subscribe({
       next: (trainingInfo: TrainingInfo) => {
         this.trainingInfo = trainingInfo;
@@ -92,7 +193,7 @@ export class ProfileComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Erreur lors du chargement des infos d\'entraînement:', err);
-        // Ne pas afficher d'erreur si pas d'infos d'entraînement
+        // Don't show error if no training info
         this.isLoading = false;
       }
     });
@@ -100,6 +201,10 @@ export class ProfileComponent implements OnInit {
 
   goBackToDashboard(): void {
     this.router.navigate(['/dashboard']);
+  }
+
+  editTrainingInfo(): void {
+    this.router.navigate(['/training-info']);
   }
 
   editProfile(): void {

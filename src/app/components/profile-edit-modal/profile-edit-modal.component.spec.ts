@@ -59,8 +59,8 @@ describe('ProfileEditModalComponent', () => {
   it('should load current profile data when modal opens', () => {
     component.currentProfile = mockProfile;
     component.isOpen = true;
-    
     component.ngOnChanges();
+    fixture.detectChanges();
     
     expect(component.editForm.get('firstName')?.value).toBe('Jean');
     expect(component.editForm.get('lastName')?.value).toBe('Dupont');
@@ -82,15 +82,23 @@ describe('ProfileEditModalComponent', () => {
     const lastNameControl = component.editForm.get('lastName');
     
     firstNameControl?.setValue('A');
+    firstNameControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(firstNameControl?.errors?.['minlength']).toBeTruthy();
     
     firstNameControl?.setValue('A'.repeat(51));
+    firstNameControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(firstNameControl?.errors?.['maxlength']).toBeTruthy();
     
     lastNameControl?.setValue('A');
+    lastNameControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(lastNameControl?.errors?.['minlength']).toBeTruthy();
     
     lastNameControl?.setValue('A'.repeat(51));
+    lastNameControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(lastNameControl?.errors?.['maxlength']).toBeTruthy();
   });
 
@@ -101,12 +109,16 @@ describe('ProfileEditModalComponent', () => {
     const futureDate = new Date();
     futureDate.setFullYear(futureDate.getFullYear() + 1);
     dateControl?.setValue(futureDate.toISOString().split('T')[0]);
+    dateControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(dateControl?.errors?.['tooOld']).toBeTruthy();
     
     // Date making user too young (less than 13 years old)
     const youngDate = new Date();
     youngDate.setFullYear(youngDate.getFullYear() - 10);
     dateControl?.setValue(youngDate.toISOString().split('T')[0]);
+    dateControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(dateControl?.errors?.['tooYoung']).toBeTruthy();
   });
 
@@ -115,19 +127,29 @@ describe('ProfileEditModalComponent', () => {
     
     // Valid French phone numbers
     phoneControl?.setValue('0612345678');
+    phoneControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(phoneControl?.errors).toBeNull();
     
     phoneControl?.setValue('01 23 45 67 89');
+    phoneControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(phoneControl?.errors).toBeNull();
     
     phoneControl?.setValue('+33 6 12 34 56 78');
+    phoneControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(phoneControl?.errors).toBeNull();
     
     // Invalid phone numbers
     phoneControl?.setValue('123');
+    phoneControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(phoneControl?.errors?.['pattern']).toBeTruthy();
     
     phoneControl?.setValue('invalid');
+    phoneControl?.updateValueAndValidity();
+    fixture.detectChanges();
     expect(phoneControl?.errors?.['pattern']).toBeTruthy();
   });
 
@@ -138,6 +160,7 @@ describe('ProfileEditModalComponent', () => {
     component.currentProfile = mockProfile;
     component.isOpen = true;
     component.ngOnChanges();
+    fixture.detectChanges();
     
     component.editForm.patchValue({
       firstName: 'Pierre',

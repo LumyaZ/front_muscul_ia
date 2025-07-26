@@ -6,22 +6,51 @@ import { User } from '../models/user.model';
 import { environment } from '../../environments/environment';
 import { CreateUserWithProfileRequest, CreateUserWithProfileResponse } from '../models/user-profile.model';
 
+/**
+ * Interface for login request.
+ * Interface pour la requête de connexion.
+ */
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
+/**
+ * Interface for registration request.
+ * Interface pour la requête d'inscription.
+ */
 export interface RegisterRequest {
   email: string;
   password: string;
   confirmPassword: string;
 }
 
+/**
+ * Interface for authentication response.
+ * Interface pour la réponse d'authentification.
+ */
 export interface AuthResponse {
   user: User;
   token: string;
 }
 
+/**
+ * Service for managing user authentication.
+ * Service pour la gestion de l'authentification utilisateur.
+ * 
+ * This service provides methods to handle user authentication including login,
+ * registration, token management, and session handling. It manages JWT tokens
+ * and user data in localStorage for persistent sessions.
+ * 
+ * Ce service fournit des méthodes pour gérer l'authentification utilisateur
+ * incluant la connexion, l'inscription, la gestion des tokens et la gestion
+ * des sessions. Il gère les tokens JWT et les données utilisateur dans
+ * localStorage pour des sessions persistantes.
+ * 
+ * @author Muscul IA Team
+ * @version 1.0
+ * @since 2024-01-01
+ */
 @Injectable({
   providedIn: 'root',
 })
@@ -34,13 +63,13 @@ export class AuthService {
    * Login user with email and password.
    * Connexion utilisateur avec email et mot de passe.
    * 
-   * @param request - Données de connexion
-   * @returns Observable - Réponse avec utilisateur et token JWT
+   * @param request - Login credentials (email and password)
+   * @returns Observable<any> - Response with user data and JWT token
    */
   login(request: LoginRequest): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/login`, request).pipe(
       tap((response) => {
-        // Sauvegarder le token JWT retourné par le backend
+        // Save JWT token returned by backend
         this.saveAuthData(response.user, response.token);
         this.router.navigate(['/dashboard']);
       }),
@@ -51,27 +80,25 @@ export class AuthService {
    * Register a new user.
    * Inscription d'un nouvel utilisateur.
    * 
-   * @param request - Données d'inscription
-   * @returns Observable - Réponse avec utilisateur et token JWT
+   * @param request - Registration data (email, password, confirmPassword)
+   * @returns Observable<any> - Response with user data and JWT token
    */
   signup(request: RegisterRequest): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/register`, request).pipe(
       tap((response) => {
-        // Sauvegarder le token JWT retourné par le backend
+        // Save JWT token returned by backend
         this.saveAuthData(response.user, response.token);
         this.router.navigate(['/dashboard']);
       }),
     );
   }
 
-
-
   /**
    * Save authentication data to localStorage.
    * Sauvegarder les données d'authentification dans localStorage.
    * 
-   * @param user - Données utilisateur
-   * @param token - Token JWT
+   * @param user - User data to save
+   * @param token - JWT token to save
    */
   private saveAuthData(user: User, token: string): void {
     localStorage.setItem('auth_token', token);
@@ -79,8 +106,10 @@ export class AuthService {
   }
 
   /**
-   * Get current user from localStorage
-   * Récupérer l'utilisateur actuel depuis localStorage
+   * Get current user from localStorage.
+   * Récupérer l'utilisateur actuel depuis localStorage.
+   * 
+   * @returns User | null - Current user data or null if not authenticated
    */
   getCurrentUser(): User | null {
     const userStr = localStorage.getItem('current_user');
@@ -91,7 +120,7 @@ export class AuthService {
    * Get current token from localStorage.
    * Récupérer le token actuel depuis localStorage.
    * 
-   * @returns string | null - Token JWT ou null
+   * @returns string | null - JWT token or null if not authenticated
    */
   getToken(): string | null {
     return localStorage.getItem('auth_token');

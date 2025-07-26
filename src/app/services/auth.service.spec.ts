@@ -56,7 +56,7 @@ describe('AuthService', () => {
 
       service.login(loginRequest).subscribe();
 
-      const req = httpMock.expectOne('/api/auth/login');
+      const req = httpMock.expectOne('http://localhost:8080/api/auth/login');
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(loginRequest);
 
@@ -87,7 +87,7 @@ describe('AuthService', () => {
 
       service.signup(signupRequest).subscribe();
 
-      const req = httpMock.expectOne('/api/auth/register');
+      const req = httpMock.expectOne('http://localhost:8080/api/auth/register');
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(signupRequest);
 
@@ -129,7 +129,7 @@ describe('AuthService', () => {
         expect(response).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne('/api/auth/create-user-with-profile');
+      const req = httpMock.expectOne('http://localhost:8080/api/auth/create-user-with-profile');
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(request);
 

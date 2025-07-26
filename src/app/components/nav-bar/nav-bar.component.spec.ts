@@ -32,11 +32,11 @@ describe('NavBarComponent', () => {
 
   it('should have correct navigation items structure', () => {
     const expectedItems = [
-      { label: 'Accueil', icon: 'fas fa-home', route: '/dashboard' },
-      { label: 'Entraînements', icon: 'fas fa-dumbbell', route: '/workouts' },
-      { label: 'Progression', icon: 'fas fa-chart-line', route: '/progress' },
-      { label: 'Profil', icon: 'fas fa-user', route: '/profile' },
-      { label: 'Plus', icon: 'fas fa-ellipsis-h', route: '/more' }
+      { label: 'Accueil', icon: 'fas fa-home', route: '/dashboard/home' },
+      { label: 'Entraînements', icon: 'fas fa-dumbbell', route: '/dashboard/trainings' },
+      { label: 'Enregistrer', icon: 'fas fa-plus-circle', route: '/dashboard/record' },
+      { label: 'Programmes', icon: 'fas fa-list-alt', route: '/dashboard/programs' },
+      { label: 'Vous', icon: 'fas fa-user', route: '/dashboard/profile' }
     ];
 
     component.navItems.forEach((item, index) => {
@@ -47,20 +47,20 @@ describe('NavBarComponent', () => {
   });
 
   it('should update active state on init', () => {
-    component.currentRoute = '/dashboard';
+    component.currentRoute = '/dashboard/home';
     
     component.ngOnInit();
     
-    const dashboardItem = component.navItems.find(item => item.route === '/dashboard');
+    const dashboardItem = component.navItems.find(item => item.route === '/dashboard/home');
     expect(dashboardItem?.isActive).toBeTrue();
   });
 
   it('should update active state on changes', () => {
-    component.currentRoute = '/workouts';
+    component.currentRoute = '/dashboard/trainings';
     
     component.ngOnChanges();
     
-    const workoutsItem = component.navItems.find(item => item.route === '/workouts');
+    const workoutsItem = component.navItems.find(item => item.route === '/dashboard/trainings');
     expect(workoutsItem?.isActive).toBeTrue();
   });
 

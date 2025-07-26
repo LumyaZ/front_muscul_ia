@@ -66,7 +66,7 @@ describe('HeaderComponent', () => {
     
     component.onLogoClick();
     
-    expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
+    expect(router.navigate).toHaveBeenCalledWith(['/dashboard/home']);
   });
 
   it('should navigate to home on logo click when user is not connected', () => {

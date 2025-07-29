@@ -181,6 +181,36 @@
         </div>
       </section>
 
+      <!-- Section Navigation -->
+      <section class="profile-section navigation-section">
+        <div class="section-header">
+          <h2><i class="fas fa-compass"></i> Navigation</h2>
+        </div>
+        <div class="section-content">
+          <div class="navigation-item">
+            <div class="nav-info">
+              <h3>Mes Entraînements</h3>
+              <p>Consultez vos entraînements en cours et terminés</p>
+            </div>
+            <button class="nav-btn" (click)="navigateToTrainings()">
+              <i class="fas fa-dumbbell"></i>
+              Accéder
+            </button>
+          </div>
+          
+          <div class="navigation-item">
+            <div class="nav-info">
+              <h3>Mes Programmes</h3>
+              <p>Gérez vos programmes d'entraînement personnalisés</p>
+            </div>
+            <button class="nav-btn" (click)="navigateToPrograms()">
+              <i class="fas fa-list-check"></i>
+              Accéder
+            </button>
+          </div>
+        </div>
+      </section>
+
       <!-- Section Paramètres -->
       <section class="profile-section settings-section">
         <div class="section-header">

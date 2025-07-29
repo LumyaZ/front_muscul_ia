@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import { CreateProgramComponent } from './create-program.component';
 import { TrainingProgramService } from '../../../services/training-program.service';
@@ -39,6 +40,7 @@ describe('CreateProgramComponent', () => {
       imports: [
         CreateProgramComponent,
         ReactiveFormsModule,
+        HttpClientTestingModule,
         HeaderComponent,
         NavBarComponent
       ],

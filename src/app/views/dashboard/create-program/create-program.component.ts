@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
 import { TrainingProgramService } from '../../../services/training-program.service';
+import { AuthService } from '../../../services/auth.service';
 
 /**
  * Interface for the form data to create a new training program.
@@ -97,20 +98,11 @@ export class CreateProgramComponent implements OnInit {
     'Tous niveaux'
   ];
 
-
-
-  /**
-   * Constructor for CreateProgramComponent.
-   * Constructeur pour CreateProgramComponent.
-   * 
-   * @param fb - Form builder service
-   * @param router - Angular router service
-   * @param trainingProgramService - Service for training program operations
-   */
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private trainingProgramService: TrainingProgramService
+    private trainingProgramService: TrainingProgramService,
+    private authService: AuthService
   ) {
     this.createProgramForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
@@ -118,44 +110,23 @@ export class CreateProgramComponent implements OnInit {
       category: ['', Validators.required],
       difficultyLevel: ['', Validators.required],
       targetAudience: ['', Validators.required],
-      durationWeeks: ['', [Validators.required, Validators.min(1), Validators.max(52)]],
-      sessionsPerWeek: ['', [Validators.required, Validators.min(1), Validators.max(7)]],
-      estimatedDurationMinutes: ['', [Validators.required, Validators.min(15), Validators.max(300)]],
+      durationWeeks: [4, [Validators.required, Validators.min(1), Validators.max(52)]],
+      sessionsPerWeek: [3, [Validators.required, Validators.min(1), Validators.max(7)]],
+      estimatedDurationMinutes: [60, [Validators.required, Validators.min(15), Validators.max(300)]],
       equipmentRequired: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      isPublic: [true]
+      isPublic: [false]
     });
   }
 
-  /**
-   * Lifecycle hook that is called after data-bound properties are initialized.
-   * Hook de cycle de vie appelé après l'initialisation des propriétés liées aux données.
-   * 
-   * This method initializes the component and sets up any necessary
-   * default values or configurations.
-   * 
-   * Cette méthode initialise le composant et configure toutes les valeurs
-   * par défaut ou configurations nécessaires.
-   */
   ngOnInit(): void {
-    // Set default values
+    // Initialize form with default values
     this.createProgramForm.patchValue({
-      durationWeeks: 8,
-      sessionsPerWeek: 3,
-      estimatedDurationMinutes: 60,
-      isPublic: false
+      category: this.categories[0],
+      difficultyLevel: this.difficultyLevels[0],
+      targetAudience: this.targetAudiences[0]
     });
   }
 
-  /**
-   * Handles form submission to create a new training program.
-   * Gère la soumission du formulaire pour créer un nouveau programme d'entraînement.
-   * 
-   * This method validates the form and submits the program data
-   * to create a new training program.
-   * 
-   * Cette méthode valide le formulaire et soumet les données du programme
-   * pour créer un nouveau programme d'entraînement.
-   */
   onSubmit(): void {
     if (this.createProgramForm.valid) {
       this.loading = true;
@@ -163,8 +134,15 @@ export class CreateProgramComponent implements OnInit {
       this.success = '';
 
       const formData: CreateProgramForm = this.createProgramForm.value;
+      const currentUser = this.authService.getCurrentUser();
       
-      this.trainingProgramService.createTrainingProgram(formData).subscribe({
+      if (!currentUser || !currentUser.id) {
+        this.error = 'Erreur: Utilisateur non connecté';
+        this.loading = false;
+        return;
+      }
+      
+      this.trainingProgramService.createTrainingProgram(formData, currentUser.id).subscribe({
         next: (result) => {
           this.success = 'Programme créé avec succès !';
           this.loading = false;

@@ -1,0 +1,81 @@
+<div class="trainings-container">
+  <div class="content-header">
+    <button class="header-btn" 
+            [class.active]="activeTab === 'current'" 
+            (click)="setActiveTab('current')">
+      En cours
+    </button>
+    <button class="header-btn" 
+            [class.active]="activeTab === 'completed'" 
+            (click)="setActiveTab('completed')">
+      Terminés
+    </button>
+  </div>
+
+  <div class="tab-content">
+    <!-- Onglet Entraînements en cours -->
+    <div *ngIf="activeTab === 'current'" class="tab-pane">
+      <!-- Graphique d'activités -->
+      <div class="chart-section">
+        <h3 class="chart-title">
+          <i class="fas fa-chart-line"></i>
+          Activités des dernières semaines
+        </h3>
+        <div class="chart-container">
+          <canvas #activityChart></canvas>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Chargement des entraînements...</p>
+      </div>
+
+      <div *ngIf="!isLoading && error" class="error-state">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>{{ error }}</p>
+        <button (click)="refreshTrainings()" class="retry-btn">Réessayer</button>
+      </div>
+
+      <div *ngIf="!isLoading && !error && currentTrainings.length === 0" class="empty-state">
+        <i class="fas fa-dumbbell"></i>
+        <h3>Aucun entraînement en cours</h3>
+        <p>Vous n'avez pas encore commencé d'entraînement.</p>
+      </div>
+
+      <div *ngIf="!isLoading && !error && currentTrainings.length > 0" class="trainings-list">
+        <!-- Liste des entraînements en cours -->
+        <div class="training-item" *ngFor="let training of currentTrainings">
+          <!-- Contenu de l'entraînement -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Entraînements terminés -->
+    <div *ngIf="activeTab === 'completed'" class="tab-pane">
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Chargement des entraînements terminés...</p>
+      </div>
+
+      <div *ngIf="!isLoading && error" class="error-state">
+        <i class="fas fa-exclamation-triangle"></i>
+        <p>{{ error }}</p>
+        <button (click)="refreshTrainings()" class="retry-btn">Réessayer</button>
+      </div>
+
+      <div *ngIf="!isLoading && !error && completedTrainings.length === 0" class="empty-state">
+        <i class="fas fa-trophy"></i>
+        <h3>Aucun entraînement terminé</h3>
+        <p>Commencez vos entraînements pour voir vos accomplissements ici.</p>
+      </div>
+
+      <div *ngIf="!isLoading && !error && completedTrainings.length > 0" class="trainings-list">
+        <!-- Liste des entraînements terminés -->
+        <div class="training-item" *ngFor="let training of completedTrainings">
+          <!-- Contenu de l'entraînement -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

@@ -173,4 +173,20 @@ export class ProfileComponent implements OnInit {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+
+  /**
+   * Navigate to user trainings page.
+   * Naviguer vers la page des entraînements de l'utilisateur.
+   */
+  navigateToTrainings(): void {
+    this.router.navigate(['/dashboard/you']);
+  }
+
+  /**
+   * Navigate to user programs page.
+   * Naviguer vers la page des programmes de l'utilisateur.
+   */
+  navigateToPrograms(): void {
+    this.router.navigate(['/dashboard/you']);
+  }
 } 

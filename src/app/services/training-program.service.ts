@@ -134,28 +134,26 @@ export class TrainingProgramService {
    * Create a new training program.
    * Créer un nouveau programme d'entraînement.
    * 
-   * @param program - Training program data to create
-   * @returns Observable<TrainingProgram> - Created training program
+   * @param program - The training program data
+   * @param userId - The ID of the user creating the program
+   * @returns Observable of the created training program
    */
-  createProgram(program: CreateTrainingProgramRequest): Observable<TrainingProgram> {
-    return this.http.post<TrainingProgram>(this.apiUrl, program);
+  createProgram(program: CreateTrainingProgramRequest, userId: number): Observable<TrainingProgram> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.post<TrainingProgram>(this.apiUrl, program, { params });
   }
 
   /**
-   * Create a new training program without exercises.
-   * Créer un nouveau programme d'entraînement sans exercices.
+   * Create a training program with simplified data.
+   * Créer un programme d'entraînement avec des données simplifiées.
    * 
-   * This method creates a basic training program structure that can
-   * be populated with exercises later.
-   * 
-   * Cette méthode crée une structure de programme d'entraînement de base
-   * qui peut être remplie d'exercices plus tard.
-   * 
-   * @param programData - Basic program data without exercises
-   * @returns Observable<TrainingProgram> - Created program
+   * @param programData - Simplified program data
+   * @param userId - The ID of the user creating the program
+   * @returns Observable of the created training program
    */
-  createTrainingProgram(programData: any): Observable<TrainingProgram> {
-    return this.http.post<TrainingProgram>(this.apiUrl, programData);
+  createTrainingProgram(programData: any, userId: number): Observable<TrainingProgram> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.post<TrainingProgram>(this.apiUrl, programData, { params });
   }
 
   /**

@@ -36,7 +36,7 @@ describe('NavBarComponent', () => {
       { label: 'Entraînements', icon: 'fas fa-dumbbell', route: '/dashboard/trainings' },
       { label: 'Enregistrer', icon: 'fas fa-plus-circle', route: '/dashboard/record' },
       { label: 'Programmes', icon: 'fas fa-list-alt', route: '/dashboard/programs' },
-      { label: 'Vous', icon: 'fas fa-user', route: '/dashboard/profile' }
+      { label: 'Vous', icon: 'fas fa-user', route: '/dashboard/you' }
     ];
 
     component.navItems.forEach((item, index) => {

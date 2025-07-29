@@ -1,0 +1,72 @@
+<div class="programs-container">
+  <div class="content-header">
+    <h2>Mes Programmes</h2>
+    <button class="create-program-btn" (click)="createNewProgram()">
+      <span>➕</span>
+      Créer un programme
+    </button>
+  </div>
+
+  <div class="programs-content">
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Chargement de vos programmes...</p>
+    </div>
+
+    <div *ngIf="!isLoading && error" class="error-state">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ error }}</p>
+      <button (click)="refreshPrograms()" class="retry-btn">Réessayer</button>
+    </div>
+
+    <div *ngIf="!isLoading && !error && userPrograms.length === 0" class="empty-state">
+      <i class="fas fa-calendar-alt"></i>
+      <h3>Aucun programme</h3>
+      <p>Vous n'avez pas encore de programmes d'entraînement.</p>
+      <button (click)="goToAllPrograms()" class="browse-btn">Parcourir les programmes</button>
+    </div>
+
+    <div *ngIf="!isLoading && !error && userPrograms.length > 0" class="programs-list">
+      <div class="program-item" *ngFor="let userProgram of userPrograms">
+        <div class="program-header">
+          <h3>{{ userProgram.trainingProgram.name }}</h3>
+          <div class="program-status" [style.background-color]="getStatusColor(userProgram.status)">
+            {{ getStatusText(userProgram.status) }}
+          </div>
+        </div>
+        
+        <div class="program-details">
+          <p class="program-description">{{ userProgram.trainingProgram.description }}</p>
+          
+          <div class="program-info">
+            <div class="info-item">
+              <span class="label">Difficulté:</span>
+              <span class="value">{{ userProgram.trainingProgram.difficultyLevel }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Durée:</span>
+              <span class="value">{{ userProgram.trainingProgram.durationWeeks }} semaines</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Sessions/semaine:</span>
+              <span class="value">{{ userProgram.trainingProgram.sessionsPerWeek }}</span>
+            </div>
+            <div class="info-item" *ngIf="userProgram.status === 'IN_PROGRESS'">
+              <span class="label">Progression:</span>
+              <span class="value">Semaine {{ userProgram.currentWeek }}, Session {{ userProgram.currentSession }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="program-actions">
+          <button class="action-btn view-btn" (click)="viewProgramDetails(userProgram.trainingProgram.id)">
+            Voir les détails
+          </button>
+          <button class="action-btn unsubscribe-btn" (click)="unsubscribeFromProgram(userProgram.trainingProgram.id)">
+            Se désabonner
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

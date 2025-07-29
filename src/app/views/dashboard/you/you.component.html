@@ -1,0 +1,25 @@
+<div class="you-container">
+  <!-- Header Component -->
+  <app-header></app-header>
+
+  <main class="you-content">
+    <div class="you-tabs">
+      <button [class.active]="selectedTab === 'trainings'" (click)="selectTab('trainings')">
+        <i class="fas fa-dumbbell"></i>
+        Mes Entraînements
+      </button>
+      <button [class.active]="selectedTab === 'programs'" (click)="selectTab('programs')">
+        <i class="fas fa-list-check"></i>
+        Mes Programmes
+      </button>
+    </div>
+
+    <div class="tab-content">
+      <app-user-trainings *ngIf="selectedTab === 'trainings'"></app-user-trainings>
+      <app-user-programs *ngIf="selectedTab === 'programs'"></app-user-programs>
+    </div>
+  </main>
+
+  <!-- Navigation Bar Component -->
+  <app-nav-bar [currentRoute]="'/dashboard/you'"></app-nav-bar>
+</div> 

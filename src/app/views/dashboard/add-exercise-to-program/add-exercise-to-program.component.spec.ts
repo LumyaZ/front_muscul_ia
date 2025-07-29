@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import { AddExerciseToProgramComponent } from './add-exercise-to-program.component';
 import { ExerciseService } from '../../../services/exercise.service';
@@ -43,7 +44,7 @@ describe('AddExerciseToProgramComponent', () => {
 
   beforeEach(async () => {
     const exerciseServiceSpy = jasmine.createSpyObj('ExerciseService', ['getAllExercises']);
-    const programExerciseServiceSpy = jasmine.createSpyObj('ProgramExerciseService', []);
+    const programExerciseServiceSpy = jasmine.createSpyObj('ProgramExerciseService', ['addExerciseToProgram']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       params: of({ id: '123' })
@@ -53,6 +54,7 @@ describe('AddExerciseToProgramComponent', () => {
       imports: [
         AddExerciseToProgramComponent,
         ReactiveFormsModule,
+        HttpClientTestingModule,
         HeaderComponent,
         NavBarComponent
       ],
@@ -70,6 +72,28 @@ describe('AddExerciseToProgramComponent', () => {
     mockActivatedRoute = TestBed.inject(ActivatedRoute) as jasmine.SpyObj<ActivatedRoute>;
 
     mockExerciseService.getAllExercises.and.returnValue(of(mockExercises));
+    mockProgramExerciseService.addExerciseToProgram.and.returnValue(of({
+      id: 1,
+      trainingProgramId: 123,
+      exerciseId: 1,
+      exerciseName: 'Push-ups',
+      exerciseDescription: 'Classic push-ups',
+      exerciseCategory: 'Strength',
+      exerciseMuscleGroup: 'Chest',
+      exerciseEquipmentNeeded: 'None',
+      exerciseDifficultyLevel: 'Beginner',
+      orderInProgram: 1,
+      setsCount: 3,
+      repsCount: 10,
+      restDurationSeconds: 60,
+      durationSeconds: 30,
+      weightKg: 0,
+      distanceMeters: 0,
+      isOptional: false,
+      notes: 'Test exercise',
+      createdAt: '2024-01-01',
+      updatedAt: '2024-01-01'
+    }));
   });
 
   beforeEach(() => {

@@ -103,7 +103,7 @@ export class NavBarComponent {
     {
       label: 'Vous',
       icon: 'fas fa-user',
-      route: '/dashboard/profile'
+      route: '/dashboard/you'
     }
   ];
 

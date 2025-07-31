@@ -5,76 +5,19 @@
   <main class="record-content">
     <div class="page-header">
       <h1>Enregistrer un Entraînement</h1>
-      <p>Suivez vos sessions d'entraînement</p>
+      <p>Choisissez comment vous souhaitez enregistrer votre session</p>
     </div>
 
-    <div class="record-section">
-      <div class="section-header">
-        <h2>Nouvel entraînement</h2>
-      </div>
-
-      <div class="record-form">
-        <div class="form-group">
-          <label for="trainingName">Nom de l'entraînement *</label>
-          <input type="text" id="trainingName" placeholder="Ex: Entraînement Haut du Corps" class="form-control">
+    <div class="start-training-section">
+      <div class="start-training-card">
+        <div class="card-icon">
+          <i class="fas fa-play-circle"></i>
         </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="trainingDate">Date *</label>
-            <input type="date" id="trainingDate" class="form-control">
-          </div>
-
-          <div class="form-group">
-            <label for="trainingDuration">Durée (minutes) *</label>
-            <input type="number" id="trainingDuration" placeholder="45" min="5" max="300" class="form-control">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="trainingType">Type d'entraînement *</label>
-          <select id="trainingType" class="form-control">
-            <option value="">Sélectionner un type</option>
-            <option value="strength">Musculation</option>
-            <option value="cardio">Cardio</option>
-            <option value="hiit">HIIT</option>
-            <option value="flexibility">Flexibilité</option>
-            <option value="mixed">Mixte</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="trainingNotes">Notes (optionnel)</label>
-          <textarea id="trainingNotes" placeholder="Décrivez votre entraînement, sensations, difficultés..." class="form-control" rows="4"></textarea>
-        </div>
-
-        <div class="form-actions">
-          <button class="btn btn-secondary">
-            <i class="fas fa-times"></i>
-            Annuler
-          </button>
-          <button class="btn btn-primary">
-            <i class="fas fa-save"></i>
-            Enregistrer
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="quick-actions">
-      <h3>Actions rapides</h3>
-      <div class="quick-buttons">
-        <button class="quick-btn">
+        <h2>Démarrer un Entraînement</h2>
+        <p>Sélectionnez un programme et commencez votre session d'entraînement guidée</p>
+        <button class="btn btn-primary btn-start" (click)="startTraining()">
           <i class="fas fa-play"></i>
-          Démarrer un entraînement
-        </button>
-        <button class="quick-btn">
-          <i class="fas fa-copy"></i>
-          Dupliquer le dernier
-        </button>
-        <button class="quick-btn">
-          <i class="fas fa-history"></i>
-          Voir l'historique
+          Démarrer un Entraînement
         </button>
       </div>
     </div>

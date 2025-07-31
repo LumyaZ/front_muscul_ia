@@ -1,0 +1,104 @@
+<div class="select-program-container">
+  <!-- Header Component -->
+  <app-header></app-header>
+
+  <main class="select-program-content">
+    <div class="page-header">
+      <button class="btn-back" (click)="onBack()">
+        <i class="fas fa-arrow-left"></i>
+        Retour
+      </button>
+      <div class="header-content">
+        <h1>Sélectionner un Programme</h1>
+        <p>Choisissez le programme d'entraînement que vous souhaitez effectuer</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement des programmes...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="error-container">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ error }}</p>
+      <button class="btn btn-primary" (click)="loadUserPrograms()">
+        <i class="fas fa-refresh"></i>
+        Réessayer
+      </button>
+    </div>
+
+    <!-- Programs List -->
+    <div *ngIf="!loading && !error" class="programs-container">
+      <div *ngIf="userPrograms.length === 0" class="no-programs">
+        <i class="fas fa-dumbbell"></i>
+        <h3>Aucun programme disponible</h3>
+        <p>Vous n'avez pas encore de programmes d'entraînement.</p>
+        <button class="btn btn-primary" (click)="onBack()">
+          <i class="fas fa-plus"></i>
+          Créer un programme
+        </button>
+      </div>
+
+      <div *ngIf="userPrograms.length > 0" class="programs-list">
+        <div *ngFor="let category of getProgramsByCategory() | keyvalue" class="category-section">
+          <h2 class="category-title">{{ category.key }}</h2>
+          
+          <div class="programs-grid">
+            <div 
+              *ngFor="let program of category.value" 
+              class="program-card"
+              [class.selected]="isProgramSelected(program)"
+              (click)="selectProgram(program)"
+            >
+              <div class="program-header">
+                <h3 class="program-name">{{ program.trainingProgram?.name || 'Programme sans nom' }}</h3>
+                <div class="program-status" [class]="(program.status || 'NOT_STARTED').toLowerCase()">
+                  {{ getStatusLabel(program.status) }}
+                </div>
+              </div>
+              
+              <div class="program-details">
+                <p class="program-description">{{ program.trainingProgram?.description || 'Aucune description' }}</p>
+                <div class="program-info">
+                  <span class="info-item">
+                    <i class="fas fa-calendar"></i>
+                    {{ program.trainingProgram?.duration || 0 }} semaines
+                  </span>
+                  <span class="info-item">
+                    <i class="fas fa-clock"></i>
+                    {{ program.trainingProgram?.sessionsPerWeek || 0 }} sessions/semaine
+                  </span>
+                </div>
+              </div>
+              
+              <div class="program-progress" *ngIf="program.status !== 'NOT_STARTED'">
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width.%]="getProgressPercentage(program)"></div>
+                </div>
+                <span class="progress-text">Semaine {{ program.currentWeek || 0 }}/{{ program.trainingProgram?.duration || 0 }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next Button -->
+    <div class="action-bar" *ngIf="!loading && !error && userPrograms.length > 0">
+      <button 
+        class="btn btn-primary btn-next"
+        [disabled]="!canProceed()"
+        (click)="onNext()"
+      >
+        <i class="fas fa-arrow-right"></i>
+        Suivant
+      </button>
+    </div>
+  </main>
+
+  <!-- Navigation Bar Component -->
+  <app-nav-bar [currentRoute]="'/dashboard/record'"></app-nav-bar>
+</div> 

@@ -1,0 +1,134 @@
+<div class="training-recap-container">
+  <!-- Header Component -->
+  <app-header></app-header>
+
+  <main class="training-recap-content">
+    <!-- Back Button -->
+    <div class="page-header">
+      <button class="btn-back" (click)="onBack()">
+        <i class="fas fa-arrow-left"></i>
+        Retour
+      </button>
+      <div class="header-content">
+        <h1>Récapitulatif d'Entraînement</h1>
+        <p>Partagez votre expérience et notez votre session</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Chargement du récapitulatif...</p>
+    </div>
+
+    <!-- Recap Content -->
+    <div *ngIf="!loading && recap" class="recap-content">
+      <!-- Completion Status -->
+      <div class="completion-status">
+        <div class="completion-icon" [style.color]="getCompletionColor()">
+          <i [class]="getCompletionIcon()"></i>
+        </div>
+        <h2>{{ getCompletionMessage() }}</h2>
+        <div class="session-duration">
+          <i class="fas fa-clock"></i>
+          <span>Durée : {{ formatTime(recap.duration) }}</span>
+        </div>
+      </div>
+
+      <!-- Form Section -->
+      <div class="form-section">
+        <h3>Partagez votre expérience</h3>
+        
+        <!-- Title Input -->
+        <div class="form-group">
+          <label for="title">Titre de votre entraînement</label>
+          <input 
+            type="text" 
+            id="title"
+            [(ngModel)]="title"
+            placeholder="Ex: Entraînement pectoraux intense"
+            class="form-input"
+          >
+        </div>
+
+        <!-- Rating -->
+        <div class="form-group">
+          <label>Note de votre entraînement</label>
+          <div class="rating-stars">
+            <i 
+              *ngFor="let star of getRatingStars(); let i = index"
+              class="fas fa-star star"
+              [class.filled]="star"
+              (click)="onRatingChange(i + 1)"
+            ></i>
+            <i 
+              *ngFor="let star of [1,2,3,4,5]; let i = index"
+              class="fas fa-star star"
+              [class.filled]="i < rating"
+              (click)="onRatingChange(i + 1)"
+            ></i>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label for="notes">Notes (optionnel)</label>
+          <textarea 
+            id="notes"
+            [(ngModel)]="notes"
+            placeholder="Comment s'est passé votre entraînement ? Avez-vous des remarques ?"
+            class="form-textarea"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <!-- Save Button -->
+        <div class="form-actions">
+          <button class="btn-save" (click)="saveRecap()">
+            <i class="fas fa-save"></i>
+            Sauvegarder et retourner à l'accueil
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="stats-section">
+        <h3>Statistiques rapides</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ formatTime(recap.duration) }}</div>
+              <div class="stat-label">Durée totale</div>
+            </div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-dumbbell"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ recap.exercises.length }}</div>
+              <div class="stat-label">Exercices</div>
+            </div>
+          </div>
+          
+          <div class="stat-item">
+            <div class="stat-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-value">{{ recap.completed ? 'Terminé' : 'Interrompu' }}</div>
+              <div class="stat-label">Statut</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Navigation Bar Component -->
+  <app-nav-bar [currentRoute]="'/dashboard'"></app-nav-bar>
+</div> 

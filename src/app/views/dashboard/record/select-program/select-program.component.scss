@@ -1,0 +1,487 @@
+.select-program-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.select-program-content {
+  flex: 1;
+  padding: 90px 20px 70px 20px; // Même padding que dashboard pour éviter la navbar
+  max-width: 1200px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 100px 15px 80px 15px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 95px 15px 75px 15px;
+  }
+}
+
+.page-header {
+  margin-bottom: 25px; // Réduit de 30px à 25px
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px; // Hauteur minimale pour le header
+
+  .btn-back {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 8px 12px; // Réduit de 10px 15px à 8px 12px
+    border-radius: 20px; // Réduit de 25px à 20px
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    z-index: 10; // S'assurer qu'il est au-dessus
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    i {
+      margin-right: 6px; // Réduit de 8px à 6px
+    }
+  }
+
+  .header-content {
+    text-align: center;
+    flex: 1;
+    padding: 0 80px; // Espace pour le bouton de retour
+
+    h1 {
+      color: white;
+      font-size: 2.2rem; // Réduit de 2.5rem à 2.2rem
+      margin-bottom: 10px;
+      font-weight: 700;
+
+      @media (max-width: 768px) {
+        font-size: 1.8rem;
+      }
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 1rem; // Réduit de 1.1rem à 1rem
+      margin: 0;
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px; // Réduit de 60px à 40px
+  color: white;
+
+  .spinner {
+    width: 40px; // Réduit de 50px à 40px
+    height: 40px; // Réduit de 50px à 40px
+    border: 3px solid rgba(255, 255, 255, 0.3); // Réduit de 4px à 3px
+    border-top: 3px solid white; // Réduit de 4px à 3px
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px; // Réduit de 20px à 15px
+  }
+
+  p {
+    font-size: 1rem; // Réduit de 1.1rem à 1rem
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px; // Réduit de 60px à 40px
+  color: white;
+  text-align: center;
+
+  i {
+    font-size: 2.5rem; // Réduit de 3rem à 2.5rem
+    color: #ff6b6b;
+    margin-bottom: 15px; // Réduit de 20px à 15px
+  }
+
+  p {
+    font-size: 1rem; // Réduit de 1.1rem à 1rem
+    margin-bottom: 15px; // Réduit de 20px à 15px
+  }
+
+  .btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 20px; // Réduit de 12px 24px à 10px 20px
+    border-radius: 20px; // Réduit de 25px à 20px
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+    }
+
+    i {
+      margin-right: 6px; // Réduit de 8px à 6px
+    }
+  }
+}
+
+.programs-container {
+  .no-programs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px; // Réduit de 80px à 60px
+    color: white;
+    text-align: center;
+
+    i {
+      font-size: 3.5rem; // Réduit de 4rem à 3.5rem
+      margin-bottom: 15px; // Réduit de 20px à 15px
+      opacity: 0.7;
+    }
+
+    h3 {
+      font-size: 1.6rem; // Réduit de 1.8rem à 1.6rem
+      margin-bottom: 8px; // Réduit de 10px à 8px
+    }
+
+    p {
+      font-size: 1rem; // Réduit de 1.1rem à 1rem
+      margin-bottom: 25px; // Réduit de 30px à 25px
+      opacity: 0.9;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 12px 25px; // Réduit de 15px 30px à 12px 25px
+      border-radius: 20px; // Réduit de 25px à 20px
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      font-size: 1rem; // Réduit de 1.1rem à 1rem
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+      }
+
+      i {
+        margin-right: 6px; // Réduit de 8px à 6px
+      }
+    }
+  }
+}
+
+.programs-list {
+  .category-section {
+    margin-bottom: 30px; // Réduit de 40px à 30px
+
+    .category-title {
+      color: white;
+      font-size: 1.6rem; // Réduit de 1.8rem à 1.6rem
+      margin-bottom: 15px; // Réduit de 20px à 15px
+      font-weight: 600;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .programs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); // Réduit de 350px à 320px
+    gap: 15px; // Réduit de 20px à 15px
+    margin-bottom: 25px; // Réduit de 30px à 25px
+  }
+
+  .program-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px; // Réduit de 20px à 15px
+    padding: 20px; // Réduit de 25px à 20px
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    &.selected {
+      border-color: #4CAF50;
+      background: rgba(76, 175, 80, 0.2);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+
+      &::after {
+        content: '✓';
+        position: absolute;
+        top: 12px; // Réduit de 15px à 12px
+        right: 12px; // Réduit de 15px à 12px
+        background: #4CAF50;
+        color: white;
+        width: 25px; // Réduit de 30px à 25px
+        height: 25px; // Réduit de 30px à 25px
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem; // Réduit de 1.2rem à 1.1rem
+      }
+    }
+
+    .program-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px; // Réduit de 15px à 12px
+
+      .program-name {
+        color: white;
+        font-size: 1.3rem; // Réduit de 1.4rem à 1.3rem
+        font-weight: 600;
+        margin: 0;
+        flex: 1;
+      }
+
+      .program-status {
+        padding: 4px 10px; // Réduit de 5px 12px à 4px 10px
+        border-radius: 12px; // Réduit de 15px à 12px
+        font-size: 0.75rem; // Réduit de 0.8rem à 0.75rem
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        &.not_started {
+          background: rgba(255, 193, 7, 0.3);
+          color: #FFC107;
+        }
+
+        &.in_progress {
+          background: rgba(76, 175, 80, 0.3);
+          color: #4CAF50;
+        }
+
+        &.completed {
+          background: rgba(33, 150, 243, 0.3);
+          color: #2196F3;
+        }
+
+        &.paused {
+          background: rgba(244, 67, 54, 0.3);
+          color: #F44336;
+        }
+      }
+    }
+
+    .program-details {
+      .program-description {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.95rem; // Réduit de 1rem à 0.95rem
+        line-height: 1.5;
+        margin-bottom: 12px; // Réduit de 15px à 12px
+      }
+
+      .program-info {
+        display: flex;
+        gap: 12px; // Réduit de 15px à 12px
+        flex-wrap: wrap;
+
+        .info-item {
+          display: flex;
+          align-items: center;
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 0.85rem; // Réduit de 0.9rem à 0.85rem
+
+          i {
+            margin-right: 4px; // Réduit de 5px à 4px
+            font-size: 0.75rem; // Réduit de 0.8rem à 0.75rem
+          }
+        }
+      }
+    }
+
+    .program-progress {
+      margin-top: 12px; // Réduit de 15px à 12px
+      padding-top: 12px; // Réduit de 15px à 12px
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+      .progress-bar {
+        width: 100%;
+        height: 6px; // Réduit de 8px à 6px
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px; // Réduit de 4px à 3px
+        overflow: hidden;
+        margin-bottom: 6px; // Réduit de 8px à 6px
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #4CAF50, #8BC34A);
+          border-radius: 3px; // Réduit de 4px à 3px
+          transition: width 0.3s ease;
+        }
+      }
+
+      .progress-text {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.85rem; // Réduit de 0.9rem à 0.85rem
+        text-align: center;
+        display: block;
+      }
+    }
+  }
+}
+
+.action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 15px; // Réduit de 20px à 15px
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+
+  .btn-next {
+    background: linear-gradient(135deg, #4CAF50, #8BC34A);
+    border: none;
+    color: white;
+    padding: 12px 35px; // Réduit de 15px 40px à 12px 35px
+    border-radius: 25px; // Réduit de 30px à 25px
+    font-size: 1rem; // Réduit de 1.1rem à 1rem
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    }
+
+    &:disabled {
+      background: rgba(255, 255, 255, 0.2);
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    i {
+      margin-left: 6px; // Réduit de 8px à 6px
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .select-program-content {
+    padding: 100px 15px 80px 15px;
+  }
+
+  .page-header {
+    margin-bottom: 20px; // Réduit de 25px à 20px
+    flex-direction: column; // Empiler les éléments sur mobile
+    min-height: auto; // Pas de hauteur minimale sur mobile
+
+    .header-content {
+      padding: 0 15px; // Réduit le padding sur mobile
+      order: 2; // Le contenu après le bouton
+
+      h1 {
+        font-size: 1.8rem;
+      }
+    }
+
+    .btn-back {
+      position: static;
+      transform: none;
+      margin-bottom: 15px; // Réduit de 20px à 15px
+      left: auto; // Reset la position
+      order: 1; // Le bouton en premier
+      align-self: flex-start; // Aligner à gauche
+    }
+  }
+
+  .programs-grid {
+    grid-template-columns: 1fr;
+    gap: 12px; // Réduit de 15px à 12px
+  }
+
+  .program-card {
+    padding: 15px; // Réduit de 20px à 15px
+
+    .program-header {
+      flex-direction: column;
+      gap: 8px; // Réduit de 10px à 8px
+
+      .program-status {
+        align-self: flex-start;
+      }
+    }
+  }
+
+  .action-bar {
+    padding: 12px; // Réduit de 15px à 12px
+
+    .btn-next {
+      width: 100%;
+      max-width: 280px; // Réduit de 300px à 280px
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .select-program-content {
+    padding: 95px 15px 75px 15px;
+  }
+
+  .program-card {
+    padding: 12px; // Réduit encore plus pour mobile
+  }
+} 

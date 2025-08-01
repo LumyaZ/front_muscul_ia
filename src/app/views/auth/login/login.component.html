@@ -1,48 +1,128 @@
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-  <h2>Login</h2>
-  <div>
-    <label for="email">Email</label>
-    <input
-      id="email"
-      type="email"
-      formControlName="email"
-      required
-      aria-required="true"
-    />
-    <div
-      *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-    >
-      <small *ngIf="loginForm.get('email')?.errors?.['required']"
-        >Email is required.</small
-      >
-      <small *ngIf="loginForm.get('email')?.errors?.['email']"
-        >Invalid email format.</small
-      >
+<div class="login-container">
+  <div class="login-background">
+    <div class="background-shapes">
+      <div class="shape shape-1">
+        <i class="fas fa-dumbbell"></i>
+      </div>
+      <div class="shape shape-2">
+        <i class="fas fa-dumbbell"></i>
+      </div>
+      <div class="shape shape-3">
+        <i class="fas fa-dumbbell"></i>
+      </div>
+      <div class="shape shape-4">
+        <i class="fas fa-dumbbell"></i>
+      </div>
     </div>
   </div>
-  <div>
-    <label for="password">Password</label>
-    <input
-      id="password"
-      type="password"
-      formControlName="password"
-      required
-      aria-required="true"
-    />
-    <div
-      *ngIf="
-        loginForm.get('password')?.invalid && loginForm.get('password')?.touched
-      "
-    >
-      <small *ngIf="loginForm.get('password')?.errors?.['required']"
-        >Password is required.</small
-      >
-      <small *ngIf="loginForm.get('password')?.errors?.['minlength']"
-        >Password must be at least 6 characters.</small
-      >
+
+  <div class="login-content">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo">
+          <i class="fas fa-dumbbell"></i>
+        </div>
+        <h1>Bienvenue</h1>
+        <p>Connectez-vous à votre compte Muscul IA</p>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-group">
+          <label for="email">
+            <i class="fas fa-envelope"></i>
+            Email
+          </label>
+          <div class="input-container">
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="votre.email@exemple.com"
+              [class.error]="isFieldInvalid('email')"
+              required
+              aria-required="true"
+            />
+            <div class="input-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('email')">
+            <i class="fas fa-exclamation-circle"></i>
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">
+              L'email est requis
+            </span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">
+              Format d'email invalide
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">
+            <i class="fas fa-lock"></i>
+            Mot de passe
+          </label>
+          <div class="input-container">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Entrez votre mot de passe"
+              [class.error]="isFieldInvalid('password')"
+              required
+              aria-required="true"
+            />
+            <div class="input-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <button 
+              type="button" 
+              class="password-toggle-btn"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+              <i class="fas" [class]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('password')">
+            <i class="fas fa-exclamation-circle"></i>
+            <span *ngIf="loginForm.get('password')?.errors?.['required']">
+              Le mot de passe est requis
+            </span>
+            <span *ngIf="loginForm.get('password')?.errors?.['minlength']">
+              Le mot de passe doit contenir au moins 6 caractères
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="error" class="global-error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>{{ error }}</span>
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="loginForm.invalid || isLoading"
+          class="btn-login"
+        >
+          <span *ngIf="!isLoading">
+            <i class="fas fa-sign-in-alt"></i>
+            Se connecter
+          </span>
+          <span *ngIf="isLoading" class="loading-content">
+            <div class="spinner"></div>
+            Connexion en cours...
+          </span>
+        </button>
+
+        <div class="signup-link">
+          <p>
+            Pas encore de compte ? 
+            <a (click)="goToSignup()" class="link-signup">
+              Créer un compte
+            </a>
+          </p>
+        </div>
+      </form>
     </div>
   </div>
-  <div *ngIf="error" class="error">{{ error }}</div>
-  <button type="submit" [disabled]="loginForm.invalid">Login</button>
-  <button type="button" (click)="goToSignup()">Sign Up</button>
-</form>
+</div>

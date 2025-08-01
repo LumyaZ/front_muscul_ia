@@ -1,219 +1,245 @@
-<div class="profile-container">
-  <!-- Bouton retour -->
-  <div class="back-button-container">
-    <button class="back-button" (click)="goBackToDashboard()">
-      <i class="fas fa-arrow-left"></i>
-      <span>Retour au Dashboard</span>
-    </button>
-  </div>
-
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="loading-container">
-    <div class="loading-spinner"></div>
-    <p>Chargement de votre profil...</p>
-  </div>
-
-  <!-- Error -->
-  <div *ngIf="error" class="error-container">
-    <p class="error-message">{{ error }}</p>
-  </div>
-
-  <!-- Contenu principal -->
-  <div *ngIf="!isLoading && !error" class="profile-content">
-    <h1 class="profile-title">Mon Profil</h1>
-
-    <!-- Section Informations d'authentification -->
-    <section class="profile-section auth-section">
-      <div class="section-header">
-        <h2><i class="fas fa-user-shield"></i> Informations d'authentification</h2>
-        
+<div class="profile-container" role="main" aria-label="Page de profil utilisateur">
+  <div class="profile-background" aria-hidden="true">
+    <div class="background-shapes">
+      <div class="shape shape-1">
+        <i class="fas fa-user" aria-hidden="true"></i>
       </div>
-      <div class="section-content">
-        <div class="info-row">
-          <span class="label">Email :</span>
-          <span class="value">{{ user?.email }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Compte créé le :</span>
-          <span class="value">{{ user?.creationDate | date: 'dd/MM/yyyy à HH:mm' }}</span>
-        </div>
+      <div class="shape shape-2">
+        <i class="fas fa-dumbbell" aria-hidden="true"></i>
       </div>
-    </section>
-
-    <!-- Section Profil utilisateur -->
-    <section class="profile-section user-section">
-      <div class="section-header">
-        <h2><i class="fas fa-user"></i> Informations personnelles</h2>
-        <button class="edit-button" (click)="editProfile()">
-          <i class="fas fa-edit"></i>
-        </button>
+      <div class="shape shape-3">
+        <i class="fas fa-chart-line" aria-hidden="true"></i>
       </div>
-      <div class="section-content" *ngIf="userProfile; else noProfile">
-        <div class="info-row">
-          <span class="label">Prénom :</span>
-          <span class="value">{{ userProfile.firstName }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Nom :</span>
-          <span class="value">{{ userProfile.lastName }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Date de naissance :</span>
-          <span class="value">{{ userProfile.dateOfBirth | date: 'dd/MM/yyyy' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="label">Âge :</span>
-          <span class="value">{{ userProfile.age }} ans</span>
-        </div>
-        <div class="info-row" *ngIf="userProfile.phoneNumber">
-          <span class="label">Téléphone :</span>
-          <span class="value">{{ userProfile.phoneNumber }}</span>
-        </div>
+      <div class="shape shape-4">
+        <i class="fas fa-cog" aria-hidden="true"></i>
       </div>
-      <ng-template #noProfile>
-        <div class="no-data">
-          <p>Aucun profil utilisateur trouvé</p>
-          <button class="create-button" (click)="editProfile()">
-            <i class="fas fa-plus"></i>
-            Créer un profil
-          </button>
-        </div>
-      </ng-template>
-    </section>
-
-    <!-- Section Informations d'entraînement -->
-    <section class="profile-section training-section">
-      <div class="section-header">
-        <h2><i class="fas fa-dumbbell"></i> Informations d'entraînement</h2>
-      </div>
-      <div class="section-content" *ngIf="trainingInfo">
-          
-        <!-- Catégorie 1: Informations personnelles -->
-        <div class="training-category">
-          <div class="category-header">
-            <h3 class="category-title">
-              <i class="fas fa-user-circle"></i> Informations personnelles
-            </h3>
-            <button class="category-edit-button" (click)="editTrainingCategory('personal')">
-              <i class="fas fa-edit"></i>
-              Modifier
-            </button>
-          </div>
-          <div class="category-content">
-            <div class="info-row">
-              <span class="label">Genre :</span>
-              <span class="value">{{ getDisplayName(trainingInfo.gender, genderDisplayNames) }}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Poids :</span>
-              <span class="value">{{ trainingInfo.weight }} kg</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Taille :</span>
-              <span class="value">{{ trainingInfo.height }} cm</span>
-            </div>
-            <div class="info-row">
-              <span class="label">IMC :</span>
-              <span class="value">{{ trainingInfo.bmi | number:'1.1' }}</span>
-            </div>
-            <div class="info-row" *ngIf="trainingInfo.bodyFatPercentage">
-              <span class="label">% de graisse corporelle :</span>
-              <span class="value">{{ trainingInfo.bodyFatPercentage }}%</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Catégorie 2: Expérience d'entraînement -->
-        <div class="training-category">
-          <div class="category-header">
-            <h3 class="category-title">
-              <i class="fas fa-chart-line"></i> Expérience d'entraînement
-            </h3>
-            <button class="category-edit-button" (click)="editTrainingCategory('experience')">
-              <i class="fas fa-edit"></i>
-              Modifier
-            </button>
-          </div>
-          <div class="category-content">
-            <div class="info-row">
-              <span class="label">Niveau d'expérience :</span>
-              <span class="value">{{ getDisplayName(trainingInfo.experienceLevel, experienceLevelDisplayNames) }}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Fréquence d'entraînement :</span>
-              <span class="value">{{ getDisplayName(trainingInfo.sessionFrequency, sessionFrequencyDisplayNames) }}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Durée des sessions :</span>
-              <span class="value">{{ getDisplayName(trainingInfo.sessionDuration, sessionDurationDisplayNames) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Catégorie 3: Objectifs et préférences -->
-        <div class="training-category">
-          <div class="category-header">
-            <h3 class="category-title">
-              <i class="fas fa-bullseye"></i> Objectifs et préférences
-            </h3>
-            <button class="category-edit-button" (click)="editTrainingCategory('goals')">
-              <i class="fas fa-edit"></i>
-              Modifier
-            </button>
-          </div>
-          <div class="category-content">
-            <div class="info-row">
-              <span class="label">Objectif principal :</span>
-              <span class="value">{{ getDisplayName(trainingInfo.mainGoal, mainGoalDisplayNames) }}</span>
-            </div>
-            <div class="info-row">
-              <span class="label">Préférence d'entraînement :</span>
-              <span class="value">{{ getDisplayName(trainingInfo.trainingPreference, trainingPreferenceDisplayNames) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Catégorie 4: Équipement -->
-        <div class="training-category">
-          <div class="category-header">
-            <h3 class="category-title">
-              <i class="fas fa-tools"></i> Équipement
-            </h3>
-            <button class="category-edit-button" (click)="editTrainingCategory('equipment')">
-              <i class="fas fa-edit"></i>
-              Modifier
-            </button>
-          </div>
-          <div class="category-content">
-            <div class="info-row">
-              <span class="label">Équipement disponible :</span>
-              <span class="value">{{ getDisplayName(trainingInfo.equipment, equipmentDisplayNames) }}</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Bouton de déconnexion -->
-    <div class="logout-container">
-      <button class="logout-button" (click)="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        Se déconnecter
-      </button>
     </div>
   </div>
 
-  <!-- Training Edit Modal -->
+  <div class="profile-content">
+    <div class="profile-card">
+      <div class="profile-header">
+        <button 
+          class="back-button" 
+          (click)="goBack()"
+          aria-label="Retour au dashboard"
+          title="Retour au dashboard">
+          <i class="fas fa-arrow-left" aria-hidden="true"></i>
+          <span>Retour au Dashboard</span>
+        </button>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-container" role="status" aria-live="polite">
+        <div class="loading-spinner" aria-hidden="true"></div>
+        <p>Chargement de votre profil...</p>
+      </div>
+
+      <div *ngIf="error" class="error-container" role="alert" aria-live="polite">
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+        <p class="error-message">{{ error }}</p>
+      </div>
+
+      <div *ngIf="!isLoading && !error" class="profile-main-content">
+        <div class="welcome-section">
+          <div class="welcome-header">
+            <div class="profile-avatar">
+              <i class="fas fa-user-circle" aria-hidden="true"></i>
+            </div>
+            <div class="welcome-info">
+              <h1 class="profile-title">
+                Mon Profil
+              </h1>
+              <p class="welcome-text">
+                Gérez vos informations personnelles et vos préférences d'entraînement
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <section class="profile-section user-section" role="region" aria-label="Informations personnelles">
+          <div class="section-header">
+            <h2>
+              <i class="fas fa-user" aria-hidden="true"></i> 
+              Informations personnelles
+            </h2>
+            <button 
+              class="edit-button" 
+              (click)="editProfile()"
+              aria-label="Modifier le profil"
+              title="Modifier le profil">
+              <i class="fas fa-edit" aria-hidden="true"></i>
+              Modifier
+            </button>
+          </div>
+          <div class="section-content" *ngIf="userProfile; else noProfile">
+            <div class="info-row">
+              <span class="label">Prénom :</span>
+              <span class="value">{{ userProfile.firstName }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Nom :</span>
+              <span class="value">{{ userProfile.lastName }}</span>
+            </div>
+            <div class="info-row">
+              <span class="label">Date de naissance :</span>
+              <span class="value">{{ userProfile.dateOfBirth | date: 'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="info-row" *ngIf="userProfile.age">
+              <span class="label">Âge :</span>
+              <span class="value">{{ userProfile.age }} ans</span>
+            </div>
+            <div class="info-row" *ngIf="userProfile.phoneNumber">
+              <span class="label">Téléphone :</span>
+              <span class="value">{{ userProfile.phoneNumber }}</span>
+            </div>
+          </div>
+          <ng-template #noProfile>
+            <div class="no-data">
+              <i class="fas fa-user-plus" aria-hidden="true"></i>
+              <p>Aucun profil utilisateur trouvé</p>
+              <button 
+                class="create-button" 
+                (click)="editProfile()"
+                aria-label="Créer un profil"
+                title="Créer un profil">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                Créer un profil
+              </button>
+            </div>
+          </ng-template>
+        </section>
+
+        <section class="profile-section training-section" role="region" aria-label="Informations d'entraînement">
+          <div class="section-header">
+            <h2>
+              <i class="fas fa-dumbbell" aria-hidden="true"></i> 
+              Informations d'entraînement
+            </h2>
+            <button 
+              class="edit-button" 
+              (click)="editTrainingInfo()"
+              aria-label="Modifier les informations d'entraînement"
+              title="Modifier les informations d'entraînement">
+              <i class="fas fa-edit" aria-hidden="true"></i>
+              Modifier
+            </button>
+          </div>
+          <div class="section-content" *ngIf="trainingInfo; else noTrainingInfo">
+            <div class="training-category">
+              <div class="category-header">
+                <h3 class="category-title">
+                  <i class="fas fa-user-circle" aria-hidden="true"></i> 
+                  Informations personnelles
+                </h3>
+              </div>
+              <div class="category-content">
+                <div class="info-row">
+                  <span class="label">Genre :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.gender, genderDisplayNames) }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Poids :</span>
+                  <span class="value">{{ trainingInfo.weight }} kg</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Taille :</span>
+                  <span class="value">{{ trainingInfo.height }} cm</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">IMC :</span>
+                  <span class="value">{{ trainingInfo.bmi?.toFixed(1) }}</span>
+                </div>
+                <div class="info-row" *ngIf="trainingInfo.bodyFatPercentage">
+                  <span class="label">% de graisse corporelle :</span>
+                  <span class="value">{{ trainingInfo.bodyFatPercentage }}%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="training-category">
+              <div class="category-header">
+                <h3 class="category-title">
+                  <i class="fas fa-chart-line" aria-hidden="true"></i> 
+                  Expérience et objectifs
+                </h3>
+              </div>
+              <div class="category-content">
+                <div class="info-row">
+                  <span class="label">Niveau d'expérience :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.experienceLevel, experienceLevelDisplayNames) }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Objectif principal :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.mainGoal, mainGoalDisplayNames) }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Préférence d'entraînement :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.trainingPreference, trainingPreferenceDisplayNames) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="training-category">
+              <div class="category-header">
+                <h3 class="category-title">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i> 
+                  Fréquence et durée
+                </h3>
+              </div>
+              <div class="category-content">
+                <div class="info-row">
+                  <span class="label">Fréquence des sessions :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.sessionFrequency, sessionFrequencyDisplayNames) }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Durée des sessions :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.sessionDuration, sessionDurationDisplayNames) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="training-category">
+              <div class="category-header">
+                <h3 class="category-title">
+                  <i class="fas fa-dumbbell" aria-hidden="true"></i> 
+                  Équipement disponible
+                </h3>
+              </div>
+              <div class="category-content">
+                <div class="info-row">
+                  <span class="label">Équipement :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.equipment, equipmentDisplayNames) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ng-template #noTrainingInfo>
+            <div class="no-data">
+              <i class="fas fa-dumbbell" aria-hidden="true"></i>
+              <p>Aucune information d'entraînement trouvée</p>
+              <button 
+                class="create-button" 
+                (click)="editTrainingInfo()"
+                aria-label="Créer des informations d'entraînement"
+                title="Créer des informations d'entraînement">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                Créer des informations d'entraînement
+              </button>
+            </div>
+          </ng-template>
+        </section>
+      </div>
+    </div>
+  </div>
+
   <app-training-edit-modal
     [isOpen]="isModalOpen"
-    [category]="selectedCategory"
     [currentTrainingInfo]="trainingInfo"
+    [category]="selectedCategory"
     (closeModal)="closeTrainingModal()"
     (trainingUpdated)="onTrainingUpdated($event)">
   </app-training-edit-modal>
 
-  <!-- Profile Edit Modal -->
   <app-profile-edit-modal
     [isOpen]="isProfileModalOpen"
     [currentProfile]="userProfile"

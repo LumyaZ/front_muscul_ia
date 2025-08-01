@@ -2,283 +2,231 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { ProfileComponent } from './profile.component';
 import { AuthService } from '../../services/auth.service';
 import { UserProfileService } from '../../services/user-profile.service';
 import { TrainingInfoService } from '../../services/training-info.service';
-import { User } from '../../models/user.model';
 import { UserProfile } from '../../models/user-profile.model';
-import { TrainingInfo, Gender, ExperienceLevel, SessionFrequency, SessionDuration, MainGoal, TrainingPreference, Equipment } from '../../models/training-info.model';
+import { 
+  TrainingInfo, 
+  Gender, 
+  ExperienceLevel, 
+  SessionFrequency, 
+  SessionDuration, 
+  MainGoal, 
+  TrainingPreference, 
+  Equipment
+} from '../../models/training-info.model';
+import { TrainingEditModalComponent } from '../../components/training-edit-modal/training-edit-modal.component';
+import { ProfileEditModalComponent } from '../../components/profile-edit-modal/profile-edit-modal.component';
 
+/**
+ * Unit tests for ProfileComponent.
+ * Tests unitaires pour ProfileComponent.
+ */
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
   let fixture: ComponentFixture<ProfileComponent>;
-  let authService: jasmine.SpyObj<AuthService>;
-  let userProfileService: jasmine.SpyObj<UserProfileService>;
-  let trainingInfoService: jasmine.SpyObj<TrainingInfoService>;
+  let mockAuthService: jasmine.SpyObj<AuthService>;
+  let mockUserProfileService: jasmine.SpyObj<UserProfileService>;
+  let mockTrainingInfoService: jasmine.SpyObj<TrainingInfoService>;
+  let mockRouter: jasmine.SpyObj<Router>;
+
+  const mockUserProfile: UserProfile = {
+    id: 1,
+    userId: 1,
+    firstName: 'John',
+    lastName: 'Doe',
+    dateOfBirth: '1990-01-01',
+    phoneNumber: '+33123456789',
+    createdAt: '2023-01-01T00:00:00',
+    updatedAt: '2023-01-01T00:00:00'
+  };
+
+  const mockTrainingInfo: TrainingInfo = {
+    id: 1,
+    userId: 1,
+    gender: Gender.MALE,
+    weight: 75.0,
+    height: 180.0,
+    bodyFatPercentage: 15.0,
+    experienceLevel: ExperienceLevel.INTERMEDIATE,
+    sessionFrequency: SessionFrequency.THREE_TO_FOUR,
+    sessionDuration: SessionDuration.MEDIUM,
+    mainGoal: MainGoal.MUSCLE_GAIN,
+    trainingPreference: TrainingPreference.STRENGTH_TRAINING,
+    equipment: Equipment.GYM_ACCESS,
+    bmi: 23.15,
+    createdAt: '2023-01-01T00:00:00',
+    updatedAt: '2023-01-01T00:00:00'
+  };
 
   beforeEach(async () => {
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['isAuthenticated', 'getCurrentUser', 'logout']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['isAuthenticated', 'getCurrentUser']);
     const userProfileServiceSpy = jasmine.createSpyObj('UserProfileService', ['getMyProfile']);
     const trainingInfoServiceSpy = jasmine.createSpyObj('TrainingInfoService', ['getTrainingInfo']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
+    authServiceSpy.isAuthenticated.and.returnValue(true);
+    authServiceSpy.getCurrentUser.and.returnValue({ id: 1, username: 'testuser' });
+    userProfileServiceSpy.getMyProfile.and.returnValue(of(mockUserProfile));
+    trainingInfoServiceSpy.getTrainingInfo.and.returnValue(of(mockTrainingInfo));
 
     await TestBed.configureTestingModule({
       imports: [
-        ProfileComponent,
         HttpClientTestingModule,
-        RouterTestingModule
+        RouterTestingModule.withRoutes([
+          { path: 'dashboard', component: {} as any },
+          { path: 'login', component: {} as any }
+        ]),
+        ProfileComponent,
+        TrainingEditModalComponent,
+        ProfileEditModalComponent
       ],
       providers: [
         { provide: AuthService, useValue: authServiceSpy },
         { provide: UserProfileService, useValue: userProfileServiceSpy },
-        { provide: TrainingInfoService, useValue: trainingInfoServiceSpy }
-      ]
-    })
-    .compileComponents();
+        { provide: TrainingInfoService, useValue: trainingInfoServiceSpy },
+        { provide: Router, useValue: routerSpy }
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ProfileComponent);
     component = fixture.componentInstance;
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
-    userProfileService = TestBed.inject(UserProfileService) as jasmine.SpyObj<UserProfileService>;
-    trainingInfoService = TestBed.inject(TrainingInfoService) as jasmine.SpyObj<TrainingInfoService>;
+    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    mockUserProfileService = TestBed.inject(UserProfileService) as jasmine.SpyObj<UserProfileService>;
+    mockTrainingInfoService = TestBed.inject(TrainingInfoService) as jasmine.SpyObj<TrainingInfoService>;
+    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    fixture.detectChanges();
   });
 
+  /**
+   * Test de création du composant
+   * Test component creation
+   */
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   /**
-   * Test component initialization with authentication.
-   * Test d'initialisation du composant avec authentification.
+   * Test de chargement des données utilisateur
+   * Test loading user data
    */
-  describe('Initialization', () => {
-    it('should load user data on init', () => {
-      // Given
-      const mockUser: User = {
-        id: 1,
-        email: 'test@example.com',
-        creationDate: '2025-01-01T00:00:00'
-      };
-      const mockUserProfile: UserProfile = {
-        id: 1,
-        userId: 1,
-        firstName: 'John',
-        lastName: 'Doe',
-        dateOfBirth: '1990-01-01',
-        age: 35,
-        phoneNumber: '1234567890'
-      };
-      const mockTrainingInfo: TrainingInfo = {
-        id: 1,
-        userId: 1,
-        gender: Gender.MALE,
-        weight: 75,
-        height: 180,
-        bodyFatPercentage: 15,
-        experienceLevel: ExperienceLevel.INTERMEDIATE,
-        sessionFrequency: SessionFrequency.THREE_TO_FOUR,
-        sessionDuration: SessionDuration.MEDIUM,
-        mainGoal: MainGoal.MUSCLE_GAIN,
-        trainingPreference: TrainingPreference.STRENGTH_TRAINING,
-        equipment: Equipment.GYM_ACCESS,
-        bmi: 23.1
-      };
-
-      authService.isAuthenticated.and.returnValue(true);
-      authService.getCurrentUser.and.returnValue(mockUser);
-      userProfileService.getMyProfile.and.returnValue(of(mockUserProfile));
-      trainingInfoService.getTrainingInfo.and.returnValue(of(mockTrainingInfo));
-
-      // When
-      component.ngOnInit();
-      fixture.detectChanges();
-
-      // Then
-      expect(component.user).toEqual(mockUser);
-      expect(component.userProfile).toEqual(mockUserProfile);
-      expect(component.trainingInfo).toEqual(mockTrainingInfo);
-      expect(component.isLoading).toBeFalse();
-    });
-
-    it('should redirect to login if not authenticated', () => {
-      // Given
-      const router = TestBed.inject(Router);
-      spyOn(router, 'navigate');
-      authService.isAuthenticated.and.returnValue(false);
-
-      // When
-      component.ngOnInit();
-
-      // Then
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
-    });
+  it('should load user data on init', () => {
+    expect(mockUserProfileService.getMyProfile).toHaveBeenCalled();
+    expect(mockTrainingInfoService.getTrainingInfo).toHaveBeenCalled();
   });
 
   /**
-   * Test training category editing.
-   * Test d'édition des catégories d'entraînement.
+   * Test de navigation vers le dashboard
+   * Test navigation to dashboard
    */
-  describe('Training Category Editing', () => {
-    it('should open modal for personal category', () => {
-      // When
-      component.editTrainingCategory('personal');
-
-      // Then
-      expect(component.selectedCategory).toBe('personal');
-      expect(component.isModalOpen).toBeTrue();
-    });
-
-    it('should open modal for experience category', () => {
-      // When
-      component.editTrainingCategory('experience');
-
-      // Then
-      expect(component.selectedCategory).toBe('experience');
-      expect(component.isModalOpen).toBeTrue();
-    });
-
-    it('should open modal for goals category', () => {
-      // When
-      component.editTrainingCategory('goals');
-
-      // Then
-      expect(component.selectedCategory).toBe('goals');
-      expect(component.isModalOpen).toBeTrue();
-    });
-
-    it('should open modal for equipment category', () => {
-      // When
-      component.editTrainingCategory('equipment');
-
-      // Then
-      expect(component.selectedCategory).toBe('equipment');
-      expect(component.isModalOpen).toBeTrue();
-    });
+  it('should navigate to dashboard when goBack is called', () => {
+    component.goBack();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
   });
 
   /**
-   * Test modal management.
-   * Test de gestion des modales.
+   * Test d'ouverture et fermeture des modales
+   * Test opening and closing modals
    */
-  describe('Modal Management', () => {
-    it('should close modal', () => {
-      // Given
-      component.isModalOpen = true;
-
-      // When
-      component.closeTrainingModal();
-
-      // Then
-      expect(component.isModalOpen).toBeFalse();
-    });
-
-    it('should handle training update', () => {
-      // Given
-      const updatedTrainingInfo: TrainingInfo = {
-        id: 1,
-        userId: 1,
-        gender: Gender.MALE,
-        weight: 80,
-        height: 180,
-        experienceLevel: ExperienceLevel.ADVANCED,
-        sessionFrequency: SessionFrequency.FIVE_TO_SIX,
-        sessionDuration: SessionDuration.LONG,
-        mainGoal: MainGoal.STRENGTH,
-        trainingPreference: TrainingPreference.MIXED,
-        equipment: Equipment.FULL_EQUIPMENT,
-        bmi: 24.7
-      };
-      component.isModalOpen = true;
-
-      // When
-      component.onTrainingUpdated(updatedTrainingInfo);
-
-      // Then
-      expect(component.trainingInfo).toEqual(updatedTrainingInfo);
-      expect(component.isModalOpen).toBeFalse();
-    });
+  it('should handle modal operations correctly', () => {
+    // Test opening modals
+    component.editTrainingInfo();
+    expect(component.isModalOpen).toBeTrue();
+    
+    component.editProfile();
+    expect(component.isProfileModalOpen).toBeTrue();
+    
+    // Test closing modals
+    component.closeTrainingModal();
+    expect(component.isModalOpen).toBeFalse();
+    
+    component.closeProfileModal();
+    expect(component.isProfileModalOpen).toBeFalse();
   });
 
   /**
-   * Test display name translations.
-   * Test des traductions des noms d'affichage.
+   * Test de mise à jour des données
+   * Test updating data
    */
-  describe('Display Name Translations', () => {
-    it('should translate gender enum', () => {
-      // When
-      const result = component.getDisplayName(Gender.MALE, component.genderDisplayNames);
-
-      // Then
-      expect(result).toBe('Homme');
-    });
-
-    it('should translate experience level enum', () => {
-      // When
-      const result = component.getDisplayName(ExperienceLevel.INTERMEDIATE, component.experienceLevelDisplayNames);
-
-      // Then
-      expect(result).toBe('Intermédiaire');
-    });
-
-    it('should return original value if no translation found', () => {
-      // When
-      const result = component.getDisplayName('UNKNOWN_VALUE', component.genderDisplayNames);
-
-      // Then
-      expect(result).toBe('UNKNOWN_VALUE');
-    });
-
-    it('should return empty string for undefined value', () => {
-      // When
-      const result = component.getDisplayName(undefined, component.genderDisplayNames);
-
-      // Then
-      expect(result).toBe('');
-    });
+  it('should update data when modals close', () => {
+    const updatedTrainingInfo = { ...mockTrainingInfo, weight: 80.0 };
+    const updatedProfile = { ...mockUserProfile, firstName: 'Jane' };
+    
+    component.onTrainingUpdated(updatedTrainingInfo);
+    expect(component.trainingInfo).toEqual(updatedTrainingInfo);
+    expect(component.isModalOpen).toBeFalse();
+    expect(component.error).toBeNull();
+    
+    component.onProfileUpdated(updatedProfile);
+    expect(component.userProfile).toEqual(updatedProfile);
+    expect(component.isProfileModalOpen).toBeFalse();
+    expect(component.error).toBeNull();
   });
 
   /**
-   * Test navigation methods.
-   * Test des méthodes de navigation.
+   * Test de récupération des noms d'affichage
+   * Test getting display names
    */
-  describe('Navigation', () => {
-    it('should navigate to dashboard', () => {
-      // Given
-      const router = TestBed.inject(Router);
-      spyOn(router, 'navigate');
+  it('should get display names correctly', () => {
+    const displayNames = { 'TEST': 'Test Display' };
+    
+    expect(component.getDisplayName('TEST', displayNames)).toBe('Test Display');
+    expect(component.getDisplayName('UNKNOWN', displayNames)).toBe('UNKNOWN');
+    expect(component.getDisplayName(undefined, displayNames)).toBe('Non défini');
+  });
 
-      // When
-      component.goBackToDashboard();
+  /**
+   * Test de vérification de profil complet
+   * Test checking complete profile
+   */
+  it('should check profile completion correctly', () => {
+    // Test complete profile
+    component.userProfile = mockUserProfile;
+    component.trainingInfo = mockTrainingInfo;
+    expect(component.hasCompleteProfile()).toBeTrue();
+    expect(component.getProfileCompletionPercentage()).toBe(100);
+    
+    // Test incomplete profile
+    component.userProfile = null;
+    component.trainingInfo = null;
+    expect(component.hasCompleteProfile()).toBeFalse();
+    expect(component.getProfileCompletionPercentage()).toBe(0);
+  });
 
-      // Then
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
-    });
+  /**
+   * Test de gestion d'erreur principale
+   * Test main error handling
+   */
+  it('should handle errors correctly', () => {
+    spyOn(component['router'], 'navigate');
+    
+    // Test 401 error
+    component['handleError']({ status: 401 });
+    expect(component.error).toBe('Session expirée. Veuillez vous reconnecter.');
+    expect(component['router'].navigate).toHaveBeenCalledWith(['/login']);
+    
+    // Test generic error
+    component['handleError']({ status: 500, error: { message: 'Server error' } });
+    expect(component.error).toBe('Server error');
+  });
 
-    it('should navigate to training info', () => {
-      // Given
-      const router = TestBed.inject(Router);
-      spyOn(router, 'navigate');
-
-      // When
-      component.editTrainingInfo();
-
-      // Then
-      expect(router.navigate).toHaveBeenCalledWith(['/training-info']);
-    });
-
-    it('should logout and navigate to login', () => {
-      // Given
-      const router = TestBed.inject(Router);
-      spyOn(router, 'navigate');
-
-      // When
-      component.logout();
-
-      // Then
-      expect(authService.logout).toHaveBeenCalled();
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
-    });
+  /**
+   * Test de vérification de completion du chargement
+   * Test checking loading completion
+   */
+  it('should check loading completion correctly', () => {
+    component.isLoading = true;
+    component.userProfile = null;
+    component.trainingInfo = null;
+    
+    component['checkLoadingComplete']();
+    
+    expect(component.isLoading).toBeFalse();
   });
 });

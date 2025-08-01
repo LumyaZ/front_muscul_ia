@@ -1,95 +1,226 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { HeaderComponent } from './header.component';
+import { AuthService } from '../../services/auth.service';
+import { User } from '../../models/user.model';
+import { Router } from '@angular/router';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  let router: jasmine.SpyObj<Router>;
+  let mockAuthService: jasmine.SpyObj<AuthService>;
+  let mockRouter: jasmine.SpyObj<Router>;
+
+  const mockUser: User = {
+    id: 1,
+    email: 'test@example.com',
+    creationDate: '2024-01-01T00:00:00'
+  };
 
   beforeEach(async () => {
+    const authServiceSpy = jasmine.createSpyObj('AuthService', [
+      'getCurrentUser',
+      'isAuthenticated',
+      'logout'
+    ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    
+
+    authServiceSpy.getCurrentUser.and.returnValue(mockUser);
+    authServiceSpy.isAuthenticated.and.returnValue(true);
+    authServiceSpy.logout.and.returnValue(undefined);
+
     await TestBed.configureTestingModule({
-      imports: [HeaderComponent],
+      imports: [
+        RouterTestingModule.withRoutes([
+          { path: 'dashboard/home', component: {} as any },
+          { path: 'login', component: {} as any },
+          { path: 'profile', component: {} as any },
+          { path: '', component: {} as any }
+        ]),
+        HttpClientTestingModule,
+        HeaderComponent
+      ],
       providers: [
+        { provide: AuthService, useValue: authServiceSpy },
         { provide: Router, useValue: routerSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    fixture.detectChanges();
   });
 
+  /**
+   * Test component creation
+   * Test de création du composant
+   */
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load current user from localStorage on init', () => {
-    const mockUser = { id: 1, email: 'test@example.com', profile: { firstName: 'John' } };
-    spyOn(localStorage, 'getItem').and.returnValue(JSON.stringify(mockUser));
-    
-    component.ngOnInit();
-    
+  /**
+   * Test component initialization
+   * Test d'initialisation du composant
+   */
+  it('should initialize component correctly', () => {
+    expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
     expect(component.currentUser).toEqual(mockUser);
+    expect(component.isLoading).toBeFalse();
+    expect(component.error).toBeNull();
   });
 
-  it('should handle localStorage parsing error gracefully', () => {
-    spyOn(localStorage, 'getItem').and.returnValue('invalid json');
-    spyOn(console, 'error');
+  /**
+   * Test error handling when loading user data
+   * Test de gestion d'erreur lors du chargement des données
+   */
+  it('should handle error when loading user data', () => {
+    mockAuthService.getCurrentUser.and.throwError('Erreur de chargement');
     
     component.ngOnInit();
     
+    expect(component.error).toBe('Erreur lors du chargement des données utilisateur');
     expect(component.currentUser).toBeNull();
-    expect(console.error).toHaveBeenCalled();
+    expect(component.isLoading).toBeFalse();
   });
 
-  it('should handle logout correctly', () => {
-    spyOn(localStorage, 'removeItem');
+  /**
+   * Test authentication check
+   * Test de vérification d'authentification
+   */
+  it('should check authentication correctly', () => {
+    mockAuthService.isAuthenticated.and.returnValue(true);
+    expect(component.isAuthenticated()).toBeTrue();
+    
+    mockAuthService.isAuthenticated.and.returnValue(false);
+    expect(component.isAuthenticated()).toBeFalse();
+  });
+
+  /**
+   * Test profile navigation for different user states
+   * Test de navigation profil pour différents états utilisateur
+   */
+  it('should navigate correctly based on authentication state', () => {
+    // Test authenticated user
+    mockAuthService.isAuthenticated.and.returnValue(true);
+    component.onProfileClick();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/profile']);
+    expect(component.showUserMenu).toBeFalse();
+
+    // Test non-authenticated user
+    mockAuthService.isAuthenticated.and.returnValue(false);
+    component.onProfileClick();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+    expect(component.showUserMenu).toBeFalse();
+  });
+
+  /**
+   * Test login page navigation
+   * Test de navigation vers la page de connexion
+   */
+  it('should navigate to login page', () => {
+    component.onLogin();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  /**
+   * Test successful logout
+   * Test de déconnexion réussie
+   */
+  it('should logout successfully', () => {
+    component.currentUser = mockUser;
+    component.showUserMenu = true;
     
     component.onLogout();
     
-    expect(localStorage.removeItem).toHaveBeenCalledWith('auth_token');
-    expect(localStorage.removeItem).toHaveBeenCalledWith('current_user');
-    expect(router.navigate).toHaveBeenCalledWith(['/login']);
+    expect(mockAuthService.logout).toHaveBeenCalled();
+    expect(component.currentUser).toBeNull();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+    expect(component.showUserMenu).toBeFalse();
   });
 
-  it('should navigate to login page when onLogin is called', () => {
-    component.onLogin();
-    
-    expect(router.navigate).toHaveBeenCalledWith(['/login']);
-  });
-
-  it('should navigate to dashboard on logo click when user is connected', () => {
-    component.currentUser = { id: 1, email: 'test@example.com' };
-    
+  /**
+   * Test logo navigation for different user states
+   * Test de navigation logo pour différents états utilisateur
+   */
+  it('should navigate logo correctly based on authentication state', () => {
+    // Test authenticated user
+    mockAuthService.isAuthenticated.and.returnValue(true);
     component.onLogoClick();
-    
-    expect(router.navigate).toHaveBeenCalledWith(['/dashboard/home']);
-  });
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/home']);
 
-  it('should navigate to home on logo click when user is not connected', () => {
-    component.currentUser = null;
-    
+    // Test non-authenticated user
+    mockAuthService.isAuthenticated.and.returnValue(false);
     component.onLogoClick();
-    
-    expect(router.navigate).toHaveBeenCalledWith(['/']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
   });
 
-  it('should handle profile click when user is connected', () => {
-    component.currentUser = { id: 1, email: 'test@example.com' };
+  /**
+   * Test user menu toggle functionality
+   * Test de fonctionnalité de basculement du menu utilisateur
+   */
+  it('should toggle user menu correctly', () => {
+    expect(component.showUserMenu).toBeFalse();
     
-    component.onProfileClick();
+    component.toggleUserMenu();
+    expect(component.showUserMenu).toBeTrue();
     
-    expect(router.navigate).toHaveBeenCalledWith(['/profile']);
+    component.toggleUserMenu();
+    expect(component.showUserMenu).toBeFalse();
   });
 
-  it('should navigate to login when profile click and user is not connected', () => {
+  /**
+   * Test close user menu functionality
+   * Test de fermeture du menu utilisateur
+   */
+  it('should close user menu correctly', () => {
+    component.showUserMenu = true;
+    component.closeUserMenu();
+    expect(component.showUserMenu).toBeFalse();
+  });
+
+  /**
+   * Test user display name functionality
+   * Test de fonctionnalité du nom d'affichage utilisateur
+   */
+  it('should get user display name correctly', () => {
+    // Test with user
+    component.currentUser = mockUser;
+    expect(component.getUserDisplayName()).toBe('test@example.com');
+
+    // Test without user
     component.currentUser = null;
-    
-    component.onProfileClick();
-    
-    expect(router.navigate).toHaveBeenCalledWith(['/login']);
+    expect(component.getUserDisplayName()).toBe('Utilisateur');
+  });
+
+  /**
+   * Test user initials functionality
+   * Test de fonctionnalité des initiales utilisateur
+   */
+  it('should get user initials correctly', () => {
+    // Test with user
+    component.currentUser = mockUser;
+    expect(component.getUserInitials()).toBe('TE');
+
+    // Test with complex email
+    component.currentUser = { ...mockUser, email: 'john.doe@example.com' };
+    expect(component.getUserInitials()).toBe('JD');
+
+    // Test without user
+    component.currentUser = null;
+    expect(component.getUserInitials()).toBe('');
+  });
+
+  /**
+   * Test clear error functionality
+   * Test de fonctionnalité d'effacement d'erreur
+   */
+  it('should clear error correctly', () => {
+    component.error = 'Test error';
+    component.clearError();
+    expect(component.error).toBeNull();
   });
 }); 

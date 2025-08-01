@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -23,6 +23,10 @@ import {
   EquipmentDisplayNames
 } from '../../models/training-info.model';
 
+/**
+ * Component for training information form.
+ * Composant pour le formulaire d'informations d'entraînement.
+ */
 @Component({
   selector: 'app-training-info-form',
   templateUrl: './training-info-form.component.html',
@@ -31,6 +35,12 @@ import {
   imports: [ReactiveFormsModule, CommonModule]
 })
 export class TrainingInfoFormComponent implements OnInit {
+  
+  private fb = inject(FormBuilder);
+  private trainingInfoService = inject(TrainingInfoService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   trainingInfoForm!: FormGroup;
   isLoading = false;
   error: string | null = null;
@@ -41,6 +51,7 @@ export class TrainingInfoFormComponent implements OnInit {
   currentStep = 1;
 
   // Display names for dropdowns
+  // Noms d'affichage pour les menus déroulants
   genderOptions = Object.values(Gender);
   experienceLevelOptions = Object.values(ExperienceLevel);
   sessionFrequencyOptions = Object.values(SessionFrequency);
@@ -50,6 +61,7 @@ export class TrainingInfoFormComponent implements OnInit {
   equipmentOptions = Object.values(Equipment);
 
   // Display name mappings
+  // Mappages des noms d'affichage
   genderDisplayNames = GenderDisplayNames;
   experienceLevelDisplayNames = ExperienceLevelDisplayNames;
   sessionFrequencyDisplayNames = SessionFrequencyDisplayNames;
@@ -58,37 +70,31 @@ export class TrainingInfoFormComponent implements OnInit {
   trainingPreferenceDisplayNames = TrainingPreferenceDisplayNames;
   equipmentDisplayNames = EquipmentDisplayNames;
 
-  constructor(
-    private fb: FormBuilder,
-    private trainingInfoService: TrainingInfoService,
-    public router: Router,
-    private route: ActivatedRoute
-  ) {}
-
   ngOnInit(): void {
-    // Récupérer l'utilisateur connecté et le token
     this.loadCurrentUser();
-    
     this.initForm();
     this.checkExistingTrainingInfo();
   }
 
+  /**
+   * Loads the current user from localStorage
+   * Charge l'utilisateur actuel depuis localStorage
+   */
   private loadCurrentUser(): void {
-    // Récupérer le token et l'utilisateur depuis localStorage
     this.authToken = localStorage.getItem('auth_token');
     const userStr = localStorage.getItem('current_user');
     
     if (userStr) {
       this.currentUser = JSON.parse(userStr);
-      console.log('Utilisateur connecté:', this.currentUser);
-      console.log('Token:', this.authToken);
     } else {
-      console.warn('Aucun utilisateur connecté trouvé');
-      // Rediriger vers login si pas d'utilisateur connecté
       this.router.navigate(['/login']);
     }
   }
 
+  /**
+   * Initializes the form with validators
+   * Initialise le formulaire avec les validateurs
+   */
   private initForm(): void {
     this.trainingInfoForm = this.fb.group({
       gender: ['', Validators.required],
@@ -104,6 +110,10 @@ export class TrainingInfoFormComponent implements OnInit {
     });
   }
 
+  /**
+   * Checks if training info already exists for the user
+   * Vérifie si les informations d'entraînement existent déjà pour l'utilisateur
+   */
   private checkExistingTrainingInfo(): void {
     this.trainingInfoService.existsTrainingInfo().subscribe({
       next: (exists) => {
@@ -113,11 +123,15 @@ export class TrainingInfoFormComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error checking training info existence:', err);
+        this.handleError(err);
       }
     });
   }
 
+  /**
+   * Loads existing training info for editing
+   * Charge les informations d'entraînement existantes pour l'édition
+   */
   private loadExistingTrainingInfo(): void {
     this.trainingInfoService.getTrainingInfo().subscribe({
       next: (trainingInfo) => {
@@ -136,12 +150,15 @@ export class TrainingInfoFormComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error('Error loading existing training info:', err);
-        this.error = 'Erreur lors du chargement des informations existantes.';
+        this.handleError(err);
       }
     });
   }
 
+  /**
+   * Handles form submission
+   * Gère la soumission du formulaire
+   */
   onSubmit(): void {
     if (this.trainingInfoForm.valid) {
       this.isLoading = true;
@@ -150,74 +167,118 @@ export class TrainingInfoFormComponent implements OnInit {
       const formValue = this.trainingInfoForm.value;
 
       if (this.isEditMode) {
-        const updateRequest: UpdateTrainingInfoRequest = {
-          gender: formValue.gender,
-          weight: formValue.weight,
-          height: formValue.height,
-          bodyFatPercentage: formValue.bodyFatPercentage || undefined,
-          experienceLevel: formValue.experienceLevel,
-          sessionFrequency: formValue.sessionFrequency,
-          sessionDuration: formValue.sessionDuration,
-          mainGoal: formValue.mainGoal,
-          trainingPreference: formValue.trainingPreference,
-          equipment: formValue.equipment
-        };
-
-        this.trainingInfoService.updateTrainingInfo(updateRequest).subscribe({
-          next: (response) => {
-            console.log('Informations d\'entraînement mises à jour avec succès', response);
-            this.router.navigate(['/dashboard']);
-          },
-          error: (err) => {
-            console.error('Erreur lors de la mise à jour des informations d\'entraînement', err);
-            this.error = err.error?.message || 'Une erreur est survenue lors de la mise à jour.';
-            this.isLoading = false;
-          }
-        });
+        this.updateTrainingInfo(formValue);
       } else {
-        const createRequest: CreateTrainingInfoRequest = {
-          gender: formValue.gender,
-          weight: formValue.weight,
-          height: formValue.height,
-          bodyFatPercentage: formValue.bodyFatPercentage || undefined,
-          experienceLevel: formValue.experienceLevel,
-          sessionFrequency: formValue.sessionFrequency,
-          sessionDuration: formValue.sessionDuration,
-          mainGoal: formValue.mainGoal,
-          trainingPreference: formValue.trainingPreference,
-          equipment: formValue.equipment
-        };
-
-        this.trainingInfoService.createTrainingInfo(createRequest).subscribe({
-          next: (response) => {
-            console.log('Informations d\'entraînement créées avec succès', response);
-            this.router.navigate(['/dashboard']);
-          },
-          error: (err) => {
-            console.error('Erreur lors de la création des informations d\'entraînement', err);
-            this.error = err.error?.message || 'Une erreur est survenue lors de la création.';
-            this.isLoading = false;
-          }
-        });
+        this.createTrainingInfo(formValue);
       }
+    } else {
+      this.markAllFieldsAsTouched();
     }
   }
 
+  /**
+   * Updates existing training info
+   * Met à jour les informations d'entraînement existantes
+   */
+  private updateTrainingInfo(formValue: any): void {
+    const updateRequest: UpdateTrainingInfoRequest = {
+      gender: formValue.gender,
+      weight: formValue.weight,
+      height: formValue.height,
+      bodyFatPercentage: formValue.bodyFatPercentage || undefined,
+      experienceLevel: formValue.experienceLevel,
+      sessionFrequency: formValue.sessionFrequency,
+      sessionDuration: formValue.sessionDuration,
+      mainGoal: formValue.mainGoal,
+      trainingPreference: formValue.trainingPreference,
+      equipment: formValue.equipment
+    };
+
+    this.trainingInfoService.updateTrainingInfo(updateRequest).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.handleError(err);
+      }
+    });
+  }
+
+  /**
+   * Creates new training info
+   * Crée de nouvelles informations d'entraînement
+   */
+  private createTrainingInfo(formValue: any): void {
+    const createRequest: CreateTrainingInfoRequest = {
+      gender: formValue.gender,
+      weight: formValue.weight,
+      height: formValue.height,
+      bodyFatPercentage: formValue.bodyFatPercentage || undefined,
+      experienceLevel: formValue.experienceLevel,
+      sessionFrequency: formValue.sessionFrequency,
+      sessionDuration: formValue.sessionDuration,
+      mainGoal: formValue.mainGoal,
+      trainingPreference: formValue.trainingPreference,
+      equipment: formValue.equipment
+    };
+
+    this.trainingInfoService.createTrainingInfo(createRequest).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.handleError(err);
+      }
+    });
+  }
+
+  /**
+   * Centralized error handling
+   * Gestion centralisée des erreurs
+   */
+  private handleError(error: any): void {
+    if (error.status === 401) {
+      this.error = 'Session expirée. Veuillez vous reconnecter.';
+      this.router.navigate(['/login']);
+    } else if (error.status === 403) {
+      this.error = 'Accès refusé. Vous n\'avez pas les permissions nécessaires.';
+    } else if (error.status === 404) {
+      this.error = 'Informations d\'entraînement non trouvées.';
+    } else if (error.status === 422) {
+      this.error = 'Données invalides. Veuillez vérifier vos informations.';
+    } else if (error.status === 0) {
+      this.error = 'Impossible de se connecter au serveur. Vérifiez votre connexion.';
+    } else {
+      this.error = error.error?.message || 'Une erreur est survenue. Veuillez réessayer.';
+    }
+  }
+
+  /**
+   * Gets display name for enum values
+   * Obtient le nom d'affichage pour les valeurs d'énumération
+   */
   getDisplayName(enumValue: string, displayNames: Record<string, string>): string {
     return displayNames[enumValue] || enumValue;
   }
 
   /**
+   * Selects an option for a given field
    * Sélectionne une option pour un champ donné
-   * @param field - Nom du champ
-   * @param value - Valeur sélectionnée
+   * @param field - Field name / Nom du champ
+   * @param value - Selected value / Valeur sélectionnée
    */
   selectOption(field: string, value: string): void {
     this.trainingInfoForm.get(field)?.setValue(value);
     this.trainingInfoForm.get(field)?.markAsTouched();
+    this.onFieldChange();
   }
 
   /**
+   * Moves to the next step
    * Passe à l'étape suivante
    */
   nextStep(): void {
@@ -227,6 +288,7 @@ export class TrainingInfoFormComponent implements OnInit {
   }
 
   /**
+   * Goes back to the previous step
    * Retourne à l'étape précédente
    */
   previousStep(): void {
@@ -236,9 +298,10 @@ export class TrainingInfoFormComponent implements OnInit {
   }
 
   /**
+   * Checks if the current step is valid
    * Vérifie si l'étape actuelle est valide
-   * @param step - Numéro de l'étape
-   * @returns boolean - True si l'étape est valide
+   * @param step - Step number / Numéro de l'étape
+   * @returns boolean - True if step is valid / True si l'étape est valide
    */
   isStepValid(step: number): boolean {
     switch (step) {
@@ -258,5 +321,44 @@ export class TrainingInfoFormComponent implements OnInit {
       default:
         return false;
     }
+  }
+
+  /**
+   * Checks if a form field is invalid and has been touched
+   * Vérifie si un champ du formulaire est invalide et a été touché
+   */
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.trainingInfoForm.get(fieldName);
+    return field ? field.invalid && field.touched : false;
+  }
+
+  /**
+   * Marks all fields as touched to display errors
+   * Marque tous les champs comme touchés pour afficher les erreurs
+   */
+  private markAllFieldsAsTouched(): void {
+    Object.keys(this.trainingInfoForm.controls).forEach(key => {
+      const control = this.trainingInfoForm.get(key);
+      control?.markAsTouched();
+    });
+  }
+
+  /**
+   * Clears error message when user starts typing
+   * Efface le message d'erreur quand l'utilisateur commence à taper
+   */
+  onFieldChange(): void {
+    if (this.error) {
+      this.error = null;
+    }
+  }
+
+  /**
+   * Gets the maximum date for date of birth (today)
+   * Retourne la date maximale pour la date de naissance (aujourd'hui)
+   */
+  getMaxDate(): string {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
   }
 } 

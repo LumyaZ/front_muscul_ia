@@ -1,81 +1,4 @@
-$primary-color: #9333EA;
-$primary-dark: #7C3AED;
-$primary-light: #A855F7;
-$background-dark: #0A0A0A;
-$card-dark: #1A1A1A;
-$text-white: #FFFFFF;
-$text-muted: rgba(255, 255, 255, 0.9);
-$error-color: #A855F7;
-$success-color: #10B981;
-$danger-color: #EF4444;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin gradient-text {
-  background: linear-gradient(45deg, $text-white, $primary-light);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-@mixin glass-effect {
-  backdrop-filter: blur(10px);
-  background: rgba($card-dark, 0.8);
-  border: 1px solid rgba($primary-color, 0.2);
-}
-
-@mixin button-hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba($primary-color, 0.4);
-  background: linear-gradient(45deg, $primary-light, $primary-color);
-}
-
-@mixin input-focus {
-  outline: none;
-  background: rgba($card-dark, 1);
-  border-color: $primary-color;
-  box-shadow: 0 0 20px rgba($primary-color, 0.3);
-}
-
-@mixin error-style {
-  color: $error-color;
-  background: rgba($error-color, 0.1);
-  border: 1px solid rgba($error-color, 0.3);
-}
-
-@keyframes float {
-  0%, 100% { 
-    transform: translateY(0px) rotate(0deg); 
-  }
-  50% { 
-    transform: translateY(-20px) rotate(5deg); 
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+@import '../../../../styles/variables';
 
 .signup-container {
   min-height: 100vh;
@@ -524,13 +447,8 @@ $danger-color: #EF4444;
   }
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
-@media (min-width: 1400px) {
+// Responsive Design
+@media (min-width: $breakpoint-xl) {
   .signup-content {
     max-width: 800px;
     padding: 30px;
@@ -555,7 +473,7 @@ $danger-color: #EF4444;
   }
 }
 
-@media (min-width: 1200px) and (max-width: 1399px) {
+@media (min-width: $breakpoint-lg) and (max-width: 1399px) {
   .signup-content {
     max-width: 700px;
     padding: 30px;
@@ -570,7 +488,7 @@ $danger-color: #EF4444;
   }
 }
 
-@media (min-width: 992px) and (max-width: 1199px) {
+@media (min-width: $breakpoint-md) and (max-width: 1199px) {
   .signup-content {
     max-width: 650px;
     padding: 25px;
@@ -585,7 +503,7 @@ $danger-color: #EF4444;
   }
 }
 
-@media (min-width: 768px) and (max-width: 991px) {
+@media (min-width: $breakpoint-sm) and (max-width: 991px) {
   .signup-content {
     max-width: 550px;
     padding: 20px;
@@ -625,7 +543,7 @@ $danger-color: #EF4444;
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: $breakpoint-xs) {
   .signup-content {
     max-width: 380px;
     padding: 10px;
@@ -656,21 +574,5 @@ $danger-color: #EF4444;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-@media (prefers-color-scheme: dark) {
-  .signup-container {
-    background: $background-dark;
-  }
-}
-
-.signup-form .input-container input:focus {
-  border-color: $primary-light;
-  box-shadow: 0 0 20px rgba($primary-light, 0.4);
-}
-
-.signup-form .error-message,
-.signup-form .global-error {
-  border-width: 2px;
 }
 

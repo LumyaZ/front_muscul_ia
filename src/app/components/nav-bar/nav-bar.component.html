@@ -1,14 +1,28 @@
-<nav class="nav-bar">
+<nav class="nav-bar" role="navigation" aria-label="Navigation principale">
   <div class="nav-container">
+    <div *ngIf="error" class="error-message" (click)="clearError()">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>{{ error }}</span>
+      <button class="error-close" (click)="clearError()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
     <ul class="nav-list">
       <li *ngFor="let item of navItems" class="nav-item">
         <button 
           class="nav-button" 
           [class]="getActiveClass(item)"
           (click)="onNavItemClick(item)"
-          [attr.aria-label]="item.label">
+          [disabled]="isLoading"
+          [attr.aria-label]="item.label"
+          [attr.aria-current]="item.isActive ? 'page' : null"
+          title="{{ item.label }}">
           <i [class]="item.icon" class="nav-icon"></i>
           <span class="nav-label">{{ item.label }}</span>
+          <div *ngIf="isLoading" class="loading-indicator">
+            <div class="spinner"></div>
+          </div>
         </button>
       </li>
     </ul>

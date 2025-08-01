@@ -1,13 +1,16 @@
+@import '../../../styles/variables';
+
 .nav-bar {
-  background: white;
-  border-top: 1px solid #e1e5e9;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-top: 1px solid rgba(147, 51, 234, 0.3);
+  box-shadow: 0 -4px 20px rgba(147, 51, 234, 0.2);
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 999;
   height: 70px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   @media (max-width: 768px) {
     height: 65px;
@@ -23,9 +26,45 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  position: relative;
 
   @media (max-width: 768px) {
     padding: 0 10px;
+  }
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(239, 68, 68, 0.9);
+  color: #ffffff;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease-in-out;
+  margin-bottom: 8px;
+  max-width: 280px;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .error-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
   }
 }
 
@@ -59,10 +98,10 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  color: #666;
+  color: rgba(255, 255, 255, 0.7);
   font-weight: 500;
   font-size: 0.8rem;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   border-top: 3px solid transparent;
   min-height: 44px;
@@ -74,22 +113,39 @@
   }
 
   &:hover {
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
   }
 
   &.active {
-    color: #667eea;
-    border-top-color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
+    color: #9333ea;
 
     .nav-icon {
       transform: scale(1.1);
+      color: #9333ea;
+    }
+
+    .nav-label {
+      color: #9333ea;
+      font-weight: 600;
     }
   }
 
@@ -100,7 +156,8 @@
 
 .nav-icon {
   font-size: 1.3rem;
-  transition: transform 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(255, 255, 255, 0.7);
 
   @media (max-width: 480px) {
     font-size: 1.1rem;
@@ -113,13 +170,47 @@
   text-align: center;
   line-height: 1.1;
   white-space: nowrap;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.3s ease;
 
   @media (max-width: 480px) {
-    font-size: 0.65rem;
+    display: none;
   }
 }
 
-// Animation pour les transitions
+.loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(147, 51, 234, 0.3);
+    border-top: 2px solid #9333ea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .nav-button {
   &::before {
     content: '';
@@ -128,7 +219,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
@@ -137,13 +228,8 @@
   &:hover::before {
     opacity: 1;
   }
-
-  &.active::before {
-    opacity: 1;
-  }
 }
 
-// Effet de ripple au clic
 .nav-button {
   overflow: hidden;
   position: relative;
@@ -155,7 +241,7 @@
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(102, 126, 234, 0.3);
+    background: rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: width 0.3s ease, height 0.3s ease;
@@ -167,7 +253,6 @@
   }
 }
 
-// Ajout d'espace en bas pour éviter que le contenu soit caché par la navbar mobile
 @media (max-width: 768px) {
   body {
     padding-bottom: 80px;

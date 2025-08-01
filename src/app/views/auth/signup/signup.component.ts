@@ -1,122 +1,62 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-  AbstractControl,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { UserProfileService } from '../../../services/user-profile.service';
 
-/**
- * Component for user registration with comprehensive profile information.
- * Composant pour l'enregistrement utilisateur avec informations de profil complètes.
- * 
- * This component handles user registration including authentication data and
- * profile information. It provides a comprehensive reactive form with validation
- * for email, password strength, profile details, and age verification. The
- * component integrates with both authentication and user profile services.
- * 
- * Ce composant gère l'enregistrement utilisateur incluant les données
- * d'authentification et les informations de profil. Il fournit un formulaire
- * réactif complet avec validation pour email, force du mot de passe, détails
- * du profil et vérification de l'âge. Le composant s'intègre avec les services
- * d'authentification et de profil utilisateur.
- * 
- * @author Muscul IA Team
- * @version 1.0
- * @since 2024-01-01
- */
+interface PasswordStrength {
+  score: number;
+  label: string;
+  color: string;
+}
+
+interface SignupRequest {
+  userData: {
+    email: string;
+    password: string;
+    confirmPassword: string;
+  };
+  profileData: {
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    phoneNumber?: string;
+  };
+}
+
+interface AuthResponse {
+  user: any;
+  token: string;
+}
+
 @Component({
   selector: 'app-signup',
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
-  imports: [CommonModule, HttpClientModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   standalone: true,
 })
 export class SignupComponent {
   
-  /**
-   * Form builder service for creating reactive forms.
-   * Service de construction de formulaires pour créer des formulaires réactifs.
-   */
   private fb = inject(FormBuilder);
-  
-  /**
-   * Authentication service for registration operations.
-   * Service d'authentification pour les opérations d'enregistrement.
-   */
   private authService = inject(AuthService);
-  
-  /**
-   * User profile service for profile creation.
-   * Service de profil utilisateur pour la création de profil.
-   */
-  private userProfileService = inject(UserProfileService);
-  
-  /**
-   * Angular router for navigation.
-   * Routeur Angular pour la navigation.
-   */
   private router = inject(Router);
 
-  /**
-   * Reactive form for user registration with authentication and profile fields.
-   * Formulaire réactif pour l'enregistrement utilisateur avec champs d'authentification et profil.
-   */
   signupForm: FormGroup;
-  
-  /**
-   * Error message to display if registration fails.
-   * Message d'erreur à afficher si l'enregistrement échoue.
-   */
   error: string | null = null;
-  
-  /**
-   * Loading state indicator during registration process.
-   * Indicateur d'état de chargement pendant le processus d'enregistrement.
-   */
   isLoading = false;
-  
-  /**
-   * Flag to toggle password visibility.
-   * Indicateur pour basculer la visibilité du mot de passe.
-   */
   showPassword = false;
-  
-  /**
-   * Flag to toggle confirm password visibility.
-   * Indicateur pour basculer la visibilité de la confirmation du mot de passe.
-   */
   showConfirmPassword = false;
 
-  /**
-   * Constructor for SignupComponent.
-   * Constructeur pour SignupComponent.
-   * 
-   * Initializes the reactive form with comprehensive validation including
-   * authentication fields, profile information, and custom validators.
-   * 
-   * Initialise le formulaire réactif avec validation complète incluant
-   * les champs d'authentification, les informations de profil et les validateurs personnalisés.
-   */
   constructor() {
-    // Create reactive form with validation
     this.signupForm = this.fb.group({
-      // Authentication fields
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required, 
-        Validators.minLength(8),
+        Validators.minLength(12),
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
       ]],
       confirmPassword: ['', [Validators.required]],
-      
-      // User profile fields
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
       dateOfBirth: ['', [Validators.required]],
@@ -125,86 +65,47 @@ export class SignupComponent {
   }
 
   /**
-   * Custom validator to ensure password and confirm password match.
-   * Validateur personnalisé pour s'assurer que le mot de passe et sa confirmation correspondent.
-   * 
-   * This validator checks if the password and confirmPassword fields have
-   * the same value and returns an error if they don't match.
-   * 
-   * Ce validateur vérifie si les champs password et confirmPassword ont
-   * la même valeur et retourne une erreur s'ils ne correspondent pas.
-   * 
-   * @param control - Form control containing password fields
-   * @returns Record<string, boolean> | null - Error object or null if valid
+   * Vérifie si un champ du formulaire est invalide et a été touché
+   * Check if a form field is invalid and has been touched
    */
-  passwordMatchValidator(
-    control: AbstractControl,
-  ): Record<string, boolean> | null {
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.signupForm.get(fieldName);
+    return field ? field.invalid && field.touched : false;
+  }
+
+  /**
+   * Validateur personnalisé pour s'assurer que le mot de passe et sa confirmation correspondent
+   * Custom validator to ensure password and confirm password match
+   */
+  passwordMatchValidator(control: AbstractControl): Record<string, boolean> | null {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
 
-    if (
-      password &&
-      confirmPassword &&
-      password.value !== confirmPassword.value
-    ) {
+    if (password && confirmPassword && password.value !== confirmPassword.value) {
       return { passwordMismatch: true };
     }
     return null;
   }
 
   /**
-   * Validator to ensure date of birth is not in the future and user is old enough.
-   * Validateur pour s'assurer que la date de naissance n'est pas dans le futur et que l'utilisateur est assez âgé.
-   * 
-   * This validator checks that the selected date is not in the future and
-   * that the user is at least 13 years old.
-   * 
-   * Ce validateur vérifie que la date sélectionnée n'est pas dans le futur
-   * et que l'utilisateur a au moins 13 ans.
-   * 
-   * @param control - Form control containing date of birth
-   * @returns Record<string, boolean> | null - Error object or null if valid
-   */
-  dateOfBirthValidator(control: AbstractControl): Record<string, boolean> | null {
-    if (control.value) {
-      const selectedDate = new Date(control.value);
-      const today = new Date();
-      
-      if (selectedDate > today) {
-        return { futureDate: true };
-      }
-      
-      // Check that user is at least 13 years old
-      const minAge = new Date();
-      minAge.setFullYear(today.getFullYear() - 13);
-      
-      if (selectedDate > minAge) {
-        return { tooYoung: true };
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Toggles password visibility.
-   * Bascule la visibilité du mot de passe.
+   * Bascule la visibilité du mot de passe
+   * Toggle password visibility
    */
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   /**
-   * Toggles confirm password visibility.
-   * Bascule la visibilité de la confirmation du mot de passe.
+   * Bascule la visibilité de la confirmation du mot de passe
+   * Toggle confirm password visibility
    */
   toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   /**
-   * Gets the error message for the password field.
-   * Obtient le message d'erreur pour le champ mot de passe.
+   * Obtient le message d'erreur pour le champ mot de passe
+   * Get error message for password field
    */
   getPasswordErrorMessage(): string {
     const passwordControl = this.signupForm.get('password');
@@ -214,7 +115,7 @@ export class SignupComponent {
       return 'Le mot de passe est obligatoire';
     }
     if (passwordControl.errors['minlength']) {
-      return 'Le mot de passe doit contenir au moins 8 caractères';
+      return 'Le mot de passe doit contenir au moins 12 caractères';
     }
     if (passwordControl.errors['pattern']) {
       return 'Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&)';
@@ -223,14 +124,14 @@ export class SignupComponent {
   }
 
   /**
-   * Calculates password strength.
-   * Calcule la force du mot de passe.
+   * Calcule la force du mot de passe
+   * Calculate password strength
    */
-  getPasswordStrength(): { score: number; label: string; color: string } {
+  getPasswordStrength(): PasswordStrength {
     const password = this.signupForm.get('password')?.value || '';
     let score = 0;
     
-    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/\d/.test(password)) score++;
@@ -247,17 +148,17 @@ export class SignupComponent {
   }
 
   /**
-   * Checks if password has at least 8 characters.
-   * Vérifie si le mot de passe a au moins 8 caractères.
+   * Vérifie si le mot de passe a au moins 12 caractères
+   * Check if password has at least 12 characters
    */
   hasMinLength(): boolean {
     const password = this.signupForm.get('password')?.value || '';
-    return password.length >= 8;
+    return password.length >= 12;
   }
 
   /**
-   * Checks if password contains at least one lowercase letter.
-   * Vérifie si le mot de passe contient au moins une minuscule.
+   * Vérifie si le mot de passe contient au moins une minuscule
+   * Check if password contains at least one lowercase letter
    */
   hasLowercase(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -265,8 +166,8 @@ export class SignupComponent {
   }
 
   /**
-   * Checks if password contains at least one uppercase letter.
-   * Vérifie si le mot de passe contient au moins une majuscule.
+   * Vérifie si le mot de passe contient au moins une majuscule
+   * Check if password contains at least one uppercase letter
    */
   hasUppercase(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -274,8 +175,8 @@ export class SignupComponent {
   }
 
   /**
-   * Checks if password contains at least one number.
-   * Vérifie si le mot de passe contient au moins un chiffre.
+   * Vérifie si le mot de passe contient au moins un chiffre
+   * Check if password contains at least one number
    */
   hasNumber(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -283,8 +184,8 @@ export class SignupComponent {
   }
 
   /**
-   * Checks if password contains at least one special character.
-   * Vérifie si le mot de passe contient au moins un caractère spécial.
+   * Vérifie si le mot de passe contient au moins un caractère spécial
+   * Check if password contains at least one special character
    */
   hasSpecialChar(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -292,16 +193,15 @@ export class SignupComponent {
   }
 
   /**
-   * Submits the registration form.
-   * Soumet le formulaire d'inscription.
+   * Soumet le formulaire d'inscription
+   * Submit the registration form
    */
   onSubmit(): void {
     if (this.signupForm.valid) {
       this.isLoading = true;
       this.error = null;
 
-      // Prepare data for combined endpoint
-      const request = {
+      const request: SignupRequest = {
         userData: {
           email: this.signupForm.get('email')?.value,
           password: this.signupForm.get('password')?.value,
@@ -315,35 +215,52 @@ export class SignupComponent {
         }
       };
 
-      console.log('Sending request to create user with profile:', request);
-
       this.authService.createUserWithProfile(request).subscribe({
-        next: (response) => {
+        next: (response: AuthResponse) => {
           this.isLoading = false;
-          
-          // Use JWT token from backend
-          const token = response.token;
-          
-          // Save authentication data
-          this.saveAuthData(response.user, token);
-          
-          // Redirect to training-info page
+          this.saveAuthData(response.user, response.token);
           this.router.navigate(['/training-info']);
         },
-        error: (error) => {
+        error: (error: any) => {
           this.isLoading = false;
-          console.error('Error creating user with profile:', error);
-          this.error = 'Erreur lors de la création du compte. Veuillez vérifier vos informations.';
+          this.handleError(error);
         },
       });
+    } else {
+      this.markAllFieldsAsTouched();
     }
   }
 
-
+  /**
+   * Gère les erreurs de manière centralisée
+   * Handle errors in a centralized way
+   */
+  private handleError(error: any): void {
+    if (error.status === 409) {
+      this.error = 'Un compte avec cet email existe déjà.';
+    } else if (error.status === 400) {
+      this.error = 'Veuillez vérifier les informations saisies.';
+    } else if (error.status === 0) {
+      this.error = 'Impossible de se connecter au serveur. Vérifiez votre connexion.';
+    } else {
+      this.error = 'Une erreur est survenue lors de la création du compte. Veuillez réessayer.';
+    }
+  }
 
   /**
+   * Marque tous les champs comme touchés pour afficher les erreurs
+   * Mark all fields as touched to display errors
+   */
+  private markAllFieldsAsTouched(): void {
+    Object.keys(this.signupForm.controls).forEach(key => {
+      const control = this.signupForm.get(key);
+      control?.markAsTouched();
+    });
+  }
+
+  /**
+   * Sauvegarde les données d'authentification dans localStorage
    * Save authentication data to localStorage
-   * Sauvegarder les données d'authentification dans localStorage
    */
   private saveAuthData(user: any, token: string): void {
     localStorage.setItem('auth_token', token);
@@ -351,39 +268,29 @@ export class SignupComponent {
   }
 
   /**
-   * Redirects to the login page.
-   * Redirige vers la page de connexion.
+   * Navigue vers la page de connexion
+   * Navigate to login page
    */
   goToLogin(): void {
     this.router.navigate(['/login']);
   }
 
   /**
-   * Calculates age from date of birth.
-   * Calcule l'âge à partir de la date de naissance.
-   * @param dateOfBirth - Date de naissance
-   * @returns number - Âge calculé
-   */
-  calculateAge(dateOfBirth: string): number {
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    
-    return age;
-  }
-
-  /**
-   * Returns the maximum date for date of birth (today).
    * Retourne la date maximale pour la date de naissance (aujourd'hui)
-   * @returns string - Date au format YYYY-MM-DD
+   * Returns the maximum date for date of birth (today)
    */
   getMaxDate(): string {
     const today = new Date();
     return today.toISOString().split('T')[0];
+  }
+
+  /**
+   * Efface le message d'erreur quand l'utilisateur commence à taper
+   * Clear error message when user starts typing
+   */
+  onFieldChange(): void {
+    if (this.error) {
+      this.error = null;
+    }
   }
 }

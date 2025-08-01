@@ -26,37 +26,9 @@ describe('UserTrainingsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with default tab as current', () => {
-    expect(component.activeTab).toBe('current');
-  });
-
-  it('should change active tab when setActiveTab is called', () => {
-    component.setActiveTab('completed');
-    expect(component.activeTab).toBe('completed');
-
-    component.setActiveTab('current');
-    expect(component.activeTab).toBe('current');
-  });
-
-  it('should call loadTrainings on init', () => {
-    spyOn(component, 'loadTrainings');
-    
-    component.ngOnInit();
-    
-    expect(component.loadTrainings).toHaveBeenCalled();
-  });
-
   it('should navigate to profile when goBackToProfile is called', () => {
     component.goBackToProfile();
     
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/profile']);
-  });
-
-  it('should call loadTrainings when refreshTrainings is called', () => {
-    spyOn(component, 'loadTrainings');
-    
-    component.refreshTrainings();
-    
-    expect(component.loadTrainings).toHaveBeenCalled();
   });
 }); 

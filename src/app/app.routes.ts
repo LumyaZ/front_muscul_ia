@@ -27,6 +27,10 @@ export const routes: Routes = [
     loadComponent: () => import('./views/auth/signup/signup.component').then(m => m.SignupComponent)
   },
   {
+    path: 'training-info',
+    loadComponent: () => import('./views/training-info/training-info-form.component').then(m => m.TrainingInfoFormComponent)
+  },
+  {
     path: 'dashboard',
     children: [
       {

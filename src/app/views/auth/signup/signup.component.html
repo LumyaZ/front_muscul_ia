@@ -1,180 +1,348 @@
-<div class="signup-container">
-  <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate class="signup-form">
-    <h2>Créer un compte</h2>
-    
-    <!-- Informations d'authentification -->
-    <div class="form-section">
-      <h3>Informations de connexion</h3>
-      
-      <div class="form-group">
-        <label for="email">Email *</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          placeholder="votre.email@exemple.com"
-          required
-          aria-required="true"
-        />
+<div class="signup-container" role="main" aria-label="Page d'inscription">
+  <div class="signup-background" aria-hidden="true">
+    <div class="background-shapes">
+      <div class="shape shape-1">
+        <i class="fas fa-dumbbell" aria-hidden="true"></i>
+      </div>
+      <div class="shape shape-2">
+        <i class="fas fa-dumbbell" aria-hidden="true"></i>
+      </div>
+      <div class="shape shape-3">
+        <i class="fas fa-dumbbell" aria-hidden="true"></i>
+      </div>
+      <div class="shape shape-4">
+        <i class="fas fa-dumbbell" aria-hidden="true"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="signup-content">
+    <div class="signup-card">
+      <div class="signup-header">
+        <div class="logo" aria-label="Logo Muscul IA">
+          <i class="fas fa-dumbbell" aria-hidden="true"></i>
+        </div>
+        <h1>Créer un compte</h1>
+        <p>Rejoignez Muscul IA et commencez votre transformation</p>
       </div>
 
-      <div class="form-group">
-        <label for="password">Mot de passe *</label>
-        <div class="password-input-container">
-          <input
-            id="password"
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder="Entrez votre mot de passe"
-            required
-            aria-required="true"
-          />
-          <button 
-            type="button" 
-            class="password-toggle-btn"
-            (click)="togglePasswordVisibility()"
-            [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
-            <i class="password-icon" [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-          </button>
-        </div>
-        
-        <!-- Conditions du mot de passe -->
-        <div class="password-requirements" *ngIf="signupForm.get('password')?.value">
-          <h4>Conditions requises :</h4>
-          <ul>
-            <li [class.valid]="hasMinLength()" [class.invalid]="!hasMinLength()">
-              <i class="fas" [class]="hasMinLength() ? 'fa-check' : 'fa-times'"></i>
-              Au moins 8 caractères
-            </li>
-            <li [class.valid]="hasLowercase()" [class.invalid]="!hasLowercase()">
-              <i class="fas" [class]="hasLowercase() ? 'fa-check' : 'fa-times'"></i>
-              Au moins une minuscule
-            </li>
-            <li [class.valid]="hasUppercase()" [class.invalid]="!hasUppercase()">
-              <i class="fas" [class]="hasUppercase() ? 'fa-check' : 'fa-times'"></i>
-              Au moins une majuscule
-            </li>
-            <li [class.valid]="hasNumber()" [class.invalid]="!hasNumber()">
-              <i class="fas" [class]="hasNumber() ? 'fa-check' : 'fa-times'"></i>
-              Au moins un chiffre
-            </li>
-            <li [class.valid]="hasSpecialChar()" [class.invalid]="!hasSpecialChar()">
-              <i class="fas" [class]="hasSpecialChar() ? 'fa-check' : 'fa-times'"></i>
-              Au moins un caractère spécial (&#64;$!%*?&)
-            </li>
-          </ul>
-        </div>
-        
-        <!-- Indicateur de force du mot de passe -->
-        <div class="password-strength" *ngIf="signupForm.get('password')?.value">
-          <div class="strength-bar">
-            <div 
-              class="strength-fill" 
-              [style.width.%]="getPasswordStrength().score * 20"
-              [style.background-color]="getPasswordStrength().color">
+      <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form" aria-label="Formulaire d'inscription">
+        <div class="form-group">
+          <label for="email">
+            <i class="fas fa-envelope" aria-hidden="true"></i>
+            Email
+          </label>
+          <div class="input-container">
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="votre.email@exemple.com"
+              [class.error]="isFieldInvalid('email')"
+              (input)="onFieldChange()"
+              required
+              aria-required="true"
+              aria-describedby="email-error"
+              autocomplete="email"
+            />
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-envelope"></i>
             </div>
           </div>
-          <span class="strength-label" [style.color]="getPasswordStrength().color">
-            {{ getPasswordStrength().label }}
+          <div class="error-message" *ngIf="isFieldInvalid('email')" id="email-error" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span *ngIf="signupForm.get('email')?.errors?.['required']">
+              L'email est requis
+            </span>
+            <span *ngIf="signupForm.get('email')?.errors?.['email']">
+              Format d'email invalide
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">
+            <i class="fas fa-lock" aria-hidden="true"></i>
+            Mot de passe
+          </label>
+          <div class="input-container">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Entrez votre mot de passe"
+              [class.error]="isFieldInvalid('password')"
+              (input)="onFieldChange()"
+              required
+              aria-required="true"
+              aria-describedby="password-error password-requirements password-strength"
+              autocomplete="new-password"
+            />
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-lock"></i>
+            </div>
+            <button 
+              type="button" 
+              class="password-toggle-btn"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+              [attr.aria-pressed]="showPassword">
+              <i class="fas" [class]="showPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+            </button>
+          </div>
+          
+          <div class="password-requirements" *ngIf="signupForm.get('password')?.value" id="password-requirements" role="region" aria-label="Conditions du mot de passe">
+            <h4>Conditions requises :</h4>
+            <ul role="list" aria-label="Liste des conditions du mot de passe">
+              <li [class.valid]="hasMinLength()" [class.invalid]="!hasMinLength()" role="listitem">
+                <i class="fas" [class]="hasMinLength() ? 'fa-check' : 'fa-times'" aria-hidden="true"></i>
+                <span [attr.aria-label]="hasMinLength() ? 'Condition validée' : 'Condition non validée'">
+                  Au moins 12 caractères
+                </span>
+              </li>
+              <li [class.valid]="hasLowercase()" [class.invalid]="!hasLowercase()" role="listitem">
+                <i class="fas" [class]="hasLowercase() ? 'fa-check' : 'fa-times'" aria-hidden="true"></i>
+                <span [attr.aria-label]="hasLowercase() ? 'Condition validée' : 'Condition non validée'">
+                  Au moins une minuscule
+                </span>
+              </li>
+              <li [class.valid]="hasUppercase()" [class.invalid]="!hasUppercase()" role="listitem">
+                <i class="fas" [class]="hasUppercase() ? 'fa-check' : 'fa-times'" aria-hidden="true"></i>
+                <span [attr.aria-label]="hasUppercase() ? 'Condition validée' : 'Condition non validée'">
+                  Au moins une majuscule
+                </span>
+              </li>
+              <li [class.valid]="hasNumber()" [class.invalid]="!hasNumber()" role="listitem">
+                <i class="fas" [class]="hasNumber() ? 'fa-check' : 'fa-times'" aria-hidden="true"></i>
+                <span [attr.aria-label]="hasNumber() ? 'Condition validée' : 'Condition non validée'">
+                  Au moins un chiffre
+                </span>
+              </li>
+              <li [class.valid]="hasSpecialChar()" [class.invalid]="!hasSpecialChar()" role="listitem">
+                <i class="fas" [class]="hasSpecialChar() ? 'fa-check' : 'fa-times'" aria-hidden="true"></i>
+                <span [attr.aria-label]="hasSpecialChar() ? 'Condition validée' : 'Condition non validée'">
+                  Au moins un caractère spécial (&#64;$!%*?&)
+                </span>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="password-strength" *ngIf="signupForm.get('password')?.value" id="password-strength" role="region" aria-label="Force du mot de passe">
+            <div class="strength-bar" role="progressbar" [attr.aria-valuenow]="getPasswordStrength().score" aria-valuemin="0" aria-valuemax="5">
+              <div 
+                class="strength-fill" 
+                [style.width.%]="getPasswordStrength().score * 20"
+                [style.background-color]="getPasswordStrength().color">
+              </div>
+            </div>
+            <span class="strength-label" [style.color]="getPasswordStrength().color" [attr.aria-label]="'Force du mot de passe : ' + getPasswordStrength().label">
+              {{ getPasswordStrength().label }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">
+            <i class="fas fa-lock" aria-hidden="true"></i>
+            Confirmer le mot de passe
+          </label>
+          <div class="input-container">
+            <input
+              id="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              formControlName="confirmPassword"
+              placeholder="Répétez votre mot de passe"
+              [class.error]="isFieldInvalid('confirmPassword')"
+              (input)="onFieldChange()"
+              required
+              aria-required="true"
+              aria-describedby="confirm-password-error"
+              autocomplete="new-password"
+            />
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-lock"></i>
+            </div>
+            <button 
+              type="button" 
+              class="password-toggle-btn"
+              (click)="toggleConfirmPasswordVisibility()"
+              [attr.aria-label]="showConfirmPassword ? 'Masquer la confirmation' : 'Afficher la confirmation'"
+              [attr.aria-pressed]="showConfirmPassword">
+              <i class="fas" [class]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('confirmPassword')" id="confirm-password-error" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">
+              La confirmation du mot de passe est requise
+            </span>
+          </div>
+          <div class="error-message" *ngIf="signupForm.errors?.['passwordMismatch'] && signupForm.get('confirmPassword')?.touched" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span>Les mots de passe ne correspondent pas</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="firstName">
+            <i class="fas fa-user" aria-hidden="true"></i>
+            Prénom
+          </label>
+          <div class="input-container">
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              placeholder="Votre prénom"
+              [class.error]="isFieldInvalid('firstName')"
+              (input)="onFieldChange()"
+              required
+              aria-required="true"
+              aria-describedby="firstName-error"
+              autocomplete="given-name"
+            />
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('firstName')" id="firstName-error" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span *ngIf="signupForm.get('firstName')?.errors?.['required']">
+              Le prénom est requis
+            </span>
+            <span *ngIf="signupForm.get('firstName')?.errors?.['minlength']">
+              Le prénom doit contenir au moins 2 caractères
+            </span>
+            <span *ngIf="signupForm.get('firstName')?.errors?.['maxlength']">
+              Le prénom ne peut pas dépasser 50 caractères
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">
+            <i class="fas fa-user" aria-hidden="true"></i>
+            Nom
+          </label>
+          <div class="input-container">
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              placeholder="Votre nom"
+              [class.error]="isFieldInvalid('lastName')"
+              (input)="onFieldChange()"
+              required
+              aria-required="true"
+              aria-describedby="lastName-error"
+              autocomplete="family-name"
+            />
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-user"></i>
+            </div>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('lastName')" id="lastName-error" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span *ngIf="signupForm.get('lastName')?.errors?.['required']">
+              Le nom est requis
+            </span>
+            <span *ngIf="signupForm.get('lastName')?.errors?.['minlength']">
+              Le nom doit contenir au moins 2 caractères
+            </span>
+            <span *ngIf="signupForm.get('lastName')?.errors?.['maxlength']">
+              Le nom ne peut pas dépasser 50 caractères
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="dateOfBirth">
+            <i class="fas fa-calendar" aria-hidden="true"></i>
+            Date de naissance
+          </label>
+          <div class="input-container">
+            <input
+              id="dateOfBirth"
+              type="date"
+              formControlName="dateOfBirth"
+              [class.error]="isFieldInvalid('dateOfBirth')"
+              (input)="onFieldChange()"
+              [max]="getMaxDate()"
+              required
+              aria-required="true"
+              aria-describedby="dateOfBirth-error"
+              autocomplete="bday"
+            />
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-calendar"></i>
+            </div>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('dateOfBirth')" id="dateOfBirth-error" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span *ngIf="signupForm.get('dateOfBirth')?.errors?.['required']">
+              La date de naissance est requise
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber">
+            <i class="fas fa-phone" aria-hidden="true"></i>
+            Numéro de téléphone
+          </label>
+          <div class="input-container">
+            <input
+              id="phoneNumber"
+              type="tel"
+              formControlName="phoneNumber"
+              placeholder="+33 1 23 45 67 89 ou 01 23 45 67 89"
+              [class.error]="isFieldInvalid('phoneNumber')"
+              (input)="onFieldChange()"
+              aria-describedby="phoneNumber-error"
+              autocomplete="tel"
+            />
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-phone"></i>
+            </div>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('phoneNumber')" id="phoneNumber-error" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+            <span *ngIf="signupForm.get('phoneNumber')?.errors?.['pattern']">
+              Format de numéro de téléphone invalide
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="error" class="global-error" role="alert" aria-live="polite">
+          <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+          <span>{{ error }}</span>
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="signupForm.invalid || isLoading"
+          class="btn-signup"
+          [attr.aria-label]="isLoading ? 'Création en cours...' : 'Créer mon compte'"
+          [attr.aria-busy]="isLoading">
+          <span *ngIf="!isLoading">
+            <i class="fas fa-user-plus" aria-hidden="true"></i>
+            Créer mon compte
           </span>
-        </div>
-      </div>
+          <span *ngIf="isLoading" class="loading-content">
+            <div class="spinner" aria-hidden="true"></div>
+            Création en cours...
+          </span>
+        </button>
 
-      <div class="form-group">
-        <label for="confirmPassword">Confirmer le mot de passe *</label>
-        <div class="password-input-container">
-          <input
-            id="confirmPassword"
-            [type]="showConfirmPassword ? 'text' : 'password'"
-            formControlName="confirmPassword"
-            placeholder="Répétez votre mot de passe"
-            required
-            aria-required="true"
-          />
-          <button 
-            type="button" 
-            class="password-toggle-btn"
-            (click)="toggleConfirmPasswordVisibility()"
-            [attr.aria-label]="showConfirmPassword ? 'Masquer la confirmation' : 'Afficher la confirmation'">
-            <i class="password-icon" [class]="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-          </button>
+        <div class="login-link">
+          <p>
+            Déjà un compte ? 
+            <a (click)="goToLogin()" class="link-login" role="button" tabindex="0" (keydown.enter)="goToLogin()" (keydown.space)="goToLogin()">
+              Se connecter
+            </a>
+          </p>
         </div>
-      </div>
+      </form>
     </div>
-
-    <!-- Informations personnelles -->
-    <div class="form-section">
-      <h3>Informations personnelles</h3>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label for="firstName">Prénom *</label>
-          <input
-            id="firstName"
-            type="text"
-            formControlName="firstName"
-            placeholder="Votre prénom"
-            required
-            aria-required="true"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="lastName">Nom *</label>
-          <input
-            id="lastName"
-            type="text"
-            formControlName="lastName"
-            placeholder="Votre nom"
-            required
-            aria-required="true"
-          />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="dateOfBirth">Date de naissance *</label>
-        <input
-          id="dateOfBirth"
-          type="date"
-          formControlName="dateOfBirth"
-          required
-          aria-required="true"
-          [max]="getMaxDate()"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="phoneNumber">Numéro de téléphone</label>
-        <input
-          id="phoneNumber"
-          type="tel"
-          formControlName="phoneNumber"
-          placeholder="+33 1 23 45 67 89 ou 01 23 45 67 89"
-        />
-      </div>
-    </div>
-
-    <!-- Messages d'erreur et boutons -->
-    <div class="form-actions">
-      <div *ngIf="error" class="error-message global-error">{{ error }}</div>
-      
-      <button 
-        type="submit" 
-        [disabled]="signupForm.invalid || isLoading"
-        class="btn-primary"
-      >
-        <span *ngIf="!isLoading">Créer mon compte</span>
-        <span *ngIf="isLoading">Création en cours...</span>
-      </button>
-      
-      <button 
-        type="button" 
-        (click)="goToLogin()"
-        class="btn-secondary"
-      >
-        Déjà un compte ? Se connecter
-      </button>
-    </div>
-  </form>
+  </div>
 </div>

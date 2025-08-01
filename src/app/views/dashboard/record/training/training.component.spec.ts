@@ -217,6 +217,7 @@ describe('TrainingComponent', () => {
       userId: 1,
       trainingProgramId: 1,
       startTime: new Date(),
+      duration: 0,
       exercises: []
     };
 
@@ -233,6 +234,7 @@ describe('TrainingComponent', () => {
       userId: 1,
       trainingProgramId: 1,
       startTime: new Date(),
+      duration: 0,
       exercises: []
     };
 

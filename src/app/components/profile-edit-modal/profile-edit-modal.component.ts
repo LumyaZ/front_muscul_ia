@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef, OnChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { UserProfileService } from '../../services/user-profile.service';
@@ -11,7 +11,7 @@ import { UserProfile, UpdateUserProfileRequest } from '../../models/user-profile
   templateUrl: './profile-edit-modal.component.html',
   styleUrls: ['./profile-edit-modal.component.scss']
 })
-export class ProfileEditModalComponent implements OnInit {
+export class ProfileEditModalComponent implements OnInit, OnChanges, OnDestroy {
   @Input() isOpen = false;
   @Input() currentProfile: UserProfile | null = null;
   @Output() closeModal = new EventEmitter<void>();
@@ -52,7 +52,6 @@ export class ProfileEditModalComponent implements OnInit {
    * Initialiser le formulaire avec les validateurs.
    */
   private initForm(): void {
-    console.log('Initializing profile edit form');
     
     this.editForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(50)]],
@@ -61,7 +60,15 @@ export class ProfileEditModalComponent implements OnInit {
       phoneNumber: ['', [this.phoneNumberValidator.bind(this)]]
     });
     
-    console.log('Profile form initialized:', this.editForm);
+  }
+
+  /**
+   * Check if a field is invalid and has been touched.
+   * Vérifier si un champ est invalide et a été touché.
+   */
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.editForm.get(fieldName);
+    return field ? field.invalid && field.touched : false;
   }
 
   /**
@@ -78,24 +85,20 @@ export class ProfileEditModalComponent implements OnInit {
     const minAge = 13;
     const maxAge = 120;
 
-    // Check if date is valid
     if (isNaN(selectedDate.getTime())) {
       return { invalidDate: true };
     }
 
-    // Check if date is in the future
     if (selectedDate > today) {
       return { tooOld: true };
     }
 
-    // Check minimum age (13 years)
     const minDate = new Date();
     minDate.setFullYear(today.getFullYear() - minAge);
     if (selectedDate > minDate) {
       return { tooYoung: true };
     }
 
-    // Check maximum age (120 years)
     const maxDate = new Date();
     maxDate.setFullYear(today.getFullYear() - maxAge);
     if (selectedDate < maxDate) {
@@ -111,10 +114,9 @@ export class ProfileEditModalComponent implements OnInit {
    */
   private phoneNumberValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) {
-      return null; // Optional field
+      return null; 
     }
 
-    // French phone number pattern (mobile and landline)
     const phonePattern = /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/;
     
     if (!phonePattern.test(control.value)) {
@@ -129,10 +131,8 @@ export class ProfileEditModalComponent implements OnInit {
    * Charger les données du profil actuel dans le formulaire.
    */
   loadCurrentData(): void {
-    console.log('Loading profile data:', this.currentProfile);
     
     if (this.currentProfile && this.editForm) {
-      // Format date for input field (YYYY-MM-DD)
       const formattedDate = this.currentProfile.dateOfBirth 
         ? new Date(this.currentProfile.dateOfBirth).toISOString().split('T')[0]
         : '';
@@ -144,11 +144,8 @@ export class ProfileEditModalComponent implements OnInit {
         phoneNumber: this.currentProfile.phoneNumber || ''
       });
       
-      // Mark form as touched to trigger validation
       this.editForm.markAsTouched();
-      console.log('Form values after loading:', this.editForm.value);
       
-      // Force change detection
       this.cdr.detectChanges();
     } else {
       console.warn('No profile data or form not initialized');
@@ -171,12 +168,10 @@ export class ProfileEditModalComponent implements OnInit {
         phoneNumber: this.editForm.get('phoneNumber')?.value || undefined
       };
 
-      console.log('Submitting profile update:', updateRequest);
 
       this.userProfileService.updateMyProfile(updateRequest).subscribe({
         next: (updatedProfile: UserProfile) => {
           this.isLoading = false;
-          console.log('Profile updated successfully:', updatedProfile);
           this.profileUpdated.emit(updatedProfile);
           this.closeModal.emit();
         },
@@ -187,7 +182,6 @@ export class ProfileEditModalComponent implements OnInit {
         }
       });
     } else {
-      console.log('Form is invalid:', this.editForm.errors);
       this.markFormGroupTouched();
     }
   }

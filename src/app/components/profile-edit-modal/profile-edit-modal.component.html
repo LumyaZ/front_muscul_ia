@@ -1,25 +1,54 @@
-<!-- Modal Backdrop -->
-<div class="modal-backdrop" *ngIf="isOpen" (click)="onBackdropClick($event)">
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onBackdropClick($event)" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal-container">
     <div class="modal-header">
-      <h2 class="modal-title">
-        <i class="fas fa-user-edit"></i>
-        Modifier les informations personnelles
-      </h2>
-      <button class="close-button" (click)="onClose()">
-        <i class="fas fa-times"></i>
+      <div class="modal-title-container">
+        <div class="logo">
+          <i class="fas fa-user-edit" aria-hidden="true"></i>
+        </div>
+        <h2 id="modal-title" class="modal-title">
+          Modifier les informations personnelles
+        </h2>
+      </div>
+      <button 
+        class="close-button" 
+        (click)="onClose()"
+        aria-label="Fermer la modal"
+        type="button">
+        <i class="fas fa-times" aria-hidden="true"></i>
       </button>
     </div>
 
     <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="modal-content">
       
-      <!-- Personal Information -->
       <div class="form-section">
+        <h3 class="section-title">
+          <i class="fas fa-user" aria-hidden="true"></i>
+          Informations personnelles
+        </h3>
+        
         <div class="form-row">
           <div class="form-group">
-            <label for="firstName">Prénom *</label>
-            <input type="text" id="firstName" formControlName="firstName" class="form-control" placeholder="Ex: Jean">
-            <div *ngIf="editForm.get('firstName')?.invalid && editForm.get('firstName')?.touched" class="error-message">
+            <label for="firstName">
+              <i class="fas fa-user" aria-hidden="true"></i>
+              Prénom *
+            </label>
+            <div class="input-container">
+              <input 
+                type="text" 
+                id="firstName" 
+                formControlName="firstName" 
+                class="form-control" 
+                placeholder="Ex: Jean"
+                [class.error]="isFieldInvalid('firstName')"
+                required
+                aria-required="true"
+                aria-describedby="firstName-error">
+              <div class="input-icon" aria-hidden="true">
+                <i class="fas fa-user"></i>
+              </div>
+            </div>
+            <div *ngIf="isFieldInvalid('firstName')" class="error-message" id="firstName-error" role="alert">
+              <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
               <span *ngIf="editForm.get('firstName')?.errors?.['required']">Le prénom est requis</span>
               <span *ngIf="editForm.get('firstName')?.errors?.['minlength']">Le prénom doit contenir au moins 2 caractères</span>
               <span *ngIf="editForm.get('firstName')?.errors?.['maxlength']">Le prénom ne peut pas dépasser 50 caractères</span>
@@ -27,9 +56,27 @@
           </div>
 
           <div class="form-group">
-            <label for="lastName">Nom *</label>
-            <input type="text" id="lastName" formControlName="lastName" class="form-control" placeholder="Ex: Dupont">
-            <div *ngIf="editForm.get('lastName')?.invalid && editForm.get('lastName')?.touched" class="error-message">
+            <label for="lastName">
+              <i class="fas fa-user" aria-hidden="true"></i>
+              Nom *
+            </label>
+            <div class="input-container">
+              <input 
+                type="text" 
+                id="lastName" 
+                formControlName="lastName" 
+                class="form-control" 
+                placeholder="Ex: Dupont"
+                [class.error]="isFieldInvalid('lastName')"
+                required
+                aria-required="true"
+                aria-describedby="lastName-error">
+              <div class="input-icon" aria-hidden="true">
+                <i class="fas fa-user"></i>
+              </div>
+            </div>
+            <div *ngIf="isFieldInvalid('lastName')" class="error-message" id="lastName-error" role="alert">
+              <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
               <span *ngIf="editForm.get('lastName')?.errors?.['required']">Le nom est requis</span>
               <span *ngIf="editForm.get('lastName')?.errors?.['minlength']">Le nom doit contenir au moins 2 caractères</span>
               <span *ngIf="editForm.get('lastName')?.errors?.['maxlength']">Le nom ne peut pas dépasser 50 caractères</span>
@@ -38,9 +85,26 @@
         </div>
 
         <div class="form-group">
-          <label for="dateOfBirth">Date de naissance *</label>
-          <input type="date" id="dateOfBirth" formControlName="dateOfBirth" class="form-control">
-          <div *ngIf="editForm.get('dateOfBirth')?.invalid && editForm.get('dateOfBirth')?.touched" class="error-message">
+          <label for="dateOfBirth">
+            <i class="fas fa-calendar" aria-hidden="true"></i>
+            Date de naissance *
+          </label>
+          <div class="input-container">
+            <input 
+              type="date" 
+              id="dateOfBirth" 
+              formControlName="dateOfBirth" 
+              class="form-control"
+              [class.error]="isFieldInvalid('dateOfBirth')"
+              required
+              aria-required="true"
+              aria-describedby="dateOfBirth-error">
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-calendar"></i>
+            </div>
+          </div>
+          <div *ngIf="isFieldInvalid('dateOfBirth')" class="error-message" id="dateOfBirth-error" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
             <span *ngIf="editForm.get('dateOfBirth')?.errors?.['required']">La date de naissance est requise</span>
             <span *ngIf="editForm.get('dateOfBirth')?.errors?.['invalidDate']">La date de naissance n'est pas valide</span>
             <span *ngIf="editForm.get('dateOfBirth')?.errors?.['tooYoung']">Vous devez avoir au moins 13 ans</span>
@@ -49,30 +113,58 @@
         </div>
 
         <div class="form-group">
-          <label for="phoneNumber">Numéro de téléphone</label>
-          <input type="tel" id="phoneNumber" formControlName="phoneNumber" class="form-control" placeholder="Ex: 06 12 34 56 78">
-          <div *ngIf="editForm.get('phoneNumber')?.invalid && editForm.get('phoneNumber')?.touched" class="error-message">
+          <label for="phoneNumber">
+            <i class="fas fa-phone" aria-hidden="true"></i>
+            Numéro de téléphone
+          </label>
+          <div class="input-container">
+            <input 
+              type="tel" 
+              id="phoneNumber" 
+              formControlName="phoneNumber" 
+              class="form-control" 
+              placeholder="Ex: 06 12 34 56 78"
+              [class.error]="isFieldInvalid('phoneNumber')"
+              aria-describedby="phoneNumber-error">
+            <div class="input-icon" aria-hidden="true">
+              <i class="fas fa-phone"></i>
+            </div>
+          </div>
+          <div *ngIf="isFieldInvalid('phoneNumber')" class="error-message" id="phoneNumber-error" role="alert">
+            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
             <span *ngIf="editForm.get('phoneNumber')?.errors?.['pattern']">Le format du numéro de téléphone n'est pas valide</span>
           </div>
         </div>
       </div>
 
-      <!-- Error Display -->
-      <div *ngIf="error" class="error-alert">
-        {{ error }}
+      <div *ngIf="error" class="global-error" role="alert" aria-live="polite">
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+        <span>{{ error }}</span>
       </div>
 
-      <!-- Modal Actions -->
       <div class="modal-actions">
-        <button type="button" (click)="onClose()" class="btn btn-secondary">
+        <button 
+          type="button" 
+          (click)="onClose()" 
+          class="btn btn-secondary"
+          aria-label="Annuler les modifications">
+          <i class="fas fa-times" aria-hidden="true"></i>
           Annuler
         </button>
         <button 
           type="submit" 
           [disabled]="editForm.invalid || isLoading" 
-          class="btn btn-primary">
-          <span *ngIf="isLoading" class="spinner"></span>
-          {{ isLoading ? 'Mise à jour...' : 'Mettre à jour' }}
+          class="btn btn-primary"
+          [attr.aria-label]="isLoading ? 'Mise à jour en cours...' : 'Mettre à jour le profil'"
+          [attr.aria-busy]="isLoading">
+          <span *ngIf="!isLoading">
+            <i class="fas fa-save" aria-hidden="true"></i>
+            Mettre à jour
+          </span>
+          <span *ngIf="isLoading" class="loading-content">
+            <div class="spinner" aria-hidden="true"></div>
+            Mise à jour...
+          </span>
         </button>
       </div>
     </form>

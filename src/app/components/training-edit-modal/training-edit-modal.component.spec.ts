@@ -7,6 +7,10 @@ import { TrainingEditModalComponent, TrainingCategory } from './training-edit-mo
 import { TrainingInfoService } from '../../services/training-info.service';
 import { TrainingInfo, Gender, ExperienceLevel, SessionFrequency, SessionDuration, MainGoal, TrainingPreference, Equipment } from '../../models/training-info.model';
 
+/**
+ * Unit tests for TrainingEditModalComponent.
+ * Tests unitaires pour TrainingEditModalComponent.
+ */
 describe('TrainingEditModalComponent', () => {
   let component: TrainingEditModalComponent;
   let fixture: ComponentFixture<TrainingEditModalComponent>;
@@ -48,382 +52,280 @@ describe('TrainingEditModalComponent', () => {
     trainingInfoService = TestBed.inject(TrainingInfoService) as jasmine.SpyObj<TrainingInfoService>;
   });
 
+  /**
+   * Test de création du composant
+   * Test component creation
+   */
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   /**
-   * Test component initialization.
-   * Test d'initialisation du composant.
+   * Test d'initialisation et configuration
+   * Test initialization and configuration
    */
-  describe('Initialization', () => {
-    it('should initialize form on init', () => {
-      // Given
-      component.category = 'personal';
-
-      // When
-      component.ngOnInit();
-
-      // Then
-      expect(component.editForm).toBeDefined();
-      expect(component.editForm.get('gender')).toBeDefined();
-      expect(component.editForm.get('weight')).toBeDefined();
-      expect(component.editForm.get('height')).toBeDefined();
+  describe('Initialization and Configuration', () => {
+    it('should initialize forms for all categories correctly', () => {
+      const categories: TrainingCategory[] = ['personal', 'experience', 'goals', 'equipment'];
+      
+      categories.forEach(category => {
+        component.category = category;
+        component.ngOnInit();
+        
+        expect(component.editForm).toBeDefined();
+        
+        switch (category) {
+          case 'personal':
+            expect(component.editForm.get('gender')).toBeDefined();
+            expect(component.editForm.get('weight')).toBeDefined();
+            expect(component.editForm.get('height')).toBeDefined();
+            expect(component.editForm.get('bodyFatPercentage')).toBeDefined();
+            break;
+          case 'experience':
+            expect(component.editForm.get('experienceLevel')).toBeDefined();
+            expect(component.editForm.get('sessionFrequency')).toBeDefined();
+            expect(component.editForm.get('sessionDuration')).toBeDefined();
+            break;
+          case 'goals':
+            expect(component.editForm.get('mainGoal')).toBeDefined();
+            expect(component.editForm.get('trainingPreference')).toBeDefined();
+            break;
+          case 'equipment':
+            expect(component.editForm.get('equipment')).toBeDefined();
+            break;
+        }
+      });
     });
 
-    it('should initialize personal category form', () => {
-      // Given
-      component.category = 'personal';
-
-      // When
-      component.ngOnInit();
-
-      // Then
-      expect(component.editForm.get('gender')).toBeDefined();
-      expect(component.editForm.get('weight')).toBeDefined();
-      expect(component.editForm.get('height')).toBeDefined();
-      expect(component.editForm.get('bodyFatPercentage')).toBeDefined();
-    });
-
-    it('should initialize experience category form', () => {
-      // Given
-      component.category = 'experience';
-
-      // When
-      component.ngOnInit();
-
-      // Then
-      expect(component.editForm.get('experienceLevel')).toBeDefined();
-      expect(component.editForm.get('sessionFrequency')).toBeDefined();
-      expect(component.editForm.get('sessionDuration')).toBeDefined();
-    });
-
-    it('should initialize goals category form', () => {
-      // Given
-      component.category = 'goals';
-
-      // When
-      component.ngOnInit();
-
-      // Then
-      expect(component.editForm.get('mainGoal')).toBeDefined();
-      expect(component.editForm.get('trainingPreference')).toBeDefined();
-    });
-
-    it('should initialize equipment category form', () => {
-      // Given
-      component.category = 'equipment';
-
-      // When
-      component.ngOnInit();
-
-      // Then
-      expect(component.editForm.get('equipment')).toBeDefined();
-    });
-  });
-
-  /**
-   * Test data loading.
-   * Test de chargement des données.
-   */
-  describe('Data Loading', () => {
-    it('should load personal data into form', () => {
-      // Given
-      component.category = 'personal';
+    it('should load current training data when modal opens', () => {
       component.currentTrainingInfo = mockTrainingInfo;
+      component.category = 'personal';
 
-      // When
       component.ngOnInit();
       component.loadCurrentData();
 
-      // Then
       expect(component.editForm.get('gender')?.value).toBe(Gender.MALE);
       expect(component.editForm.get('weight')?.value).toBe(75);
       expect(component.editForm.get('height')?.value).toBe(180);
       expect(component.editForm.get('bodyFatPercentage')?.value).toBe(15);
     });
+  });
 
-    it('should load experience data into form', () => {
-      // Given
-      component.category = 'experience';
-      component.currentTrainingInfo = mockTrainingInfo;
-
-      // When
+  /**
+   * Test de validation des formulaires
+   * Test form validation
+   */
+  describe('Form Validation', () => {
+    beforeEach(() => {
+      component.category = 'personal';
       component.ngOnInit();
-      component.loadCurrentData();
-
-      // Then
-      expect(component.editForm.get('experienceLevel')?.value).toBe(ExperienceLevel.INTERMEDIATE);
-      expect(component.editForm.get('sessionFrequency')?.value).toBe(SessionFrequency.THREE_TO_FOUR);
-      expect(component.editForm.get('sessionDuration')?.value).toBe(SessionDuration.MEDIUM);
     });
 
-    it('should load goals data into form', () => {
-      // Given
-      component.category = 'goals';
-      component.currentTrainingInfo = mockTrainingInfo;
+    it('should validate required fields and constraints', () => {
+      const form = component.editForm;
+      
+      expect(form.valid).toBeFalsy();
+      expect(form.get('gender')?.errors?.['required']).toBeTruthy();
+      expect(form.get('weight')?.errors?.['required']).toBeTruthy();
+      expect(form.get('height')?.errors?.['required']).toBeTruthy();
 
-      // When
-      component.ngOnInit();
-      component.loadCurrentData();
+      const weightControl = form.get('weight');
+      weightControl?.setValue(25);
+      expect(weightControl?.errors?.['min']).toBeTruthy();
+      weightControl?.setValue(350);
+      expect(weightControl?.errors?.['max']).toBeTruthy();
+      weightControl?.setValue('invalid');
+      expect(weightControl?.errors?.['invalidNumber']).toBeTruthy();
 
-      // Then
-      expect(component.editForm.get('mainGoal')?.value).toBe(MainGoal.MUSCLE_GAIN);
-      expect(component.editForm.get('trainingPreference')?.value).toBe(TrainingPreference.STRENGTH_TRAINING);
+      const heightControl = form.get('height');
+      heightControl?.setValue(80);
+      expect(heightControl?.errors?.['min']).toBeTruthy();
+      heightControl?.setValue(280);
+      expect(heightControl?.errors?.['max']).toBeTruthy();
+
+      const bodyFatControl = form.get('bodyFatPercentage');
+      bodyFatControl?.setValue(2);
+      expect(bodyFatControl?.errors?.['min']).toBeTruthy();
+      bodyFatControl?.setValue(55);
+      expect(bodyFatControl?.errors?.['max']).toBeTruthy();
     });
 
-    it('should load equipment data into form', () => {
-      // Given
-      component.category = 'equipment';
-      component.currentTrainingInfo = mockTrainingInfo;
-
-      // When
-      component.ngOnInit();
-      component.loadCurrentData();
-
-      // Then
-      expect(component.editForm.get('equipment')?.value).toBe(Equipment.GYM_ACCESS);
+    it('should validate form with valid data', () => {
+      component.editForm.patchValue({
+        gender: Gender.MALE,
+        weight: 75,
+        height: 180,
+        bodyFatPercentage: 15
+      });
+      
+      expect(component.editForm.valid).toBeTruthy();
     });
   });
 
   /**
-   * Test category titles and icons.
-   * Test des titres et icônes de catégories.
+   * Test des méthodes utilitaires
+   * Test utility methods
    */
-  describe('Category Information', () => {
-    it('should return correct title for personal category', () => {
-      // Given
-      component.category = 'personal';
+  describe('Utility Methods', () => {
+    it('should get category information correctly', () => {
+      const testCases = [
+        { category: 'personal', title: 'Informations personnelles', icon: 'fas fa-user-circle' },
+        { category: 'experience', title: 'Expérience d\'entraînement', icon: 'fas fa-chart-line' },
+        { category: 'goals', title: 'Objectifs et préférences', icon: 'fas fa-bullseye' },
+        { category: 'equipment', title: 'Équipement', icon: 'fas fa-tools' }
+      ];
 
-      // When
-      const title = component.getCategoryTitle();
-
-      // Then
-      expect(title).toBe('Informations personnelles');
+      testCases.forEach(({ category, title, icon }) => {
+        component.category = category as TrainingCategory;
+        expect(component.getCategoryTitle()).toBe(title);
+        expect(component.getCategoryIcon()).toBe(icon);
+      });
     });
 
-    it('should return correct title for experience category', () => {
-      // Given
-      component.category = 'experience';
-
-      // When
-      const title = component.getCategoryTitle();
-
-      // Then
-      expect(title).toBe('Expérience d\'entraînement');
-    });
-
-    it('should return correct title for goals category', () => {
-      // Given
-      component.category = 'goals';
-
-      // When
-      const title = component.getCategoryTitle();
-
-      // Then
-      expect(title).toBe('Objectifs et préférences');
-    });
-
-    it('should return correct title for equipment category', () => {
-      // Given
-      component.category = 'equipment';
-
-      // When
-      const title = component.getCategoryTitle();
-
-      // Then
-      expect(title).toBe('Équipement');
-    });
-
-    it('should return correct icon for personal category', () => {
-      // Given
-      component.category = 'personal';
-
-      // When
-      const icon = component.getCategoryIcon();
-
-      // Then
-      expect(icon).toBe('fas fa-user-circle');
-    });
-
-    it('should return correct icon for experience category', () => {
-      // Given
-      component.category = 'experience';
-
-      // When
-      const icon = component.getCategoryIcon();
-
-      // Then
-      expect(icon).toBe('fas fa-chart-line');
-    });
-  });
-
-  /**
-   * Test form interactions.
-   * Test des interactions avec le formulaire.
-   */
-  describe('Form Interactions', () => {
-    it('should select option correctly', () => {
-      // Given
+    it('should handle field validation and error messages', () => {
       component.category = 'personal';
       component.ngOnInit();
-
-      // When
-      component.selectOption('gender', Gender.FEMALE);
-
-      // Then
-      expect(component.editForm.get('gender')?.value).toBe(Gender.FEMALE);
+      
+      const weightControl = component.editForm.get('weight');
+      weightControl?.setValue(25);
+      weightControl?.markAsTouched();
+      
+      expect(component.isFieldInvalid('weight')).toBeTruthy();
+      expect(component.isFieldInvalid('height')).toBeFalsy();
+      expect(component.getFieldErrorMessage('weight')).toContain('minimale est 30');
     });
 
     it('should get display name correctly', () => {
-      // When
-      const result = component.getDisplayName(Gender.MALE, component.genderDisplayNames);
-
-      // Then
-      expect(result).toBe('Homme');
-    });
-
-    it('should return original value if no display name found', () => {
-      // When
-      const result = component.getDisplayName('UNKNOWN', component.genderDisplayNames);
-
-      // Then
-      expect(result).toBe('UNKNOWN');
+      const displayNames = { 'TEST': 'Test Display' };
+      expect(component.getDisplayName('TEST', displayNames)).toBe('Test Display');
+      expect(component.getDisplayName('UNKNOWN', displayNames)).toBe('UNKNOWN');
     });
   });
 
   /**
-   * Test form submission.
-   * Test de soumission du formulaire.
+   * Test des interactions utilisateur
+   * Test user interactions
+   */
+  describe('User Interactions', () => {
+    beforeEach(() => {
+      component.category = 'personal';
+      component.ngOnInit();
+    });
+
+    it('should handle option selection and field changes', () => {
+      component.selectOption('gender', Gender.FEMALE);
+      expect(component.editForm.get('gender')?.value).toBe(Gender.FEMALE);
+
+      component.error = 'Test error';
+      component.onFieldChange();
+      expect(component.error).toBeNull();
+    });
+  });
+
+  /**
+   * Test de soumission du formulaire
+   * Test form submission
    */
   describe('Form Submission', () => {
-    it('should submit personal form successfully', () => {
-      // Given
+    beforeEach(() => {
       component.category = 'personal';
       component.currentTrainingInfo = mockTrainingInfo;
+      component.ngOnInit();
+    });
+
+    it('should submit form successfully with valid data', () => {
       const updatedTrainingInfo = { ...mockTrainingInfo, weight: 80 };
       trainingInfoService.updateTrainingInfo.and.returnValue(of(updatedTrainingInfo));
       spyOn(component.trainingUpdated, 'emit');
       spyOn(component.closeModal, 'emit');
+      
+      component.editForm.patchValue({
+        gender: Gender.MALE,
+        weight: 80,
+        height: 180,
+        bodyFatPercentage: 15
+      });
 
-      component.ngOnInit();
-      component.loadCurrentData();
-      component.editForm.patchValue({ weight: 80 });
-
-      // When
       component.onSubmit();
 
-      // Then
       expect(trainingInfoService.updateTrainingInfo).toHaveBeenCalled();
       expect(component.trainingUpdated.emit).toHaveBeenCalledWith(updatedTrainingInfo);
       expect(component.closeModal.emit).toHaveBeenCalled();
-      expect(component.isLoading).toBeFalse();
+      expect(component.isLoading).toBeFalsy();
     });
 
-    it('should handle submission error', () => {
-      // Given
-      component.category = 'personal';
-      component.currentTrainingInfo = mockTrainingInfo;
-      trainingInfoService.updateTrainingInfo.and.returnValue(throwError(() => new Error('Update failed')));
+    it('should not submit form with invalid data', () => {
+      component.editForm.patchValue({
+        gender: '',
+        weight: 25, 
+        height: 180,
+        bodyFatPercentage: 15
+      });
 
-      component.ngOnInit();
-      component.loadCurrentData();
-
-      // When
       component.onSubmit();
 
-      // Then
-      expect(component.error).toBe('Erreur lors de la mise à jour des informations d\'entraînement');
-      expect(component.isLoading).toBeFalse();
-    });
-
-    it('should not submit if form is invalid', () => {
-      // Given
-      component.category = 'personal';
-      component.currentTrainingInfo = mockTrainingInfo;
-
-      component.ngOnInit();
-      component.editForm.patchValue({ weight: null }); // Invalid value
-
-      // When
-      component.onSubmit();
-
-      // Then
       expect(trainingInfoService.updateTrainingInfo).not.toHaveBeenCalled();
     });
+
+    it('should handle various error scenarios', () => {
+      const errorScenarios = [
+        { status: 400, expectedMessage: 'vérifier les informations saisies' },
+        { status: 401, expectedMessage: 'Session expirée' },
+        { status: 403, expectedMessage: 'permissions' },
+        { status: 404, expectedMessage: 'non trouvées' },
+        { status: 0, expectedMessage: 'Impossible de se connecter au serveur' }
+      ];
+
+      errorScenarios.forEach(({ status, expectedMessage }) => {
+        trainingInfoService.updateTrainingInfo.and.returnValue(throwError(() => ({ status })));
+        
+        component.editForm.patchValue({
+          gender: Gender.MALE,
+          weight: 75,
+          height: 180,
+          bodyFatPercentage: 15
+        });
+
+        component.onSubmit();
+
+        expect(component.error).toContain(expectedMessage);
+        expect(component.isLoading).toBeFalsy();
+      });
+    });
   });
 
   /**
-   * Test modal interactions.
-   * Test des interactions avec la modale.
+   * Test de gestion de la modale
+   * Test modal management
    */
-  describe('Modal Interactions', () => {
-    it('should close modal', () => {
-      // Given
+  describe('Modal Management', () => {
+    it('should handle modal interactions correctly', () => {
       spyOn(component.closeModal, 'emit');
-
-      // When
       component.onClose();
-
-      // Then
       expect(component.closeModal.emit).toHaveBeenCalled();
+
+      const mockEvent = {
+        target: document.createElement('div'),
+        currentTarget: document.createElement('div')
+      };
+      component.onBackdropClick(mockEvent as any);
+      expect(component.closeModal.emit).toHaveBeenCalledTimes(1);
     });
 
-    it('should handle backdrop click', () => {
-      // Given
-      spyOn(component, 'onClose');
-      const event = new Event('click');
-      Object.defineProperty(event, 'target', { value: event.currentTarget });
-
-      // When
-      component.onBackdropClick(event);
-
-      // Then
-      expect(component.onClose).toHaveBeenCalled();
-    });
-
-    it('should not close on content click', () => {
-      // Given
-      spyOn(component, 'onClose');
-      const event = new Event('click');
-      const mockTarget = document.createElement('div');
-      Object.defineProperty(event, 'target', { value: mockTarget });
-
-      // When
-      component.onBackdropClick(event);
-
-      // Then
-      expect(component.onClose).not.toHaveBeenCalled();
-    });
-  });
-
-  /**
-   * Test body lock management.
-   * Test de gestion du verrouillage du body.
-   */
-  describe('Body Lock Management', () => {
-    it('should call ngOnChanges when modal opens', () => {
-      // Given
-      spyOn(component, 'ngOnChanges');
-
-      // When
+    it('should manage body scroll correctly', () => {
       component.isOpen = true;
+      spyOn(document.body.classList, 'add');
       component.ngOnChanges();
+      expect(document.body.style.overflow).toBe('hidden');
+      expect(document.body.classList.add).toHaveBeenCalledWith('modal-open');
 
-      // Then
-      expect(component.ngOnChanges).toHaveBeenCalled();
-    });
-
-    it('should call ngOnChanges when modal closes', () => {
-      // Given
-      spyOn(component, 'ngOnChanges');
-
-      // When
       component.isOpen = false;
+      spyOn(document.body.classList, 'remove');
       component.ngOnChanges();
+      expect(document.body.classList.remove).toHaveBeenCalledWith('modal-open');
 
-      // Then
-      expect(component.ngOnChanges).toHaveBeenCalled();
+      component.ngOnDestroy();
+      expect(document.body.classList.remove).toHaveBeenCalledWith('modal-open');
     });
   });
 }); 

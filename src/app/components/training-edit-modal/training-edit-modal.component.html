@@ -6,7 +6,11 @@
         <i [class]="getCategoryIcon()"></i>
         {{ getCategoryTitle() }}
       </h2>
-      <button class="close-button" (click)="onClose()">
+      <button 
+        type="button"
+        class="close-button" 
+        (click)="onClose()"
+        aria-label="Fermer la modale">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -16,45 +20,112 @@
       <!-- Personal Information -->
       <div *ngIf="category === 'personal'" class="form-section">
         <div class="form-group">
-          <label>Genre *</label>
+          <label for="gender">
+            <i class="fas fa-venus-mars"></i>
+            Genre *
+          </label>
           <div class="button-group">
             <button 
               type="button" 
               *ngFor="let gender of genderOptions" 
               [class.selected]="editForm.get('gender')?.value === gender"
               (click)="selectOption('gender', gender)"
-              class="option-button">
+              class="option-button"
+              [attr.aria-label]="'Sélectionner ' + getDisplayName(gender, genderDisplayNames)">
+              <i class="fas fa-check" *ngIf="editForm.get('gender')?.value === gender"></i>
               {{ getDisplayName(gender, genderDisplayNames) }}
             </button>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('gender')">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldErrorMessage('gender') }}</span>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="weight">Poids (kg) *</label>
-            <input type="number" id="weight" formControlName="weight" class="form-control" min="30" max="300" step="0.1" placeholder="Ex: 75">
-            <div *ngIf="editForm.get('weight')?.invalid && editForm.get('weight')?.touched" class="error-message">
-              <span *ngIf="editForm.get('weight')?.errors?.['min']">Le poids doit être d'au moins 30 kg</span>
-              <span *ngIf="editForm.get('weight')?.errors?.['max']">Le poids ne peut pas dépasser 300 kg</span>
+            <label for="weight">
+              <i class="fas fa-weight"></i>
+              Poids (kg) *
+            </label>
+            <div class="input-container">
+              <input 
+                type="number" 
+                id="weight" 
+                formControlName="weight" 
+                class="form-control" 
+                min="30" 
+                max="300" 
+                step="0.1" 
+                placeholder="Ex: 75"
+                [class.error]="isFieldInvalid('weight')"
+                (input)="onFieldChange()"
+                required
+                aria-required="true">
+              <div class="input-icon">
+                <i class="fas fa-weight"></i>
+              </div>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('weight')">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>{{ getFieldErrorMessage('weight') }}</span>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="height">Taille (cm) *</label>
-            <input type="number" id="height" formControlName="height" class="form-control" min="100" max="250" step="0.1" placeholder="Ex: 180">
-            <div *ngIf="editForm.get('height')?.invalid && editForm.get('height')?.touched" class="error-message">
-              <span *ngIf="editForm.get('height')?.errors?.['min']">La taille doit être d'au moins 100 cm</span>
-              <span *ngIf="editForm.get('height')?.errors?.['max']">La taille ne peut pas dépasser 250 cm</span>
+            <label for="height">
+              <i class="fas fa-ruler-vertical"></i>
+              Taille (cm) *
+            </label>
+            <div class="input-container">
+              <input 
+                type="number" 
+                id="height" 
+                formControlName="height" 
+                class="form-control" 
+                min="100" 
+                max="250" 
+                step="0.1" 
+                placeholder="Ex: 180"
+                [class.error]="isFieldInvalid('height')"
+                (input)="onFieldChange()"
+                required
+                aria-required="true">
+              <div class="input-icon">
+                <i class="fas fa-ruler-vertical"></i>
+              </div>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('height')">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>{{ getFieldErrorMessage('height') }}</span>
             </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="bodyFatPercentage">Pourcentage de graisse corporelle (%)</label>
-          <input type="number" id="bodyFatPercentage" formControlName="bodyFatPercentage" class="form-control" min="3" max="50" step="0.1" placeholder="Ex: 15">
-          <div *ngIf="editForm.get('bodyFatPercentage')?.invalid && editForm.get('bodyFatPercentage')?.touched" class="error-message">
-            <span *ngIf="editForm.get('bodyFatPercentage')?.errors?.['min']">Le pourcentage doit être d'au moins 3%</span>
-            <span *ngIf="editForm.get('bodyFatPercentage')?.errors?.['max']">Le pourcentage ne peut pas dépasser 50%</span>
+          <label for="bodyFatPercentage">
+            <i class="fas fa-percentage"></i>
+            Pourcentage de graisse corporelle (%)
+          </label>
+          <div class="input-container">
+            <input 
+              type="number" 
+              id="bodyFatPercentage" 
+              formControlName="bodyFatPercentage" 
+              class="form-control" 
+              min="3" 
+              max="50" 
+              step="0.1" 
+              placeholder="Ex: 15"
+              [class.error]="isFieldInvalid('bodyFatPercentage')"
+              (input)="onFieldChange()">
+            <div class="input-icon">
+              <i class="fas fa-percentage"></i>
+            </div>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('bodyFatPercentage')">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldErrorMessage('bodyFatPercentage') }}</span>
           </div>
         </div>
       </div>
@@ -62,45 +133,72 @@
       <!-- Experience -->
       <div *ngIf="category === 'experience'" class="form-section">
         <div class="form-group">
-          <label>Niveau d'expérience *</label>
+          <label for="experienceLevel">
+            <i class="fas fa-chart-line"></i>
+            Niveau d'expérience *
+          </label>
           <div class="button-group">
             <button 
               type="button" 
               *ngFor="let level of experienceLevelOptions" 
               [class.selected]="editForm.get('experienceLevel')?.value === level"
               (click)="selectOption('experienceLevel', level)"
-              class="option-button">
+              class="option-button"
+              [attr.aria-label]="'Sélectionner ' + getDisplayName(level, experienceLevelDisplayNames)">
+              <i class="fas fa-check" *ngIf="editForm.get('experienceLevel')?.value === level"></i>
               {{ getDisplayName(level, experienceLevelDisplayNames) }}
             </button>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('experienceLevel')">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldErrorMessage('experienceLevel') }}</span>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Fréquence des sessions *</label>
+            <label for="sessionFrequency">
+              <i class="fas fa-calendar-alt"></i>
+              Fréquence des sessions *
+            </label>
             <div class="button-group">
               <button 
                 type="button" 
                 *ngFor="let frequency of sessionFrequencyOptions" 
                 [class.selected]="editForm.get('sessionFrequency')?.value === frequency"
                 (click)="selectOption('sessionFrequency', frequency)"
-                class="option-button">
+                class="option-button"
+                [attr.aria-label]="'Sélectionner ' + getDisplayName(frequency, sessionFrequencyDisplayNames)">
+                <i class="fas fa-check" *ngIf="editForm.get('sessionFrequency')?.value === frequency"></i>
                 {{ getDisplayName(frequency, sessionFrequencyDisplayNames) }}
               </button>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('sessionFrequency')">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>{{ getFieldErrorMessage('sessionFrequency') }}</span>
             </div>
           </div>
 
           <div class="form-group">
-            <label>Durée des sessions *</label>
+            <label for="sessionDuration">
+              <i class="fas fa-clock"></i>
+              Durée des sessions *
+            </label>
             <div class="button-group">
               <button 
                 type="button" 
                 *ngFor="let duration of sessionDurationOptions" 
                 [class.selected]="editForm.get('sessionDuration')?.value === duration"
                 (click)="selectOption('sessionDuration', duration)"
-                class="option-button">
+                class="option-button"
+                [attr.aria-label]="'Sélectionner ' + getDisplayName(duration, sessionDurationDisplayNames)">
+                <i class="fas fa-check" *ngIf="editForm.get('sessionDuration')?.value === duration"></i>
                 {{ getDisplayName(duration, sessionDurationDisplayNames) }}
               </button>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('sessionDuration')">
+              <i class="fas fa-exclamation-circle"></i>
+              <span>{{ getFieldErrorMessage('sessionDuration') }}</span>
             </div>
           </div>
         </div>
@@ -109,30 +207,48 @@
       <!-- Goals -->
       <div *ngIf="category === 'goals'" class="form-section">
         <div class="form-group">
-          <label>Objectif principal *</label>
+          <label for="mainGoal">
+            <i class="fas fa-bullseye"></i>
+            Objectif principal *
+          </label>
           <div class="button-group">
             <button 
               type="button" 
               *ngFor="let goal of mainGoalOptions" 
               [class.selected]="editForm.get('mainGoal')?.value === goal"
               (click)="selectOption('mainGoal', goal)"
-              class="option-button">
+              class="option-button"
+              [attr.aria-label]="'Sélectionner ' + getDisplayName(goal, mainGoalDisplayNames)">
+              <i class="fas fa-check" *ngIf="editForm.get('mainGoal')?.value === goal"></i>
               {{ getDisplayName(goal, mainGoalDisplayNames) }}
             </button>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('mainGoal')">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldErrorMessage('mainGoal') }}</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Type d'entraînement préféré *</label>
+          <label for="trainingPreference">
+            <i class="fas fa-dumbbell"></i>
+            Type d'entraînement préféré *
+          </label>
           <div class="button-group">
             <button 
               type="button" 
               *ngFor="let preference of trainingPreferenceOptions" 
               [class.selected]="editForm.get('trainingPreference')?.value === preference"
               (click)="selectOption('trainingPreference', preference)"
-              class="option-button">
+              class="option-button"
+              [attr.aria-label]="'Sélectionner ' + getDisplayName(preference, trainingPreferenceDisplayNames)">
+              <i class="fas fa-check" *ngIf="editForm.get('trainingPreference')?.value === preference"></i>
               {{ getDisplayName(preference, trainingPreferenceDisplayNames) }}
             </button>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('trainingPreference')">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldErrorMessage('trainingPreference') }}</span>
           </div>
         </div>
       </div>
@@ -140,36 +256,57 @@
       <!-- Equipment -->
       <div *ngIf="category === 'equipment'" class="form-section">
         <div class="form-group">
-          <label>Équipement disponible *</label>
+          <label for="equipment">
+            <i class="fas fa-tools"></i>
+            Équipement disponible *
+          </label>
           <div class="button-group">
             <button 
               type="button" 
               *ngFor="let equip of equipmentOptions" 
               [class.selected]="editForm.get('equipment')?.value === equip"
               (click)="selectOption('equipment', equip)"
-              class="option-button">
+              class="option-button"
+              [attr.aria-label]="'Sélectionner ' + getDisplayName(equip, equipmentDisplayNames)">
+              <i class="fas fa-check" *ngIf="editForm.get('equipment')?.value === equip"></i>
               {{ getDisplayName(equip, equipmentDisplayNames) }}
             </button>
+          </div>
+          <div class="error-message" *ngIf="isFieldInvalid('equipment')">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>{{ getFieldErrorMessage('equipment') }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Error Display -->
-      <div *ngIf="error" class="error-alert">
-        {{ error }}
+      <!-- Global Error Display -->
+      <div *ngIf="error" class="global-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>{{ error }}</span>
       </div>
 
       <!-- Modal Actions -->
       <div class="modal-actions">
-        <button type="button" (click)="onClose()" class="btn btn-secondary">
+        <button 
+          type="button" 
+          (click)="onClose()" 
+          class="btn btn-secondary"
+          [disabled]="isLoading">
+          <i class="fas fa-times"></i>
           Annuler
         </button>
         <button 
           type="submit" 
           [disabled]="editForm.invalid || isLoading" 
           class="btn btn-primary">
-          <span *ngIf="isLoading" class="spinner"></span>
-          {{ isLoading ? 'Mise à jour...' : 'Mettre à jour' }}
+          <span *ngIf="!isLoading">
+            <i class="fas fa-save"></i>
+            Mettre à jour
+          </span>
+          <span *ngIf="isLoading" class="loading-content">
+            <div class="spinner"></div>
+            Mise à jour...
+          </span>
         </button>
       </div>
     </form>

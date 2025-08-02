@@ -144,10 +144,6 @@ export class ProfileComponent implements OnInit {
    * Vérifie si le chargement de toutes les données est terminé
    */
   private checkLoadingComplete(): void {
-    // Stop loading if both profile and training info have been processed (even if null)
-    // Arrêter le chargement si le profil et les infos d'entraînement ont été traités (même si null)
-    // Since this method is called after each request completes, we can stop loading
-    // Puisque cette méthode est appelée après chaque requête terminée, on peut arrêter le loading
     this.isLoading = false;
   }
 
@@ -188,6 +184,12 @@ export class ProfileComponent implements OnInit {
    * Ouvre la modale d'édition des informations d'entraînement
    */
   editTrainingInfo(): void {
+    this.selectedCategory = 'personal';
+    this.isModalOpen = true;
+  }
+
+  editTrainingCategory(category: TrainingCategory): void {
+    this.selectedCategory = category;
     this.isModalOpen = true;
   }
 

@@ -135,19 +135,43 @@ describe('ProfileComponent', () => {
    * Test opening and closing modals
    */
   it('should handle modal operations correctly', () => {
-    // Test opening modals
     component.editTrainingInfo();
     expect(component.isModalOpen).toBeTrue();
+    expect(component.selectedCategory).toBe('personal');
     
     component.editProfile();
     expect(component.isProfileModalOpen).toBeTrue();
     
-    // Test closing modals
     component.closeTrainingModal();
     expect(component.isModalOpen).toBeFalse();
     
     component.closeProfileModal();
     expect(component.isProfileModalOpen).toBeFalse();
+  });
+
+  /**
+   * Test d'édition des catégories d'entraînement
+   * Test editing training categories
+   */
+  it('should handle training category editing correctly', () => {
+    component.editTrainingCategory('personal');
+    expect(component.isModalOpen).toBeTrue();
+    expect(component.selectedCategory).toBe('personal');
+    
+    component.closeTrainingModal();
+    component.editTrainingCategory('experience');
+    expect(component.isModalOpen).toBeTrue();
+    expect(component.selectedCategory).toBe('experience');
+    
+    component.closeTrainingModal();
+    component.editTrainingCategory('goals');
+    expect(component.isModalOpen).toBeTrue();
+    expect(component.selectedCategory).toBe('goals');
+    
+    component.closeTrainingModal();
+    component.editTrainingCategory('equipment');
+    expect(component.isModalOpen).toBeTrue();
+    expect(component.selectedCategory).toBe('equipment');
   });
 
   /**
@@ -182,17 +206,38 @@ describe('ProfileComponent', () => {
   });
 
   /**
+   * Test de vérification des données d'entraînement par catégorie
+   * Test checking training data by category
+   */
+  it('should display correct training data by category', () => {
+    component.trainingInfo = mockTrainingInfo;
+    fixture.detectChanges();
+
+    expect(component.trainingInfo?.gender).toBe(Gender.MALE);
+    expect(component.trainingInfo?.weight).toBe(75.0);
+    expect(component.trainingInfo?.height).toBe(180.0);
+    expect(component.trainingInfo?.bodyFatPercentage).toBe(15.0);
+
+    expect(component.trainingInfo?.experienceLevel).toBe(ExperienceLevel.INTERMEDIATE);
+    expect(component.trainingInfo?.sessionFrequency).toBe(SessionFrequency.THREE_TO_FOUR);
+    expect(component.trainingInfo?.sessionDuration).toBe(SessionDuration.MEDIUM);
+
+    expect(component.trainingInfo?.mainGoal).toBe(MainGoal.MUSCLE_GAIN);
+    expect(component.trainingInfo?.trainingPreference).toBe(TrainingPreference.STRENGTH_TRAINING);
+
+    expect(component.trainingInfo?.equipment).toBe(Equipment.GYM_ACCESS);
+  });
+
+  /**
    * Test de vérification de profil complet
    * Test checking complete profile
    */
   it('should check profile completion correctly', () => {
-    // Test complete profile
     component.userProfile = mockUserProfile;
     component.trainingInfo = mockTrainingInfo;
     expect(component.hasCompleteProfile()).toBeTrue();
     expect(component.getProfileCompletionPercentage()).toBe(100);
     
-    // Test incomplete profile
     component.userProfile = null;
     component.trainingInfo = null;
     expect(component.hasCompleteProfile()).toBeFalse();
@@ -204,14 +249,10 @@ describe('ProfileComponent', () => {
    * Test main error handling
    */
   it('should handle errors correctly', () => {
-    spyOn(component['router'], 'navigate');
-    
-    // Test 401 error
     component['handleError']({ status: 401 });
     expect(component.error).toBe('Session expirée. Veuillez vous reconnecter.');
-    expect(component['router'].navigate).toHaveBeenCalledWith(['/login']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
     
-    // Test generic error
     component['handleError']({ status: 500, error: { message: 'Server error' } });
     expect(component.error).toBe('Server error');
   });

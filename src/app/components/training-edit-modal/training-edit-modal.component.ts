@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef, OnChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { TrainingInfoService } from '../../services/training-info.service';
 import { 
   Gender, 
@@ -23,6 +23,11 @@ import {
 
 export type TrainingCategory = 'personal' | 'experience' | 'goals' | 'equipment';
 
+interface ValidationResult {
+  isValid: boolean;
+  message: string;
+}
+
 @Component({
   selector: 'app-training-edit-modal',
   standalone: true,
@@ -30,7 +35,7 @@ export type TrainingCategory = 'personal' | 'experience' | 'goals' | 'equipment'
   templateUrl: './training-edit-modal.component.html',
   styleUrls: ['./training-edit-modal.component.scss']
 })
-export class TrainingEditModalComponent implements OnInit {
+export class TrainingEditModalComponent implements OnInit, OnChanges, OnDestroy {
   @Input() isOpen = false;
   @Input() category: TrainingCategory = 'personal';
   @Input() currentTrainingInfo: TrainingInfo | null = null;
@@ -43,7 +48,6 @@ export class TrainingEditModalComponent implements OnInit {
   isLoading = false;
   error: string | null = null;
 
-  // Display names for dropdowns
   genderOptions = Object.values(Gender);
   experienceLevelOptions = Object.values(ExperienceLevel);
   sessionFrequencyOptions = Object.values(SessionFrequency);
@@ -52,7 +56,6 @@ export class TrainingEditModalComponent implements OnInit {
   trainingPreferenceOptions = Object.values(TrainingPreference);
   equipmentOptions = Object.values(Equipment);
 
-  // Display name mappings
   genderDisplayNames = GenderDisplayNames;
   experienceLevelDisplayNames = ExperienceLevelDisplayNames;
   sessionFrequencyDisplayNames = SessionFrequencyDisplayNames;
@@ -74,7 +77,6 @@ export class TrainingEditModalComponent implements OnInit {
   ngOnChanges(): void {
     if (this.isOpen) {
       this.lockBody();
-      // Réinitialiser le formulaire et charger les données quand la modale s'ouvre
       this.initForm();
       this.loadCurrentData();
     } else {
@@ -87,42 +89,191 @@ export class TrainingEditModalComponent implements OnInit {
   }
 
   /**
-   * Initialize form based on category.
-   * Initialiser le formulaire basé sur la catégorie.
+   * Initialize form based on category with custom validators.
+   * Initialiser le formulaire basé sur la catégorie avec des validateurs personnalisés.
    */
   private initForm(): void {
-    console.log('Initializing form for category:', this.category);
-    
     switch (this.category) {
       case 'personal':
         this.editForm = this.fb.group({
-          gender: ['', Validators.required],
-          weight: ['', [Validators.required, Validators.min(30), Validators.max(300)]],
-          height: ['', [Validators.required, Validators.min(100), Validators.max(250)]],
-          bodyFatPercentage: ['', [Validators.min(3), Validators.max(50)]]
+          gender: ['', [Validators.required]],
+          weight: ['', [
+            Validators.required, 
+            Validators.min(30), 
+            Validators.max(300),
+            this.weightValidator.bind(this)
+          ]],
+          height: ['', [
+            Validators.required, 
+            Validators.min(100), 
+            Validators.max(250),
+            this.heightValidator.bind(this)
+          ]],
+          bodyFatPercentage: ['', [
+            Validators.min(3), 
+            Validators.max(50),
+            this.bodyFatValidator.bind(this)
+          ]]
         });
         break;
       case 'experience':
         this.editForm = this.fb.group({
-          experienceLevel: ['', Validators.required],
-          sessionFrequency: ['', Validators.required],
-          sessionDuration: ['', Validators.required]
+          experienceLevel: ['', [Validators.required]],
+          sessionFrequency: ['', [Validators.required]],
+          sessionDuration: ['', [Validators.required]]
         });
         break;
       case 'goals':
         this.editForm = this.fb.group({
-          mainGoal: ['', Validators.required],
-          trainingPreference: ['', Validators.required]
+          mainGoal: ['', [Validators.required]],
+          trainingPreference: ['', [Validators.required]]
         });
         break;
       case 'equipment':
         this.editForm = this.fb.group({
-          equipment: ['', Validators.required]
+          equipment: ['', [Validators.required]]
         });
         break;
     }
-    
-    console.log('Form initialized:', this.editForm);
+  }
+
+  /**
+   * Custom validator for weight field.
+   * Validateur personnalisé pour le champ poids.
+   */
+  private weightValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+
+    const weight = parseFloat(control.value);
+    if (isNaN(weight)) {
+      return { invalidNumber: true };
+    }
+
+    if (weight < 30) {
+      return { tooLight: true };
+    }
+
+    if (weight > 300) {
+      return { tooHeavy: true };
+    }
+
+    return null;
+  }
+
+  /**
+   * Custom validator for height field.
+   * Validateur personnalisé pour le champ taille.
+   */
+  private heightValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+
+    const height = parseFloat(control.value);
+    if (isNaN(height)) {
+      return { invalidNumber: true };
+    }
+
+    if (height < 100) {
+      return { tooShort: true };
+    }
+
+    if (height > 250) {
+      return { tooTall: true };
+    }
+
+    return null;
+  }
+
+  /**
+   * Custom validator for body fat percentage field.
+   * Validateur personnalisé pour le champ pourcentage de graisse corporelle.
+   */
+  private bodyFatValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+
+    const bodyFat = parseFloat(control.value);
+    if (isNaN(bodyFat)) {
+      return { invalidNumber: true };
+    }
+
+    if (bodyFat < 3) {
+      return { tooLow: true };
+    }
+
+    if (bodyFat > 50) {
+      return { tooHigh: true };
+    }
+
+    return null;
+  }
+
+  /**
+   * Check if a field is invalid and has been touched.
+   * Vérifier si un champ est invalide et a été touché.
+   */
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.editForm.get(fieldName);
+    return field ? field.invalid && field.touched : false;
+  }
+
+  /**
+   * Get error message for a specific field.
+   * Obtenir le message d'erreur pour un champ spécifique.
+   */
+  getFieldErrorMessage(fieldName: string): string {
+    const field = this.editForm.get(fieldName);
+    if (!field?.errors || !field.touched) {
+      return '';
+    }
+
+    const errors = field.errors;
+
+    if (errors['required']) {
+      return 'Ce champ est obligatoire';
+    }
+
+    if (errors['min']) {
+      return `La valeur minimale est ${errors['min'].min}`;
+    }
+
+    if (errors['max']) {
+      return `La valeur maximale est ${errors['max'].max}`;
+    }
+
+    if (errors['tooLight']) {
+      return 'Le poids doit être d\'au moins 30 kg';
+    }
+
+    if (errors['tooHeavy']) {
+      return 'Le poids ne peut pas dépasser 300 kg';
+    }
+
+    if (errors['tooShort']) {
+      return 'La taille doit être d\'au moins 100 cm';
+    }
+
+    if (errors['tooTall']) {
+      return 'La taille ne peut pas dépasser 250 cm';
+    }
+
+    if (errors['tooLow']) {
+      return 'Le pourcentage doit être d\'au moins 3%';
+    }
+
+    if (errors['tooHigh']) {
+      return 'Le pourcentage ne peut pas dépasser 50%';
+    }
+
+    if (errors['invalidNumber']) {
+      return 'Veuillez entrer un nombre valide';
+    }
+
+    return 'Valeur invalide';
   }
 
   /**
@@ -130,9 +281,6 @@ export class TrainingEditModalComponent implements OnInit {
    * Charger les données d'entraînement actuelles dans le formulaire.
    */
   loadCurrentData(): void {
-    console.log('Loading data for category:', this.category);
-    console.log('Current training info:', this.currentTrainingInfo);
-    
     if (this.currentTrainingInfo && this.editForm) {
       switch (this.category) {
         case 'personal':
@@ -163,11 +311,7 @@ export class TrainingEditModalComponent implements OnInit {
           break;
       }
       
-      // Marquer le formulaire comme touché pour déclencher la validation
       this.editForm.markAsTouched();
-      console.log('Form values after loading:', this.editForm.value);
-      
-      // Forcer la détection des changements
       this.cdr.detectChanges();
     } else {
       console.warn('No training info or form not initialized');
@@ -226,11 +370,12 @@ export class TrainingEditModalComponent implements OnInit {
    */
   selectOption(field: string, value: string): void {
     this.editForm.get(field)?.setValue(value);
+    this.onFieldChange();
   }
 
   /**
-   * Submit form.
-   * Soumettre le formulaire.
+   * Submit form with error handling.
+   * Soumettre le formulaire avec gestion d'erreurs.
    */
   onSubmit(): void {
     if (this.editForm.valid && this.currentTrainingInfo) {
@@ -250,11 +395,44 @@ export class TrainingEditModalComponent implements OnInit {
         },
         error: (err: any) => {
           this.isLoading = false;
-          this.error = 'Erreur lors de la mise à jour des informations d\'entraînement';
-          console.error('Erreur mise à jour training info:', err);
+          this.handleError(err);
         }
       });
+    } else {
+      this.markAllFieldsAsTouched();
     }
+  }
+
+  /**
+   * Handle errors in a centralized way.
+   * Gérer les erreurs de manière centralisée.
+   */
+  private handleError(error: any): void {
+    if (error.status === 400) {
+      this.error = 'Veuillez vérifier les informations saisies.';
+    } else if (error.status === 401) {
+      this.error = 'Session expirée. Veuillez vous reconnecter.';
+    } else if (error.status === 403) {
+      this.error = 'Vous n\'avez pas les permissions pour effectuer cette action.';
+    } else if (error.status === 404) {
+      this.error = 'Informations d\'entraînement non trouvées.';
+    } else if (error.status === 0) {
+      this.error = 'Impossible de se connecter au serveur. Vérifiez votre connexion.';
+    } else {
+      this.error = 'Une erreur est survenue lors de la mise à jour. Veuillez réessayer.';
+    }
+    console.error('Error updating training info:', error);
+  }
+
+  /**
+   * Mark all form controls as touched to show validation errors.
+   * Marquer tous les contrôles du formulaire comme touchés pour afficher les erreurs de validation.
+   */
+  private markAllFieldsAsTouched(): void {
+    Object.keys(this.editForm.controls).forEach(key => {
+      const control = this.editForm.get(key);
+      control?.markAsTouched();
+    });
   }
 
   /**
@@ -272,6 +450,16 @@ export class TrainingEditModalComponent implements OnInit {
   onBackdropClick(event: Event): void {
     if (event.target === event.currentTarget) {
       this.onClose();
+    }
+  }
+
+  /**
+   * Clear error message when user starts typing.
+   * Effacer le message d'erreur quand l'utilisateur commence à taper.
+   */
+  onFieldChange(): void {
+    if (this.error) {
+      this.error = null;
     }
   }
 

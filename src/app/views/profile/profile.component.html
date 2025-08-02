@@ -115,14 +115,6 @@
               <i class="fas fa-dumbbell" aria-hidden="true"></i> 
               Informations d'entraînement
             </h2>
-            <button 
-              class="edit-button" 
-              (click)="editTrainingInfo()"
-              aria-label="Modifier les informations d'entraînement"
-              title="Modifier les informations d'entraînement">
-              <i class="fas fa-edit" aria-hidden="true"></i>
-              Modifier
-            </button>
           </div>
           <div class="section-content" *ngIf="trainingInfo; else noTrainingInfo">
             <div class="training-category">
@@ -131,6 +123,14 @@
                   <i class="fas fa-user-circle" aria-hidden="true"></i> 
                   Informations personnelles
                 </h3>
+                <button 
+                  class="category-edit-button" 
+                  (click)="editTrainingCategory('personal')"
+                  aria-label="Modifier les informations personnelles"
+                  title="Modifier les informations personnelles">
+                  <i class="fas fa-edit" aria-hidden="true"></i>
+                  Modifier
+                </button>
               </div>
               <div class="category-content">
                 <div class="info-row">
@@ -160,14 +160,49 @@
               <div class="category-header">
                 <h3 class="category-title">
                   <i class="fas fa-chart-line" aria-hidden="true"></i> 
-                  Expérience et objectifs
+                  Expérience d'entraînement
                 </h3>
+                <button 
+                  class="category-edit-button" 
+                  (click)="editTrainingCategory('experience')"
+                  aria-label="Modifier l'expérience d'entraînement"
+                  title="Modifier l'expérience d'entraînement">
+                  <i class="fas fa-edit" aria-hidden="true"></i>
+                  Modifier
+                </button>
               </div>
               <div class="category-content">
                 <div class="info-row">
                   <span class="label">Niveau d'expérience :</span>
                   <span class="value">{{ getDisplayName(trainingInfo.experienceLevel, experienceLevelDisplayNames) }}</span>
                 </div>
+                <div class="info-row">
+                  <span class="label">Fréquence d'entraînement :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.sessionFrequency, sessionFrequencyDisplayNames) }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Durée des sessions :</span>
+                  <span class="value">{{ getDisplayName(trainingInfo.sessionDuration, sessionDurationDisplayNames) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="training-category">
+              <div class="category-header">
+                <h3 class="category-title">
+                  <i class="fas fa-bullseye" aria-hidden="true"></i> 
+                  Objectifs et préférences
+                </h3>
+                <button 
+                  class="category-edit-button" 
+                  (click)="editTrainingCategory('goals')"
+                  aria-label="Modifier les objectifs et préférences"
+                  title="Modifier les objectifs et préférences">
+                  <i class="fas fa-edit" aria-hidden="true"></i>
+                  Modifier
+                </button>
+              </div>
+              <div class="category-content">
                 <div class="info-row">
                   <span class="label">Objectif principal :</span>
                   <span class="value">{{ getDisplayName(trainingInfo.mainGoal, mainGoalDisplayNames) }}</span>
@@ -182,32 +217,21 @@
             <div class="training-category">
               <div class="category-header">
                 <h3 class="category-title">
-                  <i class="fas fa-calendar-alt" aria-hidden="true"></i> 
-                  Fréquence et durée
+                  <i class="fas fa-tools" aria-hidden="true"></i> 
+                  Équipement
                 </h3>
+                <button 
+                  class="category-edit-button" 
+                  (click)="editTrainingCategory('equipment')"
+                  aria-label="Modifier l'équipement"
+                  title="Modifier l'équipement">
+                  <i class="fas fa-edit" aria-hidden="true"></i>
+                  Modifier
+                </button>
               </div>
               <div class="category-content">
                 <div class="info-row">
-                  <span class="label">Fréquence des sessions :</span>
-                  <span class="value">{{ getDisplayName(trainingInfo.sessionFrequency, sessionFrequencyDisplayNames) }}</span>
-                </div>
-                <div class="info-row">
-                  <span class="label">Durée des sessions :</span>
-                  <span class="value">{{ getDisplayName(trainingInfo.sessionDuration, sessionDurationDisplayNames) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="training-category">
-              <div class="category-header">
-                <h3 class="category-title">
-                  <i class="fas fa-dumbbell" aria-hidden="true"></i> 
-                  Équipement disponible
-                </h3>
-              </div>
-              <div class="category-content">
-                <div class="info-row">
-                  <span class="label">Équipement :</span>
+                  <span class="label">Équipement disponible :</span>
                   <span class="value">{{ getDisplayName(trainingInfo.equipment, equipmentDisplayNames) }}</span>
                 </div>
               </div>

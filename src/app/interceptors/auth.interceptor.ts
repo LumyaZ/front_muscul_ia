@@ -1,4 +1,5 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { catchError, throwError } from 'rxjs';
 
 /**
  * HTTP interceptor to add JWT token to all requests.
@@ -23,5 +24,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     console.log('No token found, request sent without Authorization header');
   }
   
-  return next(req);
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      console.error('=== AUTH INTERCEPTOR ERROR ===');
+      console.error('Error status:', error.status);
+      console.error('Error message:', error.message);
+      console.error('Error URL:', error.url);
+      
+      if (error.status === 403 || error.status === 401) {
+        console.error('Authentication error detected, clearing token');
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('current_user');
+      }
+      
+      return throwError(() => error);
+    })
+  );
 };

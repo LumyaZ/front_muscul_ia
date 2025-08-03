@@ -1,8 +1,10 @@
+@import '../../../../../styles/variables';
+
 .training-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: $background-dark;
 }
 
 .training-content {
@@ -11,200 +13,459 @@
   max-width: 1200px;
   margin: 0 auto;
 
-  @media (max-width: 768px) {
+  @media (max-width: $breakpoint-sm) {
     padding: 100px 15px 80px 15px;
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: $breakpoint-xs) {
     padding: 95px 15px 75px 15px;
   }
 }
 
-// Timer Section
-.timer-section {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 30px;
-  margin-bottom: 30px;
-  backdrop-filter: blur(10px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+.loading-container {
+  @include flex-center;
+  padding: 40px 20px;
+  color: $text-white;
   text-align: center;
 
-  .timer-display {
-    margin-bottom: 20px;
+  .loading-spinner {
+    @include flex-center;
+    flex-direction: column;
+    gap: 15px;
 
-    .timer-time {
-      font-size: 3.5rem;
-      font-weight: 700;
-      color: white;
-      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      margin-bottom: 15px;
-
-      @media (max-width: 768px) {
-        font-size: 2.5rem;
-      }
-    }
-
-    .timer-controls {
-      .btn-pause, .btn-resume {
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 12px 25px;
-        border-radius: 25px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        font-size: 1rem;
-        font-weight: 600;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.3);
-          transform: translateY(-2px);
-        }
-
-        i {
-          margin-right: 8px;
-        }
-      }
-    }
-  }
-
-  .progress-overview {
-    .progress-bar {
-      width: 100%;
-      height: 8px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      overflow: hidden;
-      margin-bottom: 10px;
-
-      .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #4CAF50, #8BC34A);
-        border-radius: 4px;
-        transition: width 0.3s ease;
-      }
-    }
-
-    .progress-text {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 1rem;
-      font-weight: 600;
-    }
-  }
-}
-
-// Page Header
-.page-header {
-  margin-bottom: 25px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 80px;
-
-  .btn-back {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    z-index: 10;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-50%) scale(1.05);
-    }
-
-    i {
-      margin-right: 6px;
-    }
-  }
-
-  .header-content {
-    text-align: center;
-    flex: 1;
-    padding: 0 80px;
-
-    h1 {
-      color: white;
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-      font-weight: 700;
-
-      @media (max-width: 768px) {
-        font-size: 1.8rem;
-      }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid $text-white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
     p {
-      color: rgba(255, 255, 255, 0.9);
       font-size: 1rem;
       margin: 0;
-    }
-  }
-}
-
-// Loading and Error States
-.loading-container, .error-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  color: white;
-  text-align: center;
-
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-top: 3px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 15px;
-  }
-
-  p {
-    font-size: 1rem;
-    margin: 0;
-  }
-
-  .btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    margin-top: 15px;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.05);
-    }
-
-    i {
-      margin-right: 6px;
+      color: $text-white;
     }
   }
 }
 
 .error-container {
-  i {
-    font-size: 2.5rem;
-    color: #ff6b6b;
-    margin-bottom: 15px;
+  @include flex-center;
+  padding: 40px 20px;
+  color: $text-white;
+  text-align: center;
+
+  .error-card {
+    @include glass-effect;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 400px;
+    width: 100%;
+
+    i {
+      font-size: 2.5rem;
+      color: $error-color;
+      margin-bottom: 15px;
+    }
+
+    h3 {
+      color: $text-white;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    p {
+      color: $text-white;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .btn-retry {
+      @include button-hover;
+      background: $primary-color;
+      color: $text-white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        font-size: 0.9rem;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.main-content {
+  .timer-section {
+    @include glass-effect;
+    padding: 30px;
+    margin-bottom: 30px;
+    text-align: center;
+
+    .timer-display {
+      margin-bottom: 20px;
+
+      .timer-time {
+        font-size: 3.5rem;
+        font-weight: 700;
+        @include gradient-text;
+        text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        margin-bottom: 15px;
+
+        @media (max-width: $breakpoint-sm) {
+          font-size: 2.5rem;
+        }
+      }
+
+      .timer-controls {
+        .btn-pause, .btn-resume {
+          @include glass-effect;
+          @include button-hover;
+          color: $text-white;
+          padding: 12px 25px;
+          border-radius: 25px;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: 600;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+
+          i {
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+
+    .progress-overview {
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 10px;
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, $success-color, #8BC34A);
+          border-radius: 4px;
+          transition: width 0.3s ease;
+        }
+      }
+
+      .progress-text {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .header {
+    margin-bottom: 25px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80px;
+
+    .btn-back {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      @include glass-effect;
+      @include button-hover;
+      color: $text-white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      z-index: 10;
+      border: none;
+
+      i {
+        margin-right: 6px;
+      }
+    }
+
+    .title-section {
+      text-align: center;
+      flex: 1;
+      padding: 0 80px;
+
+      h1 {
+        @include gradient-text;
+        font-size: 2.2rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+
+        @media (max-width: $breakpoint-sm) {
+          font-size: 1.8rem;
+        }
+      }
+
+      p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        margin: 0;
+      }
+    }
+  }
+
+  .exercises-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .exercise-card {
+    @include glass-effect;
+    border-radius: 15px;
+    padding: 25px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    &.completed {
+      border-color: $success-color;
+      background: rgba(76, 175, 80, 0.1);
+    }
+
+    .exercise-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 20px;
+
+      .exercise-number {
+        background: linear-gradient(135deg, $success-color, #8BC34A);
+        color: $text-white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+      }
+
+      .exercise-info {
+        flex: 1;
+
+        .exercise-name {
+          color: $text-white;
+          font-size: 1.4rem;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+
+        .exercise-description {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 0.95rem;
+          line-height: 1.5;
+          margin-bottom: 12px;
+        }
+
+        .exercise-details {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+
+          .detail-item {
+            display: flex;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+
+            i {
+              margin-right: 6px;
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+
+      .exercise-muscle {
+        color: $text-white;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+      }
+    }
+
+    .sets-progress {
+      margin-bottom: 15px;
+
+      .sets-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+
+        h4 {
+          color: $text-white;
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        .sets-count {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+      }
+
+      .sets-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+
+        .set-checkbox {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.15);
+          }
+
+          &.completed {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: $success-color;
+          }
+
+          .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+
+            i {
+              color: $text-white;
+              font-size: 0.8rem;
+            }
+          }
+
+          &.completed .checkbox {
+            background: $success-color;
+            border-color: $success-color;
+          }
+
+          .set-number {
+            color: $text-white;
+            font-size: 0.9rem;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    .exercise-notes {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+
+      i {
+        color: #FFD700;
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+
+      span {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.9rem;
+        line-height: 1.4;
+      }
+    }
+  }
+
+  .action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+
+    .btn-stop, .btn-finish {
+      padding: 12px 35px;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      &:hover {
+        transform: translateY(-2px);
+      }
+
+      i {
+        font-size: 0.9rem;
+      }
+    }
+
+    .btn-stop {
+      background: linear-gradient(135deg, $danger-color, #FF9800);
+      color: $text-white;
+      box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+
+      &:hover {
+        box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
+      }
+    }
+
+    .btn-finish {
+      background: linear-gradient(135deg, $success-color, #8BC34A);
+      color: $text-white;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+
+      &:hover {
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+      }
+    }
   }
 }
 
@@ -213,332 +474,86 @@
   100% { transform: rotate(360deg); }
 }
 
-// Exercises Container
-.exercises-container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.exercise-card {
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 15px;
-  padding: 25px;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-
-  &.completed {
-    border-color: #4CAF50;
-    background: rgba(76, 175, 80, 0.1);
-  }
-
-  .exercise-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 20px;
-    margin-bottom: 20px;
-
-    .exercise-number {
-      background: linear-gradient(135deg, #4CAF50, #8BC34A);
-      color: white;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.2rem;
-      flex-shrink: 0;
-    }
-
-    .exercise-info {
-      flex: 1;
-
-      .exercise-name {
-        color: white;
-        font-size: 1.4rem;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      .exercise-description {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.95rem;
-        line-height: 1.5;
-        margin-bottom: 12px;
-      }
-
-      .exercise-details {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-
-        .detail-item {
-          display: flex;
-          align-items: center;
-          color: rgba(255, 255, 255, 0.8);
-          font-size: 0.9rem;
-
-          i {
-            margin-right: 6px;
-            font-size: 0.8rem;
-          }
-        }
-      }
-    }
-
-    .exercise-muscle {
-      color: white;
-      padding: 6px 12px;
-      border-radius: 15px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      flex-shrink: 0;
-    }
-  }
-
-  .sets-progress {
-    margin-bottom: 15px;
-
-    .sets-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-
-      h4 {
-        color: white;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin: 0;
-      }
-
-      .sets-count {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 0.9rem;
-        font-weight: 600;
-      }
-    }
-
-    .sets-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px;
-
-      .set-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.15);
-        }
-
-        &.completed {
-          background: rgba(76, 175, 80, 0.2);
-          border-color: #4CAF50;
-        }
-
-        .checkbox {
-          width: 20px;
-          height: 20px;
-          border: 2px solid rgba(255, 255, 255, 0.5);
-          border-radius: 4px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.3s ease;
-
-          i {
-            color: white;
-            font-size: 0.8rem;
-          }
-        }
-
-        &.completed .checkbox {
-          background: #4CAF50;
-          border-color: #4CAF50;
-        }
-
-        .set-number {
-          color: white;
-          font-size: 0.9rem;
-          font-weight: 500;
-        }
-      }
-    }
-  }
-
-  .exercise-notes {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 12px;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-
-    i {
-      color: #FFD700;
-      margin-top: 2px;
-      flex-shrink: 0;
-    }
-
-    span {
-      color: rgba(255, 255, 255, 0.9);
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-  }
-}
-
-// Action Bar
-.action-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  padding: 15px;
-  display: flex;
-  justify-content: center;
-  z-index: 1000;
-
-  .btn-stop, .btn-finish {
-    padding: 12px 35px;
-    border-radius: 25px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
-
-    i {
-      font-size: 0.9rem;
-    }
-  }
-
-  .btn-stop {
-    background: linear-gradient(135deg, #FF5722, #FF9800);
-    color: white;
-    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
-
-    &:hover {
-      box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
-    }
-  }
-
-  .btn-finish {
-    background: linear-gradient(135deg, #4CAF50, #8BC34A);
-    color: white;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
-
-    &:hover {
-      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-    }
-  }
-}
-
-// Responsive Design
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-sm) {
   .training-content {
     padding: 100px 15px 80px 15px;
   }
 
-  .page-header {
-    margin-bottom: 20px;
-    flex-direction: column;
-    min-height: auto;
-
-    .header-content {
-      padding: 0 15px;
-      order: 2;
-
-      h1 {
-        font-size: 1.8rem;
-      }
-    }
-
-    .btn-back {
-      position: static;
-      transform: none;
-      margin-bottom: 15px;
-      left: auto;
-      order: 1;
-      align-self: flex-start;
-    }
-  }
-
-  .timer-section {
-    padding: 20px;
-
-    .timer-display .timer-time {
-      font-size: 2.5rem;
-    }
-  }
-
-  .exercise-card {
-    padding: 20px;
-
-    .exercise-header {
+  .main-content {
+    .header {
+      margin-bottom: 20px;
       flex-direction: column;
-      gap: 15px;
+      min-height: auto;
 
-      .exercise-muscle {
+      .title-section {
+        padding: 0 15px;
+        order: 2;
+
+        h1 {
+          font-size: 1.8rem;
+        }
+      }
+
+      .btn-back {
+        position: static;
+        transform: none;
+        margin-bottom: 15px;
+        left: auto;
+        order: 1;
         align-self: flex-start;
       }
     }
 
-    .sets-grid {
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 8px;
+    .timer-section {
+      padding: 20px;
+
+      .timer-display .timer-time {
+        font-size: 2.5rem;
+      }
     }
-  }
 
-  .action-bar {
-    padding: 12px;
+    .exercise-card {
+      padding: 20px;
 
-    .btn-stop, .btn-finish {
-      width: 100%;
-      max-width: 280px;
-      justify-content: center;
+      .exercise-header {
+        flex-direction: column;
+        gap: 15px;
+
+        .exercise-muscle {
+          align-self: flex-start;
+        }
+      }
+
+      .sets-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 8px;
+      }
+    }
+
+    .action-bar {
+      padding: 12px;
+
+      .btn-stop, .btn-finish {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+      }
     }
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: $breakpoint-xs) {
   .training-content {
     padding: 95px 15px 75px 15px;
   }
 
-  .exercise-card {
-    padding: 15px;
-  }
+  .main-content {
+    .exercise-card {
+      padding: 15px;
+    }
 
-  .sets-grid {
-    grid-template-columns: 1fr;
+    .sets-grid {
+      grid-template-columns: 1fr;
+    }
   }
 } 

@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { TrainingComponent } from './training.component';
 import { TrainingProgramService } from '../../../../services/training-program.service';
 import { ProgramExerciseService } from '../../../../services/program-exercise.service';
 import { TrainingSessionService } from '../../../../services/training-session.service';
+import { AuthService } from '../../../../services/auth.service';
 
 describe('TrainingComponent', () => {
   let component: TrainingComponent;
@@ -14,6 +15,13 @@ describe('TrainingComponent', () => {
   let mockTrainingProgramService: jasmine.SpyObj<TrainingProgramService>;
   let mockProgramExerciseService: jasmine.SpyObj<ProgramExerciseService>;
   let mockTrainingSessionService: jasmine.SpyObj<TrainingSessionService>;
+  let mockAuthService: jasmine.SpyObj<AuthService>;
+
+  const mockUser = {
+    id: 1,
+    email: 'test@example.com',
+    creationDate: '2024-01-01'
+  };
 
   const mockExercises = [
     {
@@ -59,6 +67,7 @@ describe('TrainingComponent', () => {
     const trainingProgramServiceSpy = jasmine.createSpyObj('TrainingProgramService', ['getProgramById']);
     const programExerciseServiceSpy = jasmine.createSpyObj('ProgramExerciseService', ['getExercisesByProgramId']);
     const trainingSessionServiceSpy = jasmine.createSpyObj('TrainingSessionService', ['createTrainingSession']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser', 'isAuthenticated', 'getToken']);
 
     await TestBed.configureTestingModule({
       imports: [TrainingComponent],
@@ -67,7 +76,8 @@ describe('TrainingComponent', () => {
         { provide: Router, useValue: routerSpy },
         { provide: TrainingProgramService, useValue: trainingProgramServiceSpy },
         { provide: ProgramExerciseService, useValue: programExerciseServiceSpy },
-        { provide: TrainingSessionService, useValue: trainingSessionServiceSpy }
+        { provide: TrainingSessionService, useValue: trainingSessionServiceSpy },
+        { provide: AuthService, useValue: authServiceSpy }
       ]
     }).compileComponents();
 
@@ -78,27 +88,51 @@ describe('TrainingComponent', () => {
     mockTrainingProgramService = TestBed.inject(TrainingProgramService) as jasmine.SpyObj<TrainingProgramService>;
     mockProgramExerciseService = TestBed.inject(ProgramExerciseService) as jasmine.SpyObj<ProgramExerciseService>;
     mockTrainingSessionService = TestBed.inject(TrainingSessionService) as jasmine.SpyObj<TrainingSessionService>;
+    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load exercises on init', () => {
+  it('should initialize component successfully', () => {
+    mockAuthService.getCurrentUser.and.returnValue(mockUser);
+    mockAuthService.isAuthenticated.and.returnValue(true);
+    mockAuthService.getToken.and.returnValue('mock-token');
     mockProgramExerciseService.getExercisesByProgramId.and.returnValue(of(mockExercises as any));
 
     component.ngOnInit();
 
+    expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
     expect(mockProgramExerciseService.getExercisesByProgramId).toHaveBeenCalledWith(1);
     expect(component.exercises.length).toBe(2);
     expect(component.exercises[0].completedSets).toEqual([false, false, false]);
     expect(component.exercises[1].completedSets).toEqual([false, false, false, false]);
   });
 
+  it('should handle authentication error', () => {
+    mockAuthService.getCurrentUser.and.returnValue(null);
+    mockAuthService.isAuthenticated.and.returnValue(false);
+
+    component.ngOnInit();
+
+    expect(component.error).toBe('Utilisateur non connecté. Redirection vers la page de connexion.');
+  });
+
+  it('should handle invalid program ID', () => {
+    mockAuthService.getCurrentUser.and.returnValue(mockUser);
+    mockAuthService.isAuthenticated.and.returnValue(true);
+    (mockActivatedRoute.snapshot.paramMap.get as jasmine.Spy).and.returnValue(null);
+
+    component.ngOnInit();
+
+    expect(component.error).toBe('ID de programme invalide');
+  });
+
   it('should handle error when loading exercises', () => {
-    mockProgramExerciseService.getExercisesByProgramId.and.returnValue(of([]).pipe(() => {
-      throw new Error('Test error');
-    }));
+    mockAuthService.getCurrentUser.and.returnValue(mockUser);
+    mockAuthService.isAuthenticated.and.returnValue(true);
+    mockProgramExerciseService.getExercisesByProgramId.and.returnValue(throwError(() => new Error('Test error')));
 
     component.ngOnInit();
 
@@ -180,12 +214,10 @@ describe('TrainingComponent', () => {
 
     expect(component.getOverallProgress()).toBe(0);
 
-    // Complete first exercise (3 sets)
     component.exercises[0].completedSets = [true, true, true];
-    // Complete 2 sets of second exercise (4 sets total)
     component.exercises[1].completedSets = [true, true, false, false];
 
-    expect(component.getOverallProgress()).toBe(71); // (3+2)/(3+4) * 100 = 71%
+    expect(component.getOverallProgress()).toBe(71);
   });
 
   it('should check if training is finished', () => {
@@ -212,7 +244,7 @@ describe('TrainingComponent', () => {
     expect(component.isPaused).toBe(false);
   });
 
-  it('should finish training', () => {
+  it('should finish training successfully', () => {
     component.session = {
       userId: 1,
       trainingProgramId: 1,
@@ -220,13 +252,69 @@ describe('TrainingComponent', () => {
       duration: 0,
       exercises: []
     };
+    component.currentUser = mockUser;
+    mockAuthService.getToken.and.returnValue('mock-token');
+    mockTrainingSessionService.createTrainingSession.and.returnValue(of({ id: 1 } as any));
 
-    spyOn(component, 'saveTrainingSession');
     component.finishTraining();
 
     expect(component.isTrainingComplete).toBe(true);
     expect(component.session?.endTime).toBeDefined();
-    expect(component.saveTrainingSession).toHaveBeenCalled();
+    expect(mockTrainingSessionService.createTrainingSession).toHaveBeenCalled();
+  });
+
+  it('should not finish training when no token', () => {
+    component.session = {
+      userId: 1,
+      trainingProgramId: 1,
+      startTime: new Date(),
+      duration: 0,
+      exercises: []
+    };
+    component.currentUser = mockUser;
+    mockAuthService.getToken.and.returnValue(null);
+
+    component.finishTraining();
+
+    expect(component.error).toBe('Erreur d\'authentification. Veuillez vous reconnecter.');
+  });
+
+  it('should handle 403 error when saving session', () => {
+    component.session = {
+      userId: 1,
+      trainingProgramId: 1,
+      startTime: new Date(),
+      duration: 0,
+      exercises: []
+    };
+    component.currentUser = mockUser;
+    mockAuthService.getToken.and.returnValue('mock-token');
+    
+    const error403 = { status: 403, error: 'Forbidden' };
+    mockTrainingSessionService.createTrainingSession.and.returnValue(throwError(() => error403));
+
+    component.finishTraining();
+
+    expect(component.error).toBe('Erreur d\'autorisation. Veuillez vous reconnecter.');
+  });
+
+  it('should handle 401 error when saving session', () => {
+    component.session = {
+      userId: 1,
+      trainingProgramId: 1,
+      startTime: new Date(),
+      duration: 0,
+      exercises: []
+    };
+    component.currentUser = mockUser;
+    mockAuthService.getToken.and.returnValue('mock-token');
+    
+    const error401 = { status: 401, error: 'Unauthorized' };
+    mockTrainingSessionService.createTrainingSession.and.returnValue(throwError(() => error401));
+
+    component.finishTraining();
+
+    expect(component.error).toBe('Session expirée. Veuillez vous reconnecter.');
   });
 
   it('should stop training', () => {
@@ -238,12 +326,12 @@ describe('TrainingComponent', () => {
       exercises: []
     };
 
-    spyOn(component, 'saveTrainingSession');
+    spyOn(component as any, 'saveTrainingSession');
     component.stopTraining();
 
     expect(component.isTrainingComplete).toBe(false);
     expect(component.session?.endTime).toBeDefined();
-    expect(component.saveTrainingSession).toHaveBeenCalled();
+    expect((component as any).saveTrainingSession).toHaveBeenCalled();
   });
 
   it('should get muscle group color', () => {
@@ -278,11 +366,22 @@ describe('TrainingComponent', () => {
     expect(component.stopTraining).not.toHaveBeenCalled();
   });
 
+  it('should clear error and reload exercises', () => {
+    component.error = 'Test error';
+    spyOn(component, 'loadExercises');
+
+    component.clearError();
+
+    expect(component.error).toBeNull();
+    expect(component.loadExercises).toHaveBeenCalled();
+  });
+
   it('should clean up timer on destroy', () => {
+    spyOn(window, 'clearInterval');
     component.startTimer();
     expect(component.timerInterval).toBeDefined();
 
     component.ngOnDestroy();
-    expect(component.timerInterval).toBeUndefined();
+    expect(window.clearInterval).toHaveBeenCalled();
   });
 }); 

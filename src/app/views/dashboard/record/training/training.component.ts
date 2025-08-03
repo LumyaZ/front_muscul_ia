@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { HeaderComponent } from '../../../../components/header/header.component';
 import { NavBarComponent } from '../../../../components/nav-bar/nav-bar.component';
 import { TrainingProgramService } from '../../../../services/training-program.service';
@@ -17,90 +18,114 @@ import { AuthService } from '../../../../services/auth.service';
 })
 export class TrainingComponent implements OnInit, OnDestroy {
   
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private trainingProgramService = inject(TrainingProgramService);
+  private programExerciseService = inject(ProgramExerciseService);
+  private trainingSessionService = inject(TrainingSessionService);
+  private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
+  
   programId: number | null = null;
   exercises: TrainingExercise[] = [];
   loading = false;
-  error = '';
+  error: string | null = null;
   
-  // Chronomètre
   startTime: Date = new Date();
   elapsedTime: number = 0;
   timerInterval: any;
   isPaused: boolean = false;
   
-  // État de l'entraînement
   currentExerciseIndex: number = 0;
   currentSetIndex: number = 0;
   isTrainingComplete: boolean = false;
   
-  // Données de session
   session: TrainingSession | null = null;
   currentUser: any = null;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private trainingProgramService: TrainingProgramService,
-    private programExerciseService: ProgramExerciseService,
-    private trainingSessionService: TrainingSessionService,
-    private authService: AuthService
-  ) {}
-
   ngOnInit(): void {
-    this.currentUser = this.authService.getCurrentUser();
-    console.log('=== TRAINING COMPONENT: INIT ===');
-    console.log('Current user:', this.currentUser);
-    console.log('Auth token:', this.authService.getToken());
-    
-    if (!this.currentUser) {
-      this.error = 'Utilisateur non connecté';
-      console.error('No user found, redirecting to login');
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.programId = Number(this.route.snapshot.paramMap.get('id'));
-    console.log('Program ID:', this.programId);
-    
-    if (this.programId) {
-      this.loadExercises();
-      this.startTimer();
-    } else {
-      this.error = 'ID de programme invalide';
-      console.error('Invalid program ID');
-    }
+    this.initializeComponent();
   }
 
   ngOnDestroy(): void {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
+  /**
+   * Initialise le composant et vérifie l'authentification
+   * Initialize component and check authentication
+   */
+  private initializeComponent(): void {
+    try {
+      this.currentUser = this.authService.getCurrentUser();
+      
+      if (!this.currentUser) {
+        this.error = 'Utilisateur non connecté. Redirection vers la page de connexion.';
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+        return;
+      }
+
+      this.programId = Number(this.route.snapshot.paramMap.get('id'));
+      
+      if (!this.programId) {
+        this.error = 'ID de programme invalide';
+        return;
+      }
+
+      this.loadExercises();
+      this.startTimer();
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation du composant training:', error);
+      this.error = 'Erreur lors de l\'initialisation';
+    }
+  }
+
+  /**
+   * Charge les exercices du programme
+   * Load program exercises
+   */
   loadExercises(): void {
     this.loading = true;
-    this.error = '';
+    this.error = null;
 
-    this.programExerciseService.getExercisesByProgramId(this.programId!).subscribe({
-      next: (exercises: any) => {
-        this.exercises = exercises
-          .sort((a: any, b: any) => a.orderInProgram - b.orderInProgram)
-          .map((exercise: any) => ({
-            ...exercise,
-            completedSets: new Array(exercise.setsCount).fill(false)
-          }));
-        this.loading = false;
-        this.initializeSession();
-      },
-      error: (error: any) => {
-        console.error('Erreur lors du chargement des exercices:', error);
-        this.error = 'Erreur lors du chargement des exercices';
-        this.loading = false;
-      }
-    });
+    try {
+      this.programExerciseService.getExercisesByProgramId(this.programId!)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (exercises: any) => {
+            this.exercises = exercises
+              .sort((a: any, b: any) => a.orderInProgram - b.orderInProgram)
+              .map((exercise: any) => ({
+                ...exercise,
+                completedSets: new Array(exercise.setsCount).fill(false)
+              }));
+            this.loading = false;
+            this.initializeSession();
+          },
+          error: (error: any) => {
+            console.error('Erreur lors du chargement des exercices:', error);
+            this.error = 'Erreur lors du chargement des exercices';
+            this.loading = false;
+          }
+        });
+    } catch (error) {
+      console.error('Erreur lors du chargement des exercices:', error);
+      this.error = 'Erreur lors du chargement des exercices';
+      this.loading = false;
+    }
   }
 
-  initializeSession(): void {
+  /**
+   * Initialise la session d'entraînement
+   * Initialize training session
+   */
+  private initializeSession(): void {
     this.session = {
       userId: this.currentUser.id,
       trainingProgramId: this.programId!,
@@ -110,6 +135,10 @@ export class TrainingComponent implements OnInit, OnDestroy {
     };
   }
 
+  /**
+   * Démarre le chronomètre
+   * Start timer
+   */
   startTimer(): void {
     this.timerInterval = setInterval(() => {
       if (!this.isPaused) {
@@ -118,14 +147,28 @@ export class TrainingComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
+  /**
+   * Met en pause le chronomètre
+   * Pause timer
+   */
   pauseTimer(): void {
+    if (this.loading) return;
     this.isPaused = true;
   }
 
+  /**
+   * Reprend le chronomètre
+   * Resume timer
+   */
   resumeTimer(): void {
+    if (this.loading) return;
     this.isPaused = false;
   }
 
+  /**
+   * Formate le temps en HH:MM:SS
+   * Format time as HH:MM:SS
+   */
   formatTime(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -134,30 +177,56 @@ export class TrainingComponent implements OnInit, OnDestroy {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
+  /**
+   * Bascule l'état d'une série
+   * Toggle set completion
+   */
   toggleSet(exerciseIndex: number, setIndex: number): void {
+    if (this.loading) return;
+    
     if (exerciseIndex < this.exercises.length) {
       this.exercises[exerciseIndex].completedSets[setIndex] = !this.exercises[exerciseIndex].completedSets[setIndex];
     }
   }
 
+  /**
+   * Vérifie si une série est terminée
+   * Check if set is completed
+   */
   isSetCompleted(exerciseIndex: number, setIndex: number): boolean {
     return this.exercises[exerciseIndex]?.completedSets[setIndex] || false;
   }
 
+  /**
+   * Obtient le nombre de séries terminées
+   * Get completed sets count
+   */
   getCompletedSetsCount(exerciseIndex: number): number {
     return this.exercises[exerciseIndex]?.completedSets.filter((completed: boolean) => completed).length || 0;
   }
 
+  /**
+   * Obtient le nombre total de séries
+   * Get total sets count
+   */
   getTotalSetsCount(exerciseIndex: number): number {
     return this.exercises[exerciseIndex]?.setsCount || 0;
   }
 
+  /**
+   * Vérifie si un exercice est terminé
+   * Check if exercise is complete
+   */
   isExerciseComplete(exerciseIndex: number): boolean {
     const exercise = this.exercises[exerciseIndex];
     if (!exercise) return false;
     return exercise.completedSets.every((completed: boolean) => completed);
   }
 
+  /**
+   * Calcule la progression globale
+   * Calculate overall progress
+   */
   getOverallProgress(): number {
     if (this.exercises.length === 0) return 0;
     
@@ -168,42 +237,89 @@ export class TrainingComponent implements OnInit, OnDestroy {
     return Math.round((completedSets / totalSets) * 100);
   }
 
+  /**
+   * Vérifie si l'entraînement est terminé
+   * Check if training is finished
+   */
   isTrainingFinished(): boolean {
     return this.exercises.every(exercise => 
       exercise.completedSets.every((completed: boolean) => completed)
     );
   }
 
+  /**
+   * Termine l'entraînement
+   * Finish training
+   */
   finishTraining(): void {
-    if (this.session) {
-      this.session.endTime = new Date();
-      this.session.duration = this.elapsedTime;
-      this.isTrainingComplete = true;
-      
-      // Sauvegarder la session
-      this.saveTrainingSession();
+    if (this.loading) return;
+    
+    try {
+      if (this.session) {
+        this.session.endTime = new Date();
+        this.session.duration = this.elapsedTime;
+        this.isTrainingComplete = true;
+        
+        this.saveTrainingSession();
+      }
+    } catch (error) {
+      console.error('Erreur lors de la finalisation de l\'entraînement:', error);
+      this.error = 'Erreur lors de la finalisation de l\'entraînement';
     }
   }
 
+  /**
+   * Arrête l'entraînement
+   * Stop training
+   */
   stopTraining(): void {
-    if (this.session) {
-      this.session.endTime = new Date();
-      this.session.duration = this.elapsedTime;
-      this.isTrainingComplete = false;
-      
-      // Sauvegarder la session
-      this.saveTrainingSession();
+    if (this.loading) return;
+    
+    try {
+      if (this.session) {
+        this.session.endTime = new Date();
+        this.session.duration = this.elapsedTime;
+        this.isTrainingComplete = false;
+        
+        this.saveTrainingSession();
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'arrêt de l\'entraînement:', error);
+      this.error = 'Erreur lors de l\'arrêt de l\'entraînement';
     }
   }
 
-  saveTrainingSession(): void {
-    if (this.session && this.currentUser) {
-      console.log('=== TRAINING COMPONENT: SAVE SESSION ===');
-      console.log('Current user:', this.currentUser);
-      console.log('Session data:', this.session);
-      console.log('Elapsed time:', this.elapsedTime);
-      
-      // Créer la requête selon le format attendu par le backend
+  /**
+   * Sauvegarde la session d'entraînement
+   * Save training session
+   */
+  private saveTrainingSession(): void {
+    if (!this.session || !this.currentUser) {
+      console.error('Cannot save session - missing data');
+      console.error('Session:', this.session);
+      console.error('Current user:', this.currentUser);
+      return;
+    }
+
+    // Vérifier l'authentification
+    const token = this.authService.getToken();
+    console.log('=== TRAINING COMPONENT: SAVE SESSION ===');
+    console.log('Current user:', this.currentUser);
+    console.log('Token exists:', !!token);
+    console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null');
+    console.log('Session data:', this.session);
+    console.log('Elapsed time:', this.elapsedTime);
+
+    if (!token) {
+      console.error('No authentication token found');
+      this.error = 'Erreur d\'authentification. Veuillez vous reconnecter.';
+      setTimeout(() => {
+        this.router.navigate(['/login']);
+      }, 2000);
+      return;
+    }
+
+    try {
       const createRequest: CreateTrainingSessionRequest = {
         name: `Entraînement ${this.programId} - ${new Date().toLocaleDateString()}`,
         description: this.generateSessionDescription(),
@@ -215,33 +331,50 @@ export class TrainingComponent implements OnInit, OnDestroy {
 
       console.log('Create request:', createRequest);
 
-      this.trainingSessionService.createTrainingSession(createRequest).subscribe({
-        next: (response) => {
-          console.log('Session d\'entraînement sauvegardée:', response);
-          
-          // Rediriger vers la page de récapitulatif
-          this.router.navigate(['/dashboard/record/training-recap'], {
-            queryParams: {
-              sessionId: response.id,
-              duration: this.session!.duration,
-              completed: this.isTrainingComplete
+      this.trainingSessionService.createTrainingSession(createRequest)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            console.log('Session d\'entraînement sauvegardée:', response);
+            
+            this.router.navigate(['/dashboard/record/training-recap'], {
+              queryParams: {
+                sessionId: response.id,
+                duration: this.session!.duration,
+                completed: this.isTrainingComplete
+              }
+            });
+          },
+          error: (error) => {
+            console.error('Erreur lors de la sauvegarde de la session:', error);
+            console.error('Error details:', error.error);
+            console.error('Error status:', error.status);
+            
+            if (error.status === 403) {
+              this.error = 'Erreur d\'autorisation. Veuillez vous reconnecter.';
+              setTimeout(() => {
+                this.router.navigate(['/login']);
+              }, 2000);
+            } else if (error.status === 401) {
+              this.error = 'Session expirée. Veuillez vous reconnecter.';
+              setTimeout(() => {
+                this.router.navigate(['/login']);
+              }, 2000);
+            } else {
+              this.error = 'Erreur lors de la sauvegarde de la session';
             }
-          });
-        },
-        error: (error) => {
-          console.error('Erreur lors de la sauvegarde de la session:', error);
-          console.error('Error details:', error.error);
-          console.error('Error status:', error.status);
-          this.error = 'Erreur lors de la sauvegarde de la session';
-        }
-      });
-    } else {
-      console.error('Cannot save session - missing data');
-      console.error('Session:', this.session);
-      console.error('Current user:', this.currentUser);
+          }
+        });
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde de la session:', error);
+      this.error = 'Erreur lors de la sauvegarde de la session';
     }
   }
 
+  /**
+   * Génère la description de la session
+   * Generate session description
+   */
   private generateSessionDescription(): string {
     const completedExercises = this.exercises.filter(exercise => 
       exercise.completedSets.every(completed => completed)
@@ -252,13 +385,27 @@ export class TrainingComponent implements OnInit, OnDestroy {
     return `Session d'entraînement - ${completedExercises}/${totalExercises} exercices complétés (${progress}% de progression)`;
   }
 
+  /**
+   * Retourne à la page précédente
+   * Go back to previous page
+   */
   onBack(): void {
-    // Demander confirmation avant de quitter
-    if (confirm('Êtes-vous sûr de vouloir quitter l\'entraînement ? Votre progression sera sauvegardée.')) {
-      this.stopTraining();
+    if (this.loading) return;
+    
+    try {
+      if (confirm('Êtes-vous sûr de vouloir quitter l\'entraînement ? Votre progression sera sauvegardée.')) {
+        this.stopTraining();
+      }
+    } catch (error) {
+      console.error('Erreur lors du retour:', error);
+      this.error = 'Erreur lors du retour';
     }
   }
 
+  /**
+   * Obtient la couleur du groupe musculaire
+   * Get muscle group color
+   */
   getMuscleGroupColor(muscleGroup: string): string {
     const muscleGroupColors: { [key: string]: string } = {
       'CHEST': '#FF5722',
@@ -273,6 +420,10 @@ export class TrainingComponent implements OnInit, OnDestroy {
     return muscleGroupColors[muscleGroup] || '#666';
   }
 
+  /**
+   * Obtient l'icône de l'équipement
+   * Get equipment icon
+   */
   getEquipmentIcon(equipment: string): string {
     const equipmentIcons: { [key: string]: string } = {
       'DUMBBELLS': 'fas fa-dumbbell',
@@ -284,5 +435,14 @@ export class TrainingComponent implements OnInit, OnDestroy {
       'RESISTANCE_BAND': 'fas fa-ring'
     };
     return equipmentIcons[equipment] || 'fas fa-dumbbell';
+  }
+
+  /**
+   * Efface le message d'erreur
+   * Clear error message
+   */
+  clearError(): void {
+    this.error = null;
+    this.loadExercises();
   }
 } 

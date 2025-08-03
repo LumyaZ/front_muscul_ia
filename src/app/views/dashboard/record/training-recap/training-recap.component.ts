@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { HeaderComponent } from '../../../../components/header/header.component';
 import { NavBarComponent } from '../../../../components/nav-bar/nav-bar.component';
 import { TrainingSessionService } from '../../../../services/training-session.service';
+import { AuthService } from '../../../../services/auth.service';
 
 interface TrainingRecap {
   sessionId?: number;
@@ -23,43 +25,84 @@ interface TrainingRecap {
   templateUrl: './training-recap.component.html',
   styleUrls: ['./training-recap.component.scss']
 })
-export class TrainingRecapComponent implements OnInit {
+export class TrainingRecapComponent implements OnInit, OnDestroy {
+  
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private trainingSessionService = inject(TrainingSessionService);
+  private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
   
   recap: TrainingRecap | null = null;
   loading = false;
-  error = '';
+  error: string | null = null;
   
   // Form data
   title: string = '';
   rating: number = 5;
   notes: string = '';
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private trainingSessionService: TrainingSessionService
-  ) {}
-
   ngOnInit(): void {
-    this.loadRecapData();
+    this.initializeComponent();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Initialise le composant et charge les données
+   * Initialize component and load data
+   */
+  private initializeComponent(): void {
+    try {
+      this.loadRecapData();
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation du composant training-recap:', error);
+      this.error = 'Erreur lors de l\'initialisation';
+    }
+  }
+
+  /**
+   * Charge les données du récapitulatif
+   * Load recap data
+   */
   loadRecapData(): void {
     this.loading = true;
+    this.error = null;
     
-    // Récupérer les données depuis les query params
-    this.route.queryParams.subscribe(params => {
-      this.recap = {
-        sessionId: params['sessionId'] ? Number(params['sessionId']) : undefined,
-        duration: Number(params['duration']) || 0,
-        completed: params['completed'] === 'true',
-        exercises: []
-      };
-      
+    try {
+      this.route.queryParams
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (params) => {
+            this.recap = {
+              sessionId: params['sessionId'] ? Number(params['sessionId']) : undefined,
+              duration: Number(params['duration']) || 0,
+              completed: params['completed'] === 'true',
+              exercises: []
+            };
+            
+            this.loading = false;
+          },
+          error: (error) => {
+            console.error('Erreur lors du chargement des données:', error);
+            this.error = 'Erreur lors du chargement des données';
+            this.loading = false;
+          }
+        });
+    } catch (error) {
+      console.error('Erreur lors du chargement des données:', error);
+      this.error = 'Erreur lors du chargement des données';
       this.loading = false;
-    });
+    }
   }
 
+  /**
+   * Formate le temps en HH:MM:SS
+   * Format time as HH:MM:SS
+   */
   formatTime(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -68,32 +111,67 @@ export class TrainingRecapComponent implements OnInit {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   }
 
+  /**
+   * Change la note de l'entraînement
+   * Change training rating
+   */
   onRatingChange(rating: number): void {
+    if (this.loading) return;
     this.rating = rating;
   }
 
+  /**
+   * Sauvegarde le récapitulatif
+   * Save recap
+   */
   saveRecap(): void {
-    if (this.recap) {
-      this.recap.title = this.title;
-      this.recap.rating = this.rating;
-      this.recap.notes = this.notes;
-      
-      // TODO: Sauvegarder via le service
-      console.log('Sauvegarde du récapitulatif:', this.recap);
-      
-      // Rediriger vers la page d'accueil
-      this.router.navigate(['/dashboard']);
+    if (this.loading) return;
+    
+    try {
+      if (this.recap) {
+        this.recap.title = this.title;
+        this.recap.rating = this.rating;
+        this.recap.notes = this.notes;
+        
+        // TODO: Sauvegarder via le service
+        console.log('Sauvegarde du récapitulatif:', this.recap);
+        
+        // Rediriger vers la page d'accueil
+        this.router.navigate(['/dashboard']);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+      this.error = 'Erreur lors de la sauvegarde';
     }
   }
 
+  /**
+   * Retourne à la page précédente
+   * Go back to previous page
+   */
   onBack(): void {
-    this.router.navigate(['/dashboard']);
+    if (this.loading) return;
+    
+    try {
+      this.router.navigate(['/dashboard']);
+    } catch (error) {
+      console.error('Erreur lors du retour:', error);
+      this.error = 'Erreur lors du retour';
+    }
   }
 
+  /**
+   * Obtient les étoiles de notation
+   * Get rating stars
+   */
   getRatingStars(): boolean[] {
     return Array.from({ length: 5 }, (_, i) => i < this.rating);
   }
 
+  /**
+   * Obtient le message de complétion
+   * Get completion message
+   */
   getCompletionMessage(): string {
     if (this.recap?.completed) {
       return 'Félicitations ! Vous avez terminé votre entraînement.';
@@ -102,11 +180,28 @@ export class TrainingRecapComponent implements OnInit {
     }
   }
 
+  /**
+   * Obtient l'icône de complétion
+   * Get completion icon
+   */
   getCompletionIcon(): string {
     return this.recap?.completed ? 'fas fa-trophy' : 'fas fa-pause-circle';
   }
 
+  /**
+   * Obtient la couleur de complétion
+   * Get completion color
+   */
   getCompletionColor(): string {
     return this.recap?.completed ? '#4CAF50' : '#FF9800';
+  }
+
+  /**
+   * Efface le message d'erreur
+   * Clear error message
+   */
+  clearError(): void {
+    this.error = null;
+    this.loadRecapData();
   }
 } 

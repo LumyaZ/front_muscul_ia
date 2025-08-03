@@ -1,28 +1,39 @@
 <div class="training-recap-container">
-  <!-- Header Component -->
   <app-header></app-header>
 
   <main class="training-recap-content">
-    <!-- Back Button -->
-    <div class="page-header">
-      <button class="btn-back" (click)="onBack()">
-        <i class="fas fa-arrow-left"></i>
-        Retour
-      </button>
-      <div class="header-content">
-        <h1>Récapitulatif d'Entraînement</h1>
-        <p>Partagez votre expérience et notez votre session</p>
+    <div *ngIf="loading" class="loading-container">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Chargement du récapitulatif...</p>
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="loading" class="loading-container">
-      <div class="spinner"></div>
-      <p>Chargement du récapitulatif...</p>
+    <div *ngIf="error && !loading" class="error-container">
+      <div class="error-card">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Erreur</h3>
+        <p>{{ error }}</p>
+        <button (click)="clearError()" class="btn-retry">
+          <i class="fas fa-refresh"></i>
+          Réessayer
+        </button>
+      </div>
     </div>
 
-    <!-- Recap Content -->
-    <div *ngIf="!loading && recap" class="recap-content">
+    <div *ngIf="!loading && !error && recap" class="main-content">
+      <!-- Header -->
+      <div class="header">
+        <button class="btn-back" (click)="onBack()">
+          <i class="fas fa-arrow-left"></i>
+          Retour
+        </button>
+        <div class="title-section">
+          <h1>Récapitulatif d'Entraînement</h1>
+          <p>Partagez votre expérience et notez votre session</p>
+        </div>
+      </div>
+
       <!-- Completion Status -->
       <div class="completion-status">
         <div class="completion-icon" [style.color]="getCompletionColor()">
@@ -55,12 +66,6 @@
         <div class="form-group">
           <label>Note de votre entraînement</label>
           <div class="rating-stars">
-            <i 
-              *ngFor="let star of getRatingStars(); let i = index"
-              class="fas fa-star star"
-              [class.filled]="star"
-              (click)="onRatingChange(i + 1)"
-            ></i>
             <i 
               *ngFor="let star of [1,2,3,4,5]; let i = index"
               class="fas fa-star star"
@@ -129,6 +134,5 @@
     </div>
   </main>
 
-  <!-- Navigation Bar Component -->
   <app-nav-bar [currentRoute]="'/dashboard'"></app-nav-bar>
 </div> 

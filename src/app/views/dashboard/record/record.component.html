@@ -1,28 +1,97 @@
 <div class="record-container">
-  <!-- Header Component -->
   <app-header></app-header>
 
   <main class="record-content">
-    <div class="page-header">
-      <h1>Enregistrer un Entraînement</h1>
-      <p>Choisissez comment vous souhaitez enregistrer votre session</p>
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Chargement de vos données...</p>
+      </div>
     </div>
 
-    <div class="start-training-section">
-      <div class="start-training-card">
-        <div class="card-icon">
-          <i class="fas fa-play-circle"></i>
-        </div>
-        <h2>Démarrer un Entraînement</h2>
-        <p>Sélectionnez un programme et commencez votre session d'entraînement guidée</p>
-        <button class="btn btn-primary btn-start" (click)="startTraining()">
-          <i class="fas fa-play"></i>
-          Démarrer un Entraînement
+    <div *ngIf="error && !isLoading" class="error-container">
+      <div class="error-card">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h3>Erreur</h3>
+        <p>{{ error }}</p>
+        <button (click)="clearError()" class="btn-retry">
+          <i class="fas fa-refresh"></i>
+          Réessayer
         </button>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && !error" class="main-content">
+      <div class="header">
+        <div class="title-section">
+          <h1>Enregistrer un Entraînement</h1>
+          <p>Choisissez comment vous souhaitez enregistrer votre session d'entraînement</p>
+        </div>
+      </div>
+
+      <div class="options-section">
+        <div class="option-card" (click)="startTraining()">
+          <div class="card-icon">
+            <i class="fas fa-play-circle"></i>
+          </div>
+          <div class="card-content">
+            <h3>Démarrer un Entraînement</h3>
+            <p>Sélectionnez un programme et commencez votre session d'entraînement guidée</p>
+            <div class="card-features">
+              <span class="feature">
+                <i class="fas fa-clock"></i>
+                Chronomètre intégré
+              </span>
+              <span class="feature">
+                <i class="fas fa-check-circle"></i>
+                Suivi des séries
+              </span>
+              <span class="feature">
+                <i class="fas fa-chart-line"></i>
+                Progression en temps réel
+              </span>
+            </div>
+          </div>
+          <div class="card-action">
+            <button class="btn-primary">
+              <i class="fas fa-play"></i>
+              Commencer
+            </button>
+          </div>
+        </div>
+
+        <div class="option-card" (click)="viewHistory()">
+          <div class="card-icon">
+            <i class="fas fa-history"></i>
+          </div>
+          <div class="card-content">
+            <h3>Historique des Entraînements</h3>
+            <p>Consultez vos sessions précédentes et analysez vos performances</p>
+            <div class="card-features">
+              <span class="feature">
+                <i class="fas fa-calendar"></i>
+                Historique complet
+              </span>
+              <span class="feature">
+                <i class="fas fa-trophy"></i>
+                Statistiques
+              </span>
+              <span class="feature">
+                <i class="fas fa-chart-bar"></i>
+                Évolution
+              </span>
+            </div>
+          </div>
+          <div class="card-action">
+            <button class="btn-secondary">
+              <i class="fas fa-eye"></i>
+              Consulter
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- Navigation Bar Component -->
   <app-nav-bar [currentRoute]="'/dashboard/record'"></app-nav-bar>
 </div> 

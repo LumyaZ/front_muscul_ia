@@ -1,44 +1,62 @@
-<div class="programs-container">
-  <div class="content-header">
+<section class="programs-container" aria-label="Programmes d'entraînement">
+  <header class="content-header">
     <h2>Mes Programmes</h2>
-    <button class="create-program-btn" (click)="createNewProgram()">
-      <span>➕</span>
+    <button class="create-program-btn" 
+            (click)="createNewProgram()" 
+            aria-label="Créer un nouveau programme d'entraînement">
+      <span aria-hidden="true">➕</span>
       Créer un programme
     </button>
-  </div>
+  </header>
 
   <div class="programs-content">
-    <div *ngIf="isLoading" class="loading-state">
-      <div class="spinner"></div>
+    <div *ngIf="isLoading" class="loading-state" role="status" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
       <p>Chargement de vos programmes...</p>
     </div>
 
-    <div *ngIf="!isLoading && error" class="error-state">
-      <i class="fas fa-exclamation-triangle"></i>
+    <div *ngIf="!isLoading && error" class="error-state" role="alert" aria-live="assertive">
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
       <p>{{ error }}</p>
-      <button (click)="refreshPrograms()" class="retry-btn">Réessayer</button>
+      <button (click)="refreshPrograms()" 
+              class="retry-btn" 
+              aria-label="Réessayer le chargement des programmes">
+        Réessayer
+      </button>
     </div>
 
-    <div *ngIf="!isLoading && !error && userPrograms.length === 0" class="empty-state">
-      <i class="fas fa-calendar-alt"></i>
+    <div *ngIf="!isLoading && !error && userPrograms.length === 0" class="empty-state" role="status">
+      <i class="fas fa-calendar-alt" aria-hidden="true"></i>
       <h3>Aucun programme</h3>
       <p>Vous n'avez pas encore de programmes d'entraînement.</p>
-      <button (click)="goToAllPrograms()" class="browse-btn">Parcourir les programmes</button>
+      <button (click)="goToAllPrograms()" 
+              class="browse-btn" 
+              aria-label="Parcourir tous les programmes disponibles">
+        Parcourir les programmes
+      </button>
     </div>
 
-    <div *ngIf="!isLoading && !error && userPrograms.length > 0" class="programs-list">
-      <div class="program-item" *ngFor="let userProgram of userPrograms">
-        <div class="program-header">
+    <div *ngIf="!isLoading && !error && userPrograms.length > 0" 
+         class="programs-list" 
+         role="list" 
+         aria-label="Liste des programmes d'entraînement">
+      <article *ngFor="let userProgram of userPrograms; trackBy: trackByProgramId" 
+               class="program-item" 
+               role="listitem"
+               [attr.aria-label]="'Programme: ' + userProgram.trainingProgram.name">
+        <header class="program-header">
           <h3>{{ userProgram.trainingProgram.name }}</h3>
-          <div class="program-status" [style.background-color]="getStatusColor(userProgram.status)">
+          <div class="program-status" 
+               [style.background-color]="getStatusColor(userProgram.status)"
+               [attr.aria-label]="'Statut: ' + getStatusText(userProgram.status)">
             {{ getStatusText(userProgram.status) }}
           </div>
-        </div>
+        </header>
         
         <div class="program-details">
           <p class="program-description">{{ userProgram.trainingProgram.description }}</p>
           
-          <div class="program-info">
+          <div class="program-info" role="group" aria-label="Informations du programme">
             <div class="info-item">
               <span class="label">Difficulté:</span>
               <span class="value">{{ userProgram.trainingProgram.difficultyLevel }}</span>
@@ -58,15 +76,19 @@
           </div>
         </div>
         
-        <div class="program-actions">
-          <button class="action-btn view-btn" (click)="viewProgramDetails(userProgram.trainingProgram.id)">
+        <div class="program-actions" role="group" aria-label="Actions pour le programme">
+          <button class="action-btn view-btn" 
+                  (click)="viewProgramDetails(userProgram.trainingProgram.id)"
+                  [attr.aria-label]="'Voir les détails de ' + userProgram.trainingProgram.name">
             Voir les détails
           </button>
-          <button class="action-btn unsubscribe-btn" (click)="unsubscribeFromProgram(userProgram.trainingProgram.id)">
+          <button class="action-btn unsubscribe-btn" 
+                  (click)="unsubscribeFromProgram(userProgram.trainingProgram.id)"
+                  [attr.aria-label]="'Se désabonner de ' + userProgram.trainingProgram.name">
             Se désabonner
           </button>
         </div>
-      </div>
+      </article>
     </div>
   </div>
-</div> 
+</section> 

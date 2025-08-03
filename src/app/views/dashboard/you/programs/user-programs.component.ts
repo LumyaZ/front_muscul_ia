@@ -1,8 +1,16 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { UserTrainingProgramService, UserTrainingProgram } from '../../../../services/user-training-program.service';
 import { AuthService } from '../../../../services/auth.service';
+
+interface ProgramStatus {
+  IN_PROGRESS: string;
+  COMPLETED: string;
+  PAUSED: string;
+  NOT_STARTED: string;
+}
 
 @Component({
   selector: 'app-user-programs',
@@ -11,82 +19,161 @@ import { AuthService } from '../../../../services/auth.service';
   templateUrl: './user-programs.component.html',
   styleUrls: ['./user-programs.component.scss']
 })
-export class UserProgramsComponent implements OnInit {
+export class UserProgramsComponent implements OnInit, OnDestroy {
+  
   private router = inject(Router);
   private userTrainingProgramService = inject(UserTrainingProgramService);
   private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
 
   isLoading = false;
   error: string | null = null;
   userPrograms: UserTrainingProgram[] = [];
+  currentUser: any = null;
 
-  ngOnInit() {
+  readonly STATUS_CONFIG: ProgramStatus = {
+    IN_PROGRESS: 'En cours',
+    COMPLETED: 'Terminé',
+    PAUSED: 'En pause',
+    NOT_STARTED: 'Non commencé'
+  };
+
+  ngOnInit(): void {
+    this.loadUserData();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Charge les données de l'utilisateur connecté
+   * Load connected user data
+   */
+  private loadUserData(): void {
+    this.currentUser = this.authService.getCurrentUser();
+    
+    if (!this.currentUser || !this.currentUser.id) {
+      this.error = 'Erreur: Utilisateur non connecté';
+      return;
+    }
+    
     this.loadUserPrograms();
   }
 
-  loadUserPrograms() {
+  /**
+   * Charge les programmes de l'utilisateur
+   * Load user programs
+   */
+  loadUserPrograms(): void {
     this.isLoading = true;
     this.error = null;
     
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser || !currentUser.id) {
+    if (!this.currentUser || !this.currentUser.id) {
       this.error = 'Erreur: Utilisateur non connecté';
       this.isLoading = false;
       return;
     }
 
-    this.userTrainingProgramService.getUserPrograms(currentUser.id).subscribe({
-      next: (programs: UserTrainingProgram[]) => {
-        this.userPrograms = programs;
-        this.isLoading = false;
-      },
-      error: (err: any) => {
-        this.error = 'Erreur lors du chargement des programmes';
-        this.isLoading = false;
-        console.error('Erreur chargement programmes:', err);
-      }
-    });
+    this.userTrainingProgramService.getUserPrograms(this.currentUser.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (programs: UserTrainingProgram[]) => {
+          this.userPrograms = programs;
+          this.isLoading = false;
+        },
+        error: (err: any) => {
+          this.handleError(err, 'Erreur lors du chargement des programmes');
+          this.isLoading = false;
+        }
+      });
   }
 
-  createNewProgram() {
+  /**
+   * Gère les erreurs de manière centralisée
+   * Handle errors in a centralized way
+   */
+  private handleError(error: any, defaultMessage: string): void {
+    console.error('Erreur:', error);
+    
+    if (error.status === 401) {
+      this.error = 'Session expirée. Veuillez vous reconnecter.';
+    } else if (error.status === 403) {
+      this.error = 'Accès refusé. Vous n\'avez pas les permissions nécessaires.';
+    } else if (error.status === 404) {
+      this.error = 'Aucun programme trouvé.';
+    } else if (error.status === 0) {
+      this.error = 'Impossible de se connecter au serveur. Vérifiez votre connexion.';
+    } else {
+      this.error = defaultMessage;
+    }
+  }
+
+  /**
+   * Navigue vers la page de création de programme
+   * Navigate to program creation page
+   */
+  createNewProgram(): void {
     this.router.navigate(['/dashboard/programs/create']);
   }
 
-  goBackToProfile() {
-    this.router.navigate(['/dashboard/profile']);
-  }
-
-  goToAllPrograms() {
+  /**
+   * Navigue vers la page de tous les programmes
+   * Navigate to all programs page
+   */
+  goToAllPrograms(): void {
     this.router.navigate(['/dashboard/programs']);
   }
 
-  refreshPrograms() {
+  /**
+   * Rafraîchit la liste des programmes
+   * Refresh programs list
+   */
+  refreshPrograms(): void {
     this.loadUserPrograms();
   }
 
-  viewProgramDetails(programId: number) {
+  /**
+   * Navigue vers les détails d'un programme
+   * Navigate to program details
+   */
+  viewProgramDetails(programId: number): void {
     this.router.navigate(['/dashboard/programs', programId]);
   }
 
-  unsubscribeFromProgram(programId: number) {
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser || !currentUser.id) {
+  /**
+   * Désabonne l'utilisateur d'un programme
+   * Unsubscribe user from program
+   */
+  unsubscribeFromProgram(programId: number): void {
+    if (!this.currentUser || !this.currentUser.id) {
       this.error = 'Erreur: Utilisateur non connecté';
       return;
     }
 
-    this.userTrainingProgramService.unsubscribeUserFromProgram(currentUser.id, programId).subscribe({
-      next: () => {
-        // Retirer le programme de la liste
-        this.userPrograms = this.userPrograms.filter(p => p.trainingProgram.id !== programId);
-      },
-      error: (err: any) => {
-        this.error = 'Erreur lors du désabonnement';
-        console.error('Erreur désabonnement:', err);
-      }
-    });
+    if (confirm('Êtes-vous sûr de vouloir vous désabonner de ce programme ?')) {
+      this.isLoading = true;
+      
+      this.userTrainingProgramService.unsubscribeUserFromProgram(this.currentUser.id, programId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.userPrograms = this.userPrograms.filter(p => p.trainingProgram.id !== programId);
+            this.isLoading = false;
+          },
+          error: (err: any) => {
+            this.handleError(err, 'Erreur lors du désabonnement');
+            this.isLoading = false;
+          }
+        });
+    }
   }
 
+  /**
+   * Obtient la couleur du statut
+   * Get status color
+   */
   getStatusColor(status: string): string {
     switch (status) {
       case 'IN_PROGRESS':
@@ -95,23 +182,26 @@ export class UserProgramsComponent implements OnInit {
         return '#2196F3';
       case 'PAUSED':
         return '#FF9800';
+      case 'NOT_STARTED':
+        return '#9E9E9E';
       default:
         return '#9E9E9E';
     }
   }
 
+  /**
+   * Obtient le texte du statut
+   * Get status text
+   */
   getStatusText(status: string): string {
-    switch (status) {
-      case 'NOT_STARTED':
-        return 'Non commencé';
-      case 'IN_PROGRESS':
-        return 'En cours';
-      case 'COMPLETED':
-        return 'Terminé';
-      case 'PAUSED':
-        return 'En pause';
-      default:
-        return 'Inconnu';
-    }
+    return this.STATUS_CONFIG[status as keyof ProgramStatus] || 'Inconnu';
+  }
+
+  /**
+   * Fonction de tracking pour optimiser les performances de la liste
+   * TrackBy function to optimize list performance
+   */
+  trackByProgramId(index: number, userProgram: UserTrainingProgram): number {
+    return userProgram.trainingProgram.id;
   }
 } 

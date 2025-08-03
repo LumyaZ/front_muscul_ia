@@ -1,63 +1,68 @@
-<div class="trainings-container">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner"></div>
+<section class="trainings-container" aria-label="Sessions d'entraînement">
+  <div *ngIf="isLoading" class="loading-state" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
     <p>Chargement de vos entraînements...</p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="!loading && error" class="error-state">
-    <i class="fas fa-exclamation-triangle"></i>
+  <div *ngIf="!isLoading && error" class="error-state" role="alert" aria-live="assertive">
+    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
     <p>{{ error }}</p>
-    <button (click)="refreshTrainings()" class="retry-btn">
-      <i class="fas fa-refresh"></i>
+    <button (click)="refreshTrainings()" class="retry-btn" aria-label="Réessayer le chargement">
+      <i class="fas fa-refresh" aria-hidden="true"></i>
       Réessayer
     </button>
   </div>
 
-  <!-- Empty State -->
-  <div *ngIf="!loading && !error && trainingSessions.length === 0" class="empty-state">
-    <i class="fas fa-dumbbell"></i>
+  <div *ngIf="!isLoading && !error && trainingSessions.length === 0" class="empty-state" role="status">
+    <i class="fas fa-dumbbell" aria-hidden="true"></i>
     <h3>Aucun entraînement enregistré</h3>
     <p>Vous n'avez pas encore enregistré de session d'entraînement.</p>
     <p>Commencez un entraînement pour voir votre historique ici.</p>
   </div>
 
-  <!-- Trainings List -->
-  <div *ngIf="!loading && !error && trainingSessions.length > 0" class="trainings-section">
-    <div class="section-header">
+  <div *ngIf="!isLoading && !error && trainingSessions.length > 0" class="trainings-section">
+    <header class="section-header">
       <h2>Mes Entraînements</h2>
-      <button class="filter-btn">
-        <i class="fas fa-filter"></i>
+      <button class="filter-btn" aria-label="Filtrer les entraînements">
+        <i class="fas fa-filter" aria-hidden="true"></i>
         Filtrer
       </button>
-    </div>
+    </header>
 
-    <div class="trainings-list">
-      <div *ngFor="let session of trainingSessions" class="training-item">
+    <div class="trainings-list" role="list" aria-label="Liste des sessions d'entraînement">
+      <article *ngFor="let session of trainingSessions; trackBy: trackBySessionId" 
+               class="training-item" 
+               role="listitem"
+               [attr.aria-label]="'Session: ' + session.name">
         <div class="training-info">
           <h3>{{ session.name }}</h3>
-          <p class="training-date">{{ formatDate(session.sessionDate) }}</p>
+          <p class="training-date">
+            <time [attr.datetime]="session.sessionDate">{{ formatDate(session.sessionDate) }}</time>
+          </p>
           <p class="training-duration">Durée: {{ formatDuration(session.durationMinutes) }}</p>
           <p *ngIf="session.sessionType" class="training-type">
-            <i class="fas fa-tag"></i>
+            <i class="fas fa-tag" aria-hidden="true"></i>
             {{ session.sessionType }}
           </p>
           <p *ngIf="session.description" class="training-description">
             {{ session.description }}
           </p>
         </div>
-        <div class="training-actions">
-          <button class="view-btn" (click)="viewTrainingSession(session.id)">
-            <i class="fas fa-eye"></i>
+        <div class="training-actions" role="group" aria-label="Actions pour la session">
+          <button class="view-btn" 
+                  (click)="viewTrainingSession(session.id)"
+                  [attr.aria-label]="'Voir les détails de ' + session.name">
+            <i class="fas fa-eye" aria-hidden="true"></i>
             Voir
           </button>
-          <button class="delete-btn" (click)="deleteTrainingSession(session.id)">
-            <i class="fas fa-trash"></i>
+          <button class="delete-btn" 
+                  (click)="deleteTrainingSession(session.id)"
+                  [attr.aria-label]="'Supprimer ' + session.name">
+            <i class="fas fa-trash" aria-hidden="true"></i>
             Supprimer
           </button>
         </div>
-      </div>
+      </article>
     </div>
   </div>
-</div> 
+</section> 

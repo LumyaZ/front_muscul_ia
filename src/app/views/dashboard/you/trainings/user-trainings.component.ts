@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { TrainingSessionService, TrainingSessionDto } from '../../../../services/training-session.service';
 import { AuthService } from '../../../../services/auth.service';
+import { User } from '../../../../models/user.model';
 
 @Component({
   selector: 'app-user-trainings',
@@ -11,24 +13,33 @@ import { AuthService } from '../../../../services/auth.service';
   templateUrl: './user-trainings.component.html',
   styleUrls: ['./user-trainings.component.scss']
 })
-export class UserTrainingsComponent implements OnInit {
+export class UserTrainingsComponent implements OnInit, OnDestroy {
   
-  trainingSessions: TrainingSessionDto[] = [];
-  loading = false;
-  error = '';
-  currentUser: any = null;
+  private router = inject(Router);
+  private trainingSessionService = inject(TrainingSessionService);
+  private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
 
-  constructor(
-    private router: Router,
-    private trainingSessionService: TrainingSessionService,
-    private authService: AuthService
-  ) {}
+  trainingSessions: TrainingSessionDto[] = [];
+  isLoading = false;
+  error: string | null = null;
+  currentUser: User | null = null;
 
   ngOnInit(): void {
+    this.loadUserData();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * Charge les données de l'utilisateur connecté
+   * Load connected user data
+   */
+  private loadUserData(): void {
     this.currentUser = this.authService.getCurrentUser();
-    console.log('=== USER TRAININGS COMPONENT: INIT ===');
-    console.log('Current user:', this.currentUser);
-    console.log('Auth token:', this.authService.getToken());
     
     if (!this.currentUser) {
       this.error = 'Utilisateur non connecté';
@@ -39,31 +50,63 @@ export class UserTrainingsComponent implements OnInit {
     this.loadTrainingSessions();
   }
 
+  /**
+   * Charge les sessions d'entraînement de l'utilisateur
+   * Load user training sessions
+   */
   loadTrainingSessions(): void {
-    this.loading = true;
-    this.error = '';
-    console.log('=== USER TRAININGS COMPONENT: LOAD SESSIONS ===');
+    this.isLoading = true;
+    this.error = null;
 
-    this.trainingSessionService.getUserTrainingSessions().subscribe({
-      next: (sessions) => {
-        console.log('Training sessions loaded:', sessions);
-        this.trainingSessions = sessions;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des sessions d\'entraînement:', error);
-        console.error('Error details:', error.error);
-        console.error('Error status:', error.status);
-        this.error = 'Erreur lors du chargement des sessions d\'entraînement';
-        this.loading = false;
-      }
-    });
+    this.trainingSessionService.getUserTrainingSessions()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (sessions) => {
+          console.log('Training sessions loaded:', sessions);
+          this.trainingSessions = sessions;
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.handleError(error, 'Erreur lors du chargement des sessions d\'entraînement');
+          this.isLoading = false;
+        }
+      });
   }
 
+  /**
+   * Gère les erreurs de manière centralisée
+   * Handle errors in a centralized way
+   */
+  private handleError(error: any, defaultMessage: string): void {
+    console.error('Erreur lors du chargement des sessions d\'entraînement:', error);
+    console.error('Error details:', error.error);
+    console.error('Error status:', error.status);
+    
+    if (error.status === 401) {
+      this.error = 'Session expirée. Veuillez vous reconnecter.';
+    } else if (error.status === 403) {
+      this.error = 'Accès refusé. Vous n\'avez pas les permissions nécessaires.';
+    } else if (error.status === 404) {
+      this.error = 'Aucune session d\'entraînement trouvée.';
+    } else if (error.status === 0) {
+      this.error = 'Impossible de se connecter au serveur. Vérifiez votre connexion.';
+    } else {
+      this.error = defaultMessage;
+    }
+  }
+
+  /**
+   * Rafraîchit la liste des entraînements
+   * Refresh trainings list
+   */
   refreshTrainings(): void {
     this.loadTrainingSessions();
   }
 
+  /**
+   * Formate une date en format français
+   * Format date in French format
+   */
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', {
@@ -73,6 +116,10 @@ export class UserTrainingsComponent implements OnInit {
     });
   }
 
+  /**
+   * Formate la durée en heures et minutes
+   * Format duration in hours and minutes
+   */
   formatDuration(minutes: number): string {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -84,27 +131,43 @@ export class UserTrainingsComponent implements OnInit {
     }
   }
 
+  /**
+   * Navigue vers les détails d'une session d'entraînement
+   * Navigate to training session details
+   */
   viewTrainingSession(sessionId: number): void {
-    // TODO: Implémenter la navigation vers la page de détail de la session
     console.log('Voir la session:', sessionId);
+    this.router.navigate(['/dashboard/trainings', sessionId]);
   }
 
+  /**
+   * Supprime une session d'entraînement
+   * Delete training session
+   */
   deleteTrainingSession(sessionId: number): void {
     if (confirm('Êtes-vous sûr de vouloir supprimer cette session d\'entraînement ?')) {
-      this.trainingSessionService.deleteTrainingSession(sessionId).subscribe({
-        next: () => {
-          console.log('Session supprimée avec succès');
-          this.loadTrainingSessions(); // Recharger la liste
-        },
-        error: (error) => {
-          console.error('Erreur lors de la suppression:', error);
-          this.error = 'Erreur lors de la suppression de la session';
-        }
-      });
+      this.isLoading = true;
+      
+      this.trainingSessionService.deleteTrainingSession(sessionId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            console.log('Session supprimée avec succès');
+            this.loadTrainingSessions();
+          },
+          error: (error) => {
+            console.error('Erreur lors de la suppression:', error);
+            this.handleError(error, 'Erreur lors de la suppression de la session');
+          }
+        });
     }
   }
 
-  goBackToProfile() {
-    this.router.navigate(['/dashboard/profile']);
+  /**
+   * Fonction de tracking pour optimiser les performances de la liste
+   * TrackBy function to optimize list performance
+   */
+  trackBySessionId(index: number, session: TrainingSessionDto): number {
+    return session.id;
   }
 } 

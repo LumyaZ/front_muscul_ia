@@ -1,17 +1,20 @@
+@import '../../../../styles/variables';
+
 .you-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: $background-dark;
+  color: $text-white;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  position: relative;
 }
 
 .you-content {
   flex: 1;
   padding: 20px;
-  padding-top: 100px; // Pour le header fixe
-  padding-bottom: 80px; // Pour la nav-bar fixe
+  padding-top: 100px;
+  padding-bottom: 80px;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
@@ -19,31 +22,98 @@
   overflow-x: hidden;
 }
 
-.page-header {
+.loading-container {
+  @include flex-center;
+  min-height: 400px;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loading-spinner {
   text-align: center;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-sizing: border-box;
-
-  h1 {
-    margin: 0 0 5px 0;
-    font-size: 2.5rem;
-    font-weight: 700;
-    background: linear-gradient(45deg, #fff, #f0f0f0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba($primary-color, 0.3);
+    border-top: 4px solid $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
   }
-
+  
   p {
-    margin: 0;
+    color: $text-white;
     font-size: 1.1rem;
-    opacity: 0.9;
+    margin: 0;
   }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container {
+  @include flex-center;
+  min-height: 400px;
+}
+
+.error-card {
+  background: rgba($error-color, 0.1);
+  border: 1px solid rgba($error-color, 0.3);
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  max-width: 500px;
+  backdrop-filter: blur(10px);
+  
+  i {
+    font-size: 3rem;
+    color: $error-color;
+    margin-bottom: 20px;
+  }
+  
+  h3 {
+    margin: 0 0 15px 0;
+    color: $text-white;
+    font-size: 1.5rem;
+  }
+  
+  p {
+    margin: 0 0 25px 0;
+    color: $text-white;
+    opacity: 0.9;
+    line-height: 1.5;
+  }
+}
+
+.btn-retry {
+  background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
+  color: $text-white;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba($primary-color, 0.4);
+  }
+  
+  i {
+    font-size: 0.9rem;
+  }
+}
+
+.main-content {
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 .you-tabs {
@@ -62,13 +132,13 @@
   box-sizing: border-box;
 }
 
-.you-tabs button {
+.tab-button {
   flex: 1;
   padding: 15px 25px;
   border: none;
   border-radius: 10px;
   background: transparent;
-  color: #ffffff;
+  color: $text-white;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -102,14 +172,20 @@
   }
 
   &.active {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
-    color: #ffffff;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
+    color: $text-white;
+    box-shadow: 0 4px 15px rgba($primary-color, 0.4);
     transform: translateY(-2px);
   }
 
   i {
     font-size: 18px;
+  }
+  
+  span {
+    @media (max-width: 320px) {
+      display: none;  
+    }
   }
 }
 
@@ -126,6 +202,10 @@
   overflow: hidden;
 }
 
+.tab-panel {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -137,53 +217,264 @@
   }
 }
 
-// Responsive design
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 768px) {
   .you-content {
-    padding: 15px;
-    padding-top: 90px;
-    padding-bottom: 70px;
-  }
-
-  .page-header {
-    padding: 15px;
-
-    h1 {
-      font-size: 2rem;
-    }
-
-    p {
-      font-size: 1rem;
-    }
+    padding: 12px;
+    padding-top: 90px; 
+    padding-bottom: 65px;
   }
 
   .you-tabs {
-    flex-direction: column;
+    flex-direction: row; 
     gap: 8px;
     max-width: 100%;
+    margin-bottom: 18px;
+    padding: 6px;
   }
 
-  .you-tabs button {
-    padding: 12px 20px;
+  .tab-button {
+    padding: 12px 16px;
+    font-size: 14px;
+    
+    i {
+      font-size: 16px;
+    }
   }
 
   .tab-content {
-    padding: 15px;
+    padding: 12px;
+    min-height: 320px;
+  }
+
+  .error-card {
+    padding: 18px;
+    max-width: 95%;
+    
+    i {
+      font-size: 2.2rem;
+    }
+    
+    h3 {
+      font-size: 1.2rem;
+    }
+  }
+
+  .loading-spinner {
+    .spinner {
+      width: 35px;
+      height: 35px;
+    }
+    
+    p {
+      font-size: 0.95rem;
+    }
   }
 }
 
 @media (max-width: 480px) {
   .you-content {
-    padding: 10px;
-    padding-top: 80px;
-    padding-bottom: 60px;
+    padding: 8px;
+    padding-top: 80px; 
+    padding-bottom: 55px;
   }
 
-  .page-header h1 {
-    font-size: 1.8rem;
+  .you-tabs {
+    margin-bottom: 12px;
+    padding: 4px;
+    gap: 4px;
+    flex-direction: row; 
+  }
+
+  .tab-button {
+    padding: 8px 12px;
+    font-size: 12px;
+    
+    i {
+      font-size: 14px;
+    }
+    
+    span {
+      display: block; 
+      font-size: 11px;
+    }
   }
 
   .tab-content {
-    padding: 15px;
+    padding: 10px;
+    min-height: 280px;
+  }
+
+  .error-card {
+    padding: 12px;
+    
+    i {
+      font-size: 1.8rem;
+    }
+    
+    h3 {
+      font-size: 1.1rem;
+    }
+    
+    p {
+      font-size: 0.85rem;
+    }
+  }
+
+  .btn-retry {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .loading-spinner {
+    .spinner {
+      width: 30px;
+      height: 30px;
+    }
+    
+    p {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .you-content {
+    padding: 6px;
+    padding-top: 70px; 
+    padding-bottom: 50px;
+  }
+
+  .you-tabs {
+    margin-bottom: 10px;
+    padding: 3px;
+    gap: 3px;
+    flex-direction: row;
+  }
+
+  .tab-button {
+    padding: 6px 10px;
+    font-size: 11px;
+    
+    i {
+      font-size: 12px;
+    }
+    
+    span {
+      display: block; 
+      font-size: 10px;
+    }
+  }
+
+  .tab-content {
+    padding: 8px;
+    min-height: 240px;
+  }
+
+  .error-card {
+    padding: 10px;
+    
+    i {
+      font-size: 1.5rem;
+    }
+    
+    h3 {
+      font-size: 1rem;
+    }
+    
+    p {
+      font-size: 0.8rem;
+    }
+  }
+
+  .btn-retry {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .loading-spinner {
+    .spinner {
+      width: 25px;
+      height: 25px;
+    }
+    
+    p {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 320px) {
+  .you-content {
+    padding: 4px;
+    padding-top: 65px; 
+    padding-bottom: 45px;
+  }
+
+  .you-tabs {
+    margin-bottom: 8px;
+    padding: 2px;
+    gap: 2px;
+    flex-direction: row; 
+  }
+
+  .tab-button {
+    padding: 5px 8px;
+    font-size: 10px;
+    
+    i {
+      font-size: 11px;
+    }
+    
+    span {
+      display: none;
+    }
+  }
+
+  .tab-content {
+    padding: 6px;
+    min-height: 200px;
+  }
+
+  .error-card {
+    padding: 8px;
+    
+    i {
+      font-size: 1.3rem;
+    }
+    
+    h3 {
+      font-size: 0.9rem;
+    }
+    
+    p {
+      font-size: 0.75rem;
+    }
+  }
+
+  .btn-retry {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+
+  .loading-spinner {
+    .spinner {
+      width: 20px;
+      height: 20px;
+    }
+    
+    p {
+      font-size: 0.75rem;
+    }
   }
 } 

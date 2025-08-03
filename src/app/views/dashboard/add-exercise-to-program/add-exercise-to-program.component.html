@@ -1,9 +1,7 @@
 <div class="add-exercise-container">
-  <!-- Header Component -->
   <app-header></app-header>
 
   <main class="add-exercise-content">
-    <!-- Bouton retour -->
     <div class="back-button">
       <button class="back-btn" (click)="goBackToProgram()">
         <span>‹</span>
@@ -11,191 +9,194 @@
       </button>
     </div>
 
-    <!-- En-tête de la page -->
     <div class="page-header">
       <h1>Ajouter un exercice au programme</h1>
       <p *ngIf="programName">Programme : <strong>{{ programName }}</strong></p>
     </div>
 
-    <!-- État de chargement -->
     <div *ngIf="loading && !addExerciseForm.value.exerciseId" class="loading">
       <div class="spinner"></div>
       <p>Chargement des exercices disponibles...</p>
     </div>
 
-    <!-- Message d'erreur -->
     <div *ngIf="error" class="error-message">
       <p>{{ error }}</p>
       <button (click)="loadAvailableExercises()">Réessayer</button>
     </div>
 
-    <!-- Message de succès -->
     <div *ngIf="success" class="success-message">
       <p>{{ success }}</p>
       <div class="success-spinner"></div>
     </div>
 
-    <!-- Formulaire d'ajout d'exercice -->
     <div *ngIf="!loading && !error && !success" class="form-container">
       <form [formGroup]="addExerciseForm" (ngSubmit)="onSubmit()" class="add-exercise-form">
-        
-        <!-- Sélection de l'exercice -->
+            
         <div class="form-group">
           <label for="exerciseId">Exercice *</label>
-          <select 
-            id="exerciseId" 
-            formControlName="exerciseId" 
-            class="form-control"
-            [class.error]="addExerciseForm.get('exerciseId')?.invalid && addExerciseForm.get('exerciseId')?.touched"
-          >
-            <option value="">Sélectionnez un exercice</option>
-            <option 
-              *ngFor="let exercise of availableExercises" 
-              [value]="exercise.id"
+          <div class="input-container">
+            <select 
+              id="exerciseId" 
+              formControlName="exerciseId" 
+              class="form-control"
+              [class.error]="addExerciseForm.get('exerciseId')?.invalid && addExerciseForm.get('exerciseId')?.touched"
             >
-              {{ exercise.name }} - {{ exercise.muscleGroup }}
-            </option>
-          </select>
+              <option value="">Sélectionnez un exercice</option>
+              <option 
+                *ngFor="let exercise of availableExercises" 
+                [value]="exercise.id"
+              >
+                {{ exercise.name }} - {{ exercise.muscleGroup }}
+              </option>
+            </select>
+          </div>
           <div *ngIf="getErrorMessage('exerciseId')" class="error-text">
             {{ getErrorMessage('exerciseId') }}
           </div>
         </div>
 
-        <!-- Ordre dans le programme -->
         <div class="form-group">
           <label for="orderInProgram">Ordre dans le programme *</label>
-          <input 
-            type="number" 
-            id="orderInProgram" 
-            formControlName="orderInProgram" 
-            class="form-control"
-            placeholder="1, 2, 3..."
-            min="1"
-            [class.error]="addExerciseForm.get('orderInProgram')?.invalid && addExerciseForm.get('orderInProgram')?.touched"
-          >
+          <div class="input-container">
+            <input 
+              type="number" 
+              id="orderInProgram" 
+              formControlName="orderInProgram" 
+              class="form-control"
+              placeholder="1, 2, 3..."
+              min="1"
+              [class.error]="addExerciseForm.get('orderInProgram')?.invalid && addExerciseForm.get('orderInProgram')?.touched"
+            >
+          </div>
           <div *ngIf="getErrorMessage('orderInProgram')" class="error-text">
             {{ getErrorMessage('orderInProgram') }}
           </div>
         </div>
 
-        <!-- Nombre de séries -->
         <div class="form-group">
           <label for="setsCount">Nombre de séries *</label>
-          <input 
-            type="number" 
-            id="setsCount" 
-            formControlName="setsCount" 
-            class="form-control"
-            placeholder="3, 4, 5..."
-            min="1"
-            [class.error]="addExerciseForm.get('setsCount')?.invalid && addExerciseForm.get('setsCount')?.touched"
-          >
+          <div class="input-container">
+            <input 
+              type="number" 
+              id="setsCount" 
+              formControlName="setsCount" 
+              class="form-control"
+              placeholder="3, 4, 5..."
+              min="1"
+              [class.error]="addExerciseForm.get('setsCount')?.invalid && addExerciseForm.get('setsCount')?.touched"
+            >
+          </div>
           <div *ngIf="getErrorMessage('setsCount')" class="error-text">
             {{ getErrorMessage('setsCount') }}
           </div>
         </div>
 
-        <!-- Nombre de répétitions -->
         <div class="form-group">
           <label for="repsCount">Nombre de répétitions</label>
-          <input 
-            type="number" 
-            id="repsCount" 
-            formControlName="repsCount" 
-            class="form-control"
-            placeholder="8, 10, 12..."
-            min="1"
-            [class.error]="addExerciseForm.get('repsCount')?.invalid && addExerciseForm.get('repsCount')?.touched"
-          >
+          <div class="input-container">
+            <input 
+              type="number" 
+              id="repsCount" 
+              formControlName="repsCount" 
+              class="form-control"
+              placeholder="8, 10, 12..."
+              min="1"
+              [class.error]="addExerciseForm.get('repsCount')?.invalid && addExerciseForm.get('repsCount')?.touched"
+            >
+          </div>
           <div *ngIf="getErrorMessage('repsCount')" class="error-text">
             {{ getErrorMessage('repsCount') }}
           </div>
           <small class="form-help">Laissez vide si l'exercice est basé sur la durée</small>
         </div>
 
-        <!-- Durée en secondes -->
         <div class="form-group">
           <label for="durationSeconds">Durée (secondes)</label>
-          <input 
-            type="number" 
-            id="durationSeconds" 
-            formControlName="durationSeconds" 
-            class="form-control"
-            placeholder="30, 45, 60..."
-            min="1"
-            [class.error]="addExerciseForm.get('durationSeconds')?.invalid && addExerciseForm.get('durationSeconds')?.touched"
-          >
+          <div class="input-container">
+            <input 
+              type="number" 
+              id="durationSeconds" 
+              formControlName="durationSeconds" 
+              class="form-control"
+              placeholder="30, 45, 60..."
+              min="1"
+              [class.error]="addExerciseForm.get('durationSeconds')?.invalid && addExerciseForm.get('durationSeconds')?.touched"
+            >
+          </div>
           <div *ngIf="getErrorMessage('durationSeconds')" class="error-text">
             {{ getErrorMessage('durationSeconds') }}
           </div>
           <small class="form-help">Laissez vide si l'exercice est basé sur les répétitions</small>
         </div>
 
-        <!-- Temps de repos -->
         <div class="form-group">
           <label for="restDurationSeconds">Temps de repos (secondes) *</label>
-          <input 
-            type="number" 
-            id="restDurationSeconds" 
-            formControlName="restDurationSeconds" 
-            class="form-control"
-            placeholder="60, 90, 120..."
-            min="0"
-            [class.error]="addExerciseForm.get('restDurationSeconds')?.invalid && addExerciseForm.get('restDurationSeconds')?.touched"
-          >
+          <div class="input-container">
+            <input 
+              type="number" 
+              id="restDurationSeconds" 
+              formControlName="restDurationSeconds" 
+              class="form-control"
+              placeholder="60, 90, 120..."
+              min="0"
+              [class.error]="addExerciseForm.get('restDurationSeconds')?.invalid && addExerciseForm.get('restDurationSeconds')?.touched"
+            >
+          </div>
           <div *ngIf="getErrorMessage('restDurationSeconds')" class="error-text">
             {{ getErrorMessage('restDurationSeconds') }}
           </div>
         </div>
 
-        <!-- Poids -->
         <div class="form-group">
           <label for="weightKg">Poids (kg)</label>
-          <input 
-            type="number" 
-            id="weightKg" 
-            formControlName="weightKg" 
-            class="form-control"
-            placeholder="20, 50, 100..."
-            min="0"
-            step="0.5"
-            [class.error]="addExerciseForm.get('weightKg')?.invalid && addExerciseForm.get('weightKg')?.touched"
-          >
+          <div class="input-container">
+            <input 
+              type="number" 
+              id="weightKg" 
+              formControlName="weightKg" 
+              class="form-control"
+              placeholder="20, 50, 100..."
+              min="0"
+              step="0.5"
+              [class.error]="addExerciseForm.get('weightKg')?.invalid && addExerciseForm.get('weightKg')?.touched"
+            >
+          </div>
           <div *ngIf="getErrorMessage('weightKg')" class="error-text">
             {{ getErrorMessage('weightKg') }}
           </div>
         </div>
 
-        <!-- Distance -->
         <div class="form-group">
           <label for="distanceMeters">Distance (mètres)</label>
-          <input 
-            type="number" 
-            id="distanceMeters" 
-            formControlName="distanceMeters" 
-            class="form-control"
-            placeholder="100, 200, 400..."
-            min="0"
-            [class.error]="addExerciseForm.get('distanceMeters')?.invalid && addExerciseForm.get('distanceMeters')?.touched"
-          >
+          <div class="input-container">
+            <input 
+              type="number" 
+              id="distanceMeters" 
+              formControlName="distanceMeters" 
+              class="form-control"
+              placeholder="100, 200, 400..."
+              min="0"
+              [class.error]="addExerciseForm.get('distanceMeters')?.invalid && addExerciseForm.get('distanceMeters')?.touched"
+            >
+          </div>
           <div *ngIf="getErrorMessage('distanceMeters')" class="error-text">
             {{ getErrorMessage('distanceMeters') }}
           </div>
         </div>
 
-        <!-- Notes -->
         <div class="form-group">
           <label for="notes">Notes</label>
-          <textarea 
-            id="notes" 
-            formControlName="notes" 
-            class="form-control"
-            placeholder="Notes supplémentaires sur l'exercice..."
-            rows="3"
-          ></textarea>
+          <div class="input-container">
+            <textarea 
+              id="notes" 
+              formControlName="notes" 
+              class="form-control"
+              placeholder="Notes supplémentaires sur l'exercice..."
+              rows="3"
+            ></textarea>
+          </div>
         </div>
 
-        <!-- Exercice optionnel -->
         <div class="form-group checkbox-group">
           <label class="checkbox-label">
             <input 
@@ -209,7 +210,6 @@
           <small class="form-help">Cochez si cet exercice est optionnel dans le programme</small>
         </div>
 
-        <!-- Boutons d'action -->
         <div class="form-actions">
           <button 
             type="button" 
@@ -232,6 +232,5 @@
     </div>
   </main>
 
-  <!-- Navigation Bar Component -->
   <app-nav-bar [currentRoute]="'/dashboard/programs'"></app-nav-bar>
 </div> 

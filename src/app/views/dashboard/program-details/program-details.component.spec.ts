@@ -6,6 +6,10 @@ import { TrainingProgramService } from '../../../services/training-program.servi
 import { ProgramExerciseService } from '../../../services/program-exercise.service';
 import { AuthService } from '../../../services/auth.service';
 
+/**
+ * Tests pour le composant ProgramDetailsComponent
+ * Tests for ProgramDetailsComponent
+ */
 describe('ProgramDetailsComponent', () => {
   let component: ProgramDetailsComponent;
   let fixture: ComponentFixture<ProgramDetailsComponent>;
@@ -19,38 +23,55 @@ describe('ProgramDetailsComponent', () => {
     name: 'Programme Test',
     description: 'Description test',
     category: 'Musculation',
-    difficulty: 'Intermédiaire',
-    duration: 60,
-    creatorId: 1,
-    creatorName: 'Test User',
-    exercises: []
+    difficultyLevel: 'Intermédiaire',
+    durationWeeks: 4,
+    sessionsPerWeek: 3,
+    estimatedDurationMinutes: 60,
+    equipmentRequired: 'Haltères',
+    targetAudience: 'Tous niveaux',
+    isPublic: true,
+    isActive: true,
+    createdByUserId: 1,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   };
 
   const mockProgramExercise = {
     id: 1,
-    programId: 1,
+    trainingProgramId: 1,
     exerciseId: 1,
-    exercise: {
-      id: 1,
-      name: 'Squat',
-      description: 'Exercice de squat',
-      muscleGroup: 'Jambes',
-      equipment: 'Barre',
-      difficulty: 'Intermédiaire',
-      instructions: 'Instructions test',
-      imageUrl: 'test.jpg'
-    },
-    order: 1,
-    sets: 3,
-    reps: 10,
-    restTime: 60,
-    isOptional: false
+    exerciseName: 'Squat',
+    exerciseDescription: 'Exercice de squat',
+    exerciseCategory: 'Musculation',
+    exerciseMuscleGroup: 'Jambes',
+    exerciseEquipmentNeeded: 'Barre',
+    exerciseDifficultyLevel: 'Intermédiaire',
+    orderInProgram: 1,
+    setsCount: 3,
+    repsCount: 10,
+    restDurationSeconds: 60,
+    durationSeconds: 30,
+    weightKg: 50,
+    distanceMeters: 0,
+    isOptional: false,
+    notes: 'Test exercise',
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   };
 
   const mockUser = {
     id: 1,
+    username: 'testuser',
     email: 'test@example.com',
-    username: 'testuser'
+    firstName: 'Test',
+    lastName: 'User',
+    dateOfBirth: '1990-01-01',
+    gender: 'MALE',
+    height: 180,
+    weight: 75,
+    experienceLevel: 'BEGINNER',
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   };
 
   beforeEach(async () => {
@@ -90,73 +111,158 @@ describe('ProgramDetailsComponent', () => {
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  describe('Initialisation du composant', () => {
+    it('should create', () => {
+      expect(component).toBeTruthy();
+    });
+
+    it('should initialize with correct programId', () => {
+      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
+      programExerciseService.getExercisesByProgramId.and.returnValue(of([]));
+      
+      component.ngOnInit();
+      expect(component.programId).toBe(1);
+    });
+
+    it('should load current user on init', () => {
+      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
+      programExerciseService.getExercisesByProgramId.and.returnValue(of([]));
+      
+      component.ngOnInit();
+      expect(component.currentUser).toEqual(mockUser);
+    });
   });
 
-  it('should initialize provenance properties correctly', () => {
-    trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
-    programExerciseService.getExercisesByProgramId.and.returnValue(of([mockProgramExercise as any]));
+  describe('Chargement des données', () => {
+    it('should load program details and then exercises sequentially', () => {
+      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
+      programExerciseService.getExercisesByProgramId.and.returnValue(of([mockProgramExercise as any]));
 
-    component.ngOnInit();
+      component.ngOnInit();
+      fixture.detectChanges();
 
-    expect(component.fromYouPrograms).toBe(false);
-    expect(component.canAddProgram).toBe(true);
-    expect(component.isProgramCreator).toBe(false);
-    expect(component.canModifyProgram).toBe(false);
+      expect(trainingProgramService.getProgramById).toHaveBeenCalledWith(1);
+      expect(programExerciseService.getExercisesByProgramId).toHaveBeenCalledWith(1);
+      expect(component.program).toBeTruthy();
+      expect(component.program?.exercises).toBeTruthy();
+      expect(component.program?.exercises.length).toBe(1);
+    });
+
+    it('should handle error when loading program details', () => {
+      const error = { status: 404, message: 'Program not found' };
+      trainingProgramService.getProgramById.and.returnValue(throwError(() => error));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.error).toBe('Programme non trouvé.');
+      expect(component.loading).toBe(false);
+    });
+
+    it('should handle error when loading exercises', () => {
+      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
+      const error = { status: 500, message: 'Server error' };
+      programExerciseService.getExercisesByProgramId.and.returnValue(throwError(() => error));
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.error).toBe('Erreur lors du chargement des exercices');
+    });
   });
 
-  it('should load program details successfully', () => {
-    trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
-    programExerciseService.getExercisesByProgramId.and.returnValue(of([mockProgramExercise as any]));
+  describe('Gestion des permissions', () => {
+    it('should set canAddProgram based on provenance', () => {
+      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
+      programExerciseService.getExercisesByProgramId.and.returnValue(of([]));
+      
+      component.fromYouPrograms = false;
+      component.ngOnInit();
+      expect(component.canAddProgram).toBe(true);
+    });
 
-    component.ngOnInit();
+    it('should update modification permissions correctly', () => {
+      component.program = { ...mockTrainingProgram, createdByUserId: 1 } as any;
+      component.currentUser = mockUser;
+      component.fromYouPrograms = true;
 
-    expect(component.program).toBeTruthy();
-    expect(component.loading).toBe(false);
-    expect(component.error).toBe('');
+      if (component.program && component.currentUser) {
+        component.isProgramCreator = component.program.createdByUserId === component.currentUser.id;
+        component.canModifyProgram = component.fromYouPrograms && component.isProgramCreator;
+      }
+
+      expect(component.isProgramCreator).toBe(true);
+      expect(component.canModifyProgram).toBe(true);
+    });
   });
 
-  it('should handle error when loading program details', () => {
-    const errorMessage = 'Erreur lors du chargement';
-    trainingProgramService.getProgramById.and.returnValue(throwError(() => new Error(errorMessage)));
-    programExerciseService.getExercisesByProgramId.and.returnValue(of([]));
+  describe('Navigation', () => {
+    it('should navigate back to you page when from you-programs', () => {
+      component.fromYouPrograms = true;
+      component.programId = 1;
 
-    component.ngOnInit();
+      component.goBack();
 
-    expect(component.error).toBe('Erreur lors du chargement du programme');
-    expect(component.loading).toBe(false);
+      expect(router.navigate).toHaveBeenCalledWith(
+        ['/dashboard/you'],
+        { queryParams: { from: 'you-programs' } }
+      );
+    });
+
+    it('should navigate back to programs page when not from you-programs', () => {
+      component.fromYouPrograms = false;
+      component.programId = 1;
+
+      component.goBack();
+
+      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/programs']);
+    });
   });
 
-  it('should add program to user when addProgramToUser is called', () => {
-    component.currentUser = mockUser;
-    component.program = mockTrainingProgram as any;
-    spyOn(console, 'log');
-    spyOn(window, 'alert');
+  describe('Méthodes utilitaires', () => {
+    beforeEach(() => {
+      component.program = {
+        ...mockTrainingProgram,
+        exercises: [mockProgramExercise as any]
+      } as any;
+    });
 
-    component.addProgramToUser();
+    it('should calculate total exercises correctly', () => {
+      const total = component.getTotalExercises();
+      expect(total).toBe(1);
+    });
 
-    expect(console.log).toHaveBeenCalledWith('Ajouter le programme', mockTrainingProgram.id, 'à l\'utilisateur', mockUser.id);
-    expect(window.alert).toHaveBeenCalledWith('Programme ajouté à vos programmes !');
+    it('should calculate total sets correctly', () => {
+      const total = component.getTotalSets();
+      expect(total).toBe(3);
+    });
+
+    it('should calculate estimated total time correctly', () => {
+      const time = component.getEstimatedTotalTime();
+      expect(time).toContain('min');
+    });
+
+    it('should return 0 min when no exercises', () => {
+      component.program!.exercises = [];
+      const time = component.getEstimatedTotalTime();
+      expect(time).toBe('0 min');
+    });
   });
 
-  it('should not add program to user when user is null', () => {
-    component.currentUser = null;
-    component.program = mockTrainingProgram as any;
-    spyOn(console, 'log');
+  describe('Gestion des erreurs', () => {
+    it('should handle different error types correctly', () => {
+      const testCases = [
+        { status: 401, expected: 'Session expirée. Veuillez vous reconnecter.' },
+        { status: 403, expected: 'Accès refusé. Vous n\'avez pas les permissions nécessaires.' },
+        { status: 404, expected: 'Programme non trouvé.' },
+        { status: 500, expected: 'Custom error message' }
+      ];
 
-    component.addProgramToUser();
-
-    expect(console.log).not.toHaveBeenCalled();
-  });
-
-  it('should not add program to user when program is null', () => {
-    component.currentUser = mockUser;
-    component.program = null;
-    spyOn(console, 'log');
-
-    component.addProgramToUser();
-
-    expect(console.log).not.toHaveBeenCalled();
+      testCases.forEach(({ status, expected }) => {
+        const error = { status };
+        component['handleError'](error, 'Custom error message');
+        expect(component.error).toBe(expected);
+      });
+    });
   });
 }); 

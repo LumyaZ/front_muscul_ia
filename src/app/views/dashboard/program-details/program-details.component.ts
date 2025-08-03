@@ -79,7 +79,6 @@ export class ProgramDetailsComponent implements OnInit {
     
     if (this.programId) {
       this.loadProgramDetails();
-      this.loadProgramExercises();
     } else {
       this.error = 'ID de programme invalide';
     }
@@ -98,8 +97,10 @@ export class ProgramDetailsComponent implements OnInit {
         this.program = { ...program, exercises: [] };
         this.updateModificationPermissions();
         this.loading = false;
+        
+        this.loadProgramExercises();
       },
-      error: (err: any) => {
+      error: (err) => {
         this.handleError(err, 'Erreur lors du chargement du programme');
         this.loading = false;
       }
@@ -114,19 +115,19 @@ export class ProgramDetailsComponent implements OnInit {
     console.error('Erreur:', error);
     
     if (error.status === 401) {
-      this.error = 'Erreur d\'authentification. Veuillez vous reconnecter.';
+      this.error = 'Session expirée. Veuillez vous reconnecter.';
+    } else if (error.status === 403) {
+      this.error = 'Accès refusé. Vous n\'avez pas les permissions nécessaires.';
     } else if (error.status === 404) {
       this.error = 'Programme non trouvé.';
-    } else if (error.status === 403) {
-      this.error = 'Accès non autorisé.';
     } else {
       this.error = defaultMessage;
     }
   }
 
   /**
-   * Charge les exercices associés au programme actuel
-   * Load exercises associated with the current program
+   * Charge les exercices du programme d'entraînement
+   * Load program exercises
    */
   loadProgramExercises(): void {
     this.programExerciseService.getExercisesByProgramId(this.programId).subscribe({
@@ -310,39 +311,36 @@ export class ProgramDetailsComponent implements OnInit {
    * Get total number of exercises in the program
    */
   getTotalExercises(): number {
-    return this.program?.exercises?.length || 0;
+    const total = this.program?.exercises?.length || 0;
+    return total;
   }
 
   /**
-   * Obtient le nombre total de séries dans tous les exercices du programme
-   * Get total number of sets across all exercises in the program
+   * Obtient le nombre total de séries dans le programme
+   * Get total number of sets in the program
    */
   getTotalSets(): number {
-    return this.program?.exercises?.reduce((total, exercise) => total + exercise.setsCount, 0) || 0;
+    const total = this.program?.exercises?.reduce((sum, exercise) => sum + exercise.setsCount, 0) || 0;
+    return total;
   }
 
   /**
-   * Estime le temps total pour l'ensemble du programme
-   * Estimate total time for the entire program
+   * Obtient le temps total estimé du programme
+   * Get estimated total time of the program
    */
   getEstimatedTotalTime(): string {
-    if (!this.program?.exercises) return '0 min';
-    
-    const totalTime = this.program.exercises.reduce((total, exercise) => {
-      let exerciseTime = 0;
-      
-      if (exercise.durationSeconds) {
-        exerciseTime = exercise.durationSeconds * exercise.setsCount;
-      } else if (exercise.repsCount) {
-        exerciseTime = exercise.repsCount * 2 * exercise.setsCount;
-      }
-      
-      exerciseTime += exercise.restDurationSeconds * (exercise.setsCount - 1);
-      
-      return total + exerciseTime;
+    if (!this.program?.exercises?.length) {
+      return '0 min';
+    }
+
+    const totalMinutes = this.program.exercises.reduce((total, exercise) => {
+      const exerciseTime = exercise.durationSeconds ? exercise.durationSeconds / 60 : 0;
+      const restTime = exercise.restDurationSeconds ? exercise.restDurationSeconds / 60 : 0;
+      const setsTime = exercise.setsCount * (exerciseTime + restTime);
+      return total + setsTime;
     }, 0);
-    
-    return this.formatDuration(Math.ceil(totalTime / 60));
+
+    return `${Math.round(totalMinutes)} min`;
   }
 
   /**

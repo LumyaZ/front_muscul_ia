@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
 import { ExerciseService } from '../../../services/exercise.service';
 import { ProgramExerciseService } from '../../../services/program-exercise.service';
+import { AuthService } from '../../../services/auth.service';
+import { User } from '../../../models/user.model';
 
 /**
- * Interface for the form data to add an exercise to a program.
- * Interface pour les données du formulaire d'ajout d'exercice à un programme.
+ * Interface pour les données du formulaire d'ajout d'exercice
+ * Interface for exercise addition form data
  */
 interface AddExerciseToProgramForm {
   exerciseId: number;
@@ -25,21 +28,8 @@ interface AddExerciseToProgramForm {
 }
 
 /**
- * Component for adding an exercise to a training program.
- * Composant pour ajouter un exercice à un programme d'entraînement.
- * 
- * This component provides a form interface for users to add new exercises
- * to existing training programs with specific parameters like sets, reps,
- * duration, and rest periods.
- * 
- * Ce composant fournit une interface de formulaire pour que les utilisateurs
- * puissent ajouter de nouveaux exercices à des programmes d'entraînement
- * existants avec des paramètres spécifiques comme les séries, répétitions,
- * durée et périodes de repos.
- * 
- * @author Muscul IA Team
- * @version 1.0
- * @since 2024-01-01
+ * Composant pour ajouter un exercice à un programme d'entraînement
+ * Component for adding an exercise to a training program
  */
 @Component({
   selector: 'app-add-exercise-to-program',
@@ -48,67 +38,27 @@ interface AddExerciseToProgramForm {
   templateUrl: './add-exercise-to-program.component.html',
   styleUrls: ['./add-exercise-to-program.component.scss']
 })
-export class AddExerciseToProgramComponent implements OnInit {
+export class AddExerciseToProgramComponent implements OnInit, OnDestroy {
   
-  /**
-   * Form group for adding exercise to program.
-   * Groupe de formulaire pour ajouter un exercice au programme.
-   */
+  private fb = inject(FormBuilder);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private exerciseService = inject(ExerciseService);
+  private programExerciseService = inject(ProgramExerciseService);
+  private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
+  
   addExerciseForm: FormGroup;
-  
-  /**
-   * ID of the training program.
-   * ID du programme d'entraînement.
-   */
   programId: number = 0;
-  
-  /**
-   * Name of the training program.
-   * Nom du programme d'entraînement.
-   */
   programName: string = '';
-  
-  /**
-   * List of available exercises to choose from.
-   * Liste des exercices disponibles à choisir.
-   */
   availableExercises: any[] = [];
-  
-  /**
-   * Loading state indicator.
-   * Indicateur d'état de chargement.
-   */
   loading = false;
-  
-  /**
-   * Error message to display if operation fails.
-   * Message d'erreur à afficher si l'opération échoue.
-   */
   error = '';
-  
-  /**
-   * Success message to display after successful addition.
-   * Message de succès à afficher après ajout réussi.
-   */
   success = '';
+  currentUser: User | null = null;
+  fromYouPrograms: boolean = false;
 
-  /**
-   * Constructor for AddExerciseToProgramComponent.
-   * Constructeur pour AddExerciseToProgramComponent.
-   * 
-   * @param fb - Form builder service
-   * @param route - Angular activated route service
-   * @param router - Angular router service
-   * @param exerciseService - Service for exercise operations
-   * @param programExerciseService - Service for program exercise operations
-   */
-  constructor(
-    private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private exerciseService: ExerciseService,
-    private programExerciseService: ProgramExerciseService
-  ) {
+  constructor() {
     this.addExerciseForm = this.fb.group({
       exerciseId: ['', Validators.required],
       orderInProgram: ['', [Validators.required, Validators.min(1)]],
@@ -123,82 +73,81 @@ export class AddExerciseToProgramComponent implements OnInit {
     });
   }
 
-  /**
-   * Lifecycle hook that is called after data-bound properties are initialized.
-   * Hook de cycle de vie appelé après l'initialisation des propriétés liées aux données.
-   * 
-   * This method initializes the component by loading the program ID from route
-   * parameters and loading available exercises.
-   * 
-   * Cette méthode initialise le composant en chargeant l'ID du programme
-   * depuis les paramètres de route et en chargeant les exercices disponibles.
-   */
   ngOnInit(): void {
+    this.loadCurrentUser();
+    this.checkProvenance();
     this.route.params.subscribe(params => {
       this.programId = +params['id'];
       if (this.programId) {
         this.loadAvailableExercises();
-        this.loadProgramDetails();
       }
     });
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   /**
-   * Loads available exercises from the service.
-   * Charge les exercices disponibles depuis le service.
-   * 
-   * This method fetches all available exercises that can be added
-   * to the training program.
-   * 
-   * Cette méthode récupère tous les exercices disponibles qui peuvent
-   * être ajoutés au programme d'entraînement.
+   * Charge les données de l'utilisateur connecté
+   * Load current authenticated user data
+   */
+  private loadCurrentUser(): void {
+    this.currentUser = this.authService.getCurrentUser();
+  }
+
+  /**
+   * Vérifie la provenance de l'utilisateur
+   * Check user provenance
+   */
+  private checkProvenance(): void {
+    this.route.queryParams.subscribe(params => {
+      this.fromYouPrograms = params['from'] === 'you-programs';
+    });
+  }
+
+  /**
+   * Charge les exercices disponibles
+   * Load available exercises
    */
   loadAvailableExercises(): void {
     this.loading = true;
-    this.exerciseService.getAllExercises().subscribe({
-      next: (exercises) => {
-        this.availableExercises = exercises;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Erreur lors du chargement des exercices';
-        this.loading = false;
-        console.error('Erreur chargement exercices:', err);
-      }
-    });
+    this.exerciseService.getAllExercises()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (exercises) => {
+          this.availableExercises = exercises;
+          this.loading = false;
+        },
+        error: (err) => {
+          this.handleError(err, 'Erreur lors du chargement des exercices');
+          this.loading = false;
+        }
+      });
   }
 
   /**
-   * Loads program details to display program name.
-   * Charge les détails du programme pour afficher le nom du programme.
-   * 
-   * This method fetches the program details to show the user which
-   * program they are adding an exercise to.
-   * 
-   * Cette méthode récupère les détails du programme pour montrer
-   * à l'utilisateur à quel programme il ajoute un exercice.
+   * Gère les erreurs de manière centralisée
+   * Handle errors in a centralized way
    */
-  loadProgramDetails(): void {
-    // TODO: Implement when TrainingProgramService is available
-    // this.trainingProgramService.getProgramById(this.programId).subscribe({
-    //   next: (program) => {
-    //     this.programName = program.name;
-    //   },
-    //   error: (err) => {
-    //     console.error('Erreur chargement programme:', err);
-    //   }
-    // });
+  private handleError(error: any, defaultMessage: string): void {
+    console.error('Erreur:', error);
+    
+    if (error.status === 401) {
+      this.error = 'Session expirée. Veuillez vous reconnecter.';
+    } else if (error.status === 403) {
+      this.error = 'Accès refusé. Vous n\'avez pas les permissions nécessaires.';
+    } else if (error.status === 404) {
+      this.error = 'Programme non trouvé.';
+    } else {
+      this.error = defaultMessage;
+    }
   }
 
   /**
-   * Handles form submission to add exercise to program.
-   * Gère la soumission du formulaire pour ajouter un exercice au programme.
-   * 
-   * This method validates the form and submits the exercise data
-   * to be added to the training program.
-   * 
-   * Cette méthode valide le formulaire et soumet les données d'exercice
-   * pour être ajoutées au programme d'entraînement.
+   * Gère la soumission du formulaire
+   * Handle form submission
    */
   onSubmit(): void {
     if (this.addExerciseForm.valid) {
@@ -208,34 +157,29 @@ export class AddExerciseToProgramComponent implements OnInit {
 
       const formData: AddExerciseToProgramForm = this.addExerciseForm.value;
       
-      this.programExerciseService.addExerciseToProgram(this.programId, formData).subscribe({
-        next: (result) => {
-          this.success = 'Exercice ajouté au programme avec succès !';
-          this.loading = false;
-          setTimeout(() => {
-            this.goBackToProgram();
-          }, 2000);
-        },
-        error: (err) => {
-          this.error = 'Erreur lors de l\'ajout de l\'exercice au programme';
-          this.loading = false;
-          console.error('Erreur ajout exercice:', err);
-        }
-      });
+      this.programExerciseService.addExerciseToProgram(this.programId, formData)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (result) => {
+            this.success = 'Exercice ajouté au programme avec succès !';
+            this.loading = false;
+            setTimeout(() => {
+              this.goBackToProgram();
+            }, 2000);
+          },
+          error: (err) => {
+            this.handleError(err, 'Erreur lors de l\'ajout de l\'exercice au programme');
+            this.loading = false;
+          }
+        });
     } else {
       this.markFormGroupTouched();
     }
   }
 
   /**
-   * Marks all form controls as touched to trigger validation display.
-   * Marque tous les contrôles du formulaire comme touchés pour déclencher l'affichage de validation.
-   * 
-   * This method is used to show validation errors when the form is submitted
-   * but contains invalid data.
-   * 
-   * Cette méthode est utilisée pour afficher les erreurs de validation
-   * quand le formulaire est soumis mais contient des données invalides.
+   * Marque tous les contrôles du formulaire comme touchés
+   * Mark all form controls as touched
    */
   markFormGroupTouched(): void {
     Object.keys(this.addExerciseForm.controls).forEach(key => {
@@ -245,37 +189,37 @@ export class AddExerciseToProgramComponent implements OnInit {
   }
 
   /**
-   * Navigates back to the program details page.
-   * Navigue vers la page de détails du programme.
-   * 
-   * This method returns the user to the program details page
-   * where they can see the updated list of exercises.
-   * 
-   * Cette méthode ramène l'utilisateur à la page de détails du programme
-   * où il peut voir la liste mise à jour des exercices.
+   * Navigue vers les détails du programme
+   * Navigate to program details
    */
   goBackToProgram(): void {
-    this.router.navigate(['/dashboard/programs', this.programId]);
+    if (this.fromYouPrograms) {
+      this.router.navigate(['/dashboard/programs', this.programId], {
+        queryParams: {
+          from: 'you-programs',
+          userId: this.currentUser?.id
+        }
+      });
+    } else {
+      this.router.navigate(['/dashboard/programs', this.programId]);
+    }
   }
 
   /**
-   * Navigates back to the programs list.
-   * Navigue vers la liste des programmes.
-   * 
-   * This method returns the user to the main programs list page.
-   * 
-   * Cette méthode ramène l'utilisateur à la page principale de liste des programmes.
+   * Navigue vers la liste des programmes
+   * Navigate to programs list
    */
   goBackToPrograms(): void {
-    this.router.navigate(['/dashboard/programs']);
+    if (this.fromYouPrograms) {
+      this.router.navigate(['/dashboard/you'], { queryParams: { from: 'you-programs' } });
+    } else {
+      this.router.navigate(['/dashboard/programs']);
+    }
   }
 
   /**
-   * Gets the display name for an exercise.
-   * Obtient le nom d'affichage pour un exercice.
-   * 
-   * @param exerciseId - ID of the exercise
-   * @returns Display name of the exercise
+   * Obtient le nom d'affichage d'un exercice
+   * Get exercise display name
    */
   getExerciseDisplayName(exerciseId: number): string {
     const exercise = this.availableExercises.find(ex => ex.id === exerciseId);
@@ -283,11 +227,8 @@ export class AddExerciseToProgramComponent implements OnInit {
   }
 
   /**
-   * Gets the error message for a form control.
-   * Obtient le message d'erreur pour un contrôle de formulaire.
-   * 
-   * @param controlName - Name of the form control
-   * @returns Error message string
+   * Obtient le message d'erreur pour un contrôle
+   * Get error message for a form control
    */
   getErrorMessage(controlName: string): string {
     const control = this.addExerciseForm.get(controlName);

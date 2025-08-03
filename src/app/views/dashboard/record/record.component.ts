@@ -74,21 +74,6 @@ export class RecordComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Affiche l'historique des entraînements
-   * Display training history
-   */
-  viewHistory(): void {
-    if (this.isLoading) return;
-    
-    try {
-      this.router.navigate(['/dashboard/record/program-recap']);
-    } catch (error) {
-      console.error('Erreur lors de la navigation vers l\'historique:', error);
-      this.error = 'Erreur lors de la navigation';
-    }
-  }
-
-  /**
    * Efface le message d'erreur
    * Clear error message
    */

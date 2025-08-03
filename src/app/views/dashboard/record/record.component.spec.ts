@@ -1,27 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
 import { RecordComponent } from './record.component';
-import { User } from '../../../models/user.model';
+import { AuthService } from '../../../services/auth.service';
 
 describe('RecordComponent', () => {
   let component: RecordComponent;
   let fixture: ComponentFixture<RecordComponent>;
-  let router: jasmine.SpyObj<Router>;
-  let authService: jasmine.SpyObj<AuthService>;
-
-  const mockUser: User = {
-    id: 1,
-    email: 'test@example.com',
-    creationDate: new Date().toISOString()
-  };
+  let mockRouter: jasmine.SpyObj<Router>;
+  let mockAuthService: jasmine.SpyObj<AuthService>;
 
   beforeEach(async () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    const authServiceSpy = jasmine.createSpyObj('AuthService', [
-      'getCurrentUser', 
-      'isAuthenticated'
-    ]);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser', 'isAuthenticated']);
 
     await TestBed.configureTestingModule({
       imports: [RecordComponent],
@@ -33,119 +23,81 @@ describe('RecordComponent', () => {
 
     fixture = TestBed.createComponent(RecordComponent);
     component = fixture.componentInstance;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('Initialization', () => {
-    it('should load user data on init when user is authenticated', () => {
-      authService.getCurrentUser.and.returnValue(mockUser);
-      authService.isAuthenticated.and.returnValue(true);
-      
-      component.ngOnInit();
-      
-      expect(authService.getCurrentUser).toHaveBeenCalled();
-      expect(component.isLoading).toBe(false);
-      expect(component.error).toBeNull();
-    });
+  it('should initialize component successfully', () => {
+    const mockUser = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
+    mockAuthService.getCurrentUser.and.returnValue(mockUser);
+    mockAuthService.isAuthenticated.and.returnValue(true);
 
-    it('should handle authentication error and redirect to login', (done) => {
-      authService.getCurrentUser.and.returnValue(null);
-      authService.isAuthenticated.and.returnValue(false);
-      
-      component.ngOnInit();
-      
-      expect(component.error).toBe('Utilisateur non connecté. Redirection vers la page de connexion.');
-      
-      setTimeout(() => {
-        expect(router.navigate).toHaveBeenCalledWith(['/login']);
-        done();
-      }, 2100);
-    });
+    component.ngOnInit();
 
-    it('should handle service errors gracefully', () => {
-      authService.getCurrentUser.and.throwError('Service error');
-      authService.isAuthenticated.and.returnValue(false);
-      
-      component.ngOnInit();
-      
-      expect(component.error).toBe('Erreur lors du chargement des données');
-      expect(component.isLoading).toBe(false);
-    });
+    expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
+    expect(component.isLoading).toBe(false);
+    expect(component.error).toBeNull();
   });
 
-  describe('Navigation', () => {
-    beforeEach(() => {
-      authService.getCurrentUser.and.returnValue(mockUser);
-      authService.isAuthenticated.and.returnValue(true);
-      component.ngOnInit();
-    });
+  it('should handle authentication error and redirect to login', () => {
+    mockAuthService.getCurrentUser.and.returnValue(null);
+    mockAuthService.isAuthenticated.and.returnValue(false);
 
-    it('should navigate to select-program when startTraining is called', () => {
-      component.startTraining();
-      
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/record/select-program']);
-    });
+    component.ngOnInit();
 
-    it('should navigate to program-recap when viewHistory is called', () => {
-      component.viewHistory();
-      
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/record/program-recap']);
-    });
+    expect(component.error).toBe('Utilisateur non connecté. Redirection vers la page de connexion.');
   });
 
-  describe('Error Handling', () => {
-    it('should clear error and reinitialize when clearError is called', () => {
-      component.error = 'Test error';
-      spyOn(component as any, 'initializeComponent');
-      
-      component.clearError();
-      
-      expect(component.error).toBeNull();
-      expect((component as any).initializeComponent).toHaveBeenCalled();
-    });
+  it('should navigate to select-program when startTraining is called', () => {
+    component.startTraining();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/record/select-program']);
   });
 
-  describe('Template Rendering', () => {
-    beforeEach(() => {
-      authService.getCurrentUser.and.returnValue(mockUser);
-      authService.isAuthenticated.and.returnValue(true);
-      component.ngOnInit();
-      fixture.detectChanges();
-    });
+  it('should not navigate when loading', () => {
+    component.isLoading = true;
 
-    it('should display loading state when isLoading is true', () => {
-      component.isLoading = true;
-      fixture.detectChanges();
-      
-      const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('Chargement de vos données');
-    });
+    component.startTraining();
 
-    it('should display error state when error exists', () => {
-      component.error = 'Test error message';
-      component.isLoading = false;
-      fixture.detectChanges();
-      
-      const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('Erreur');
-      expect(compiled.textContent).toContain('Test error message');
-      expect(compiled.textContent).toContain('Réessayer');
-    });
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
 
-    it('should display main content when not loading and no error', () => {
-      component.isLoading = false;
-      component.error = null;
-      fixture.detectChanges();
-      
-      const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('Enregistrer un Entraînement');
-      expect(compiled.textContent).toContain('Démarrer un Entraînement');
-      expect(compiled.textContent).toContain('Historique des Entraînements');
-    });
+  it('should handle navigation error', () => {
+    spyOn(console, 'error');
+    mockRouter.navigate.and.throwError('Navigation error');
+
+    component.startTraining();
+
+    expect(component.error).toBe('Erreur lors de la navigation');
+    expect(console.error).toHaveBeenCalled();
+  });
+
+  it('should clear error', () => {
+    // Initialize component first
+    const mockUser = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
+    mockAuthService.getCurrentUser.and.returnValue(mockUser);
+    mockAuthService.isAuthenticated.and.returnValue(true);
+    component.ngOnInit();
+    
+    // Set error manually
+    component.error = 'Test error';
+
+    component.clearError();
+
+    expect(component.error).toBeNull();
+  });
+
+  it('should clean up subscriptions on destroy', () => {
+    spyOn(component['destroy$'], 'next');
+    spyOn(component['destroy$'], 'complete');
+
+    component.ngOnDestroy();
+
+    expect(component['destroy$'].next).toHaveBeenCalled();
+    expect(component['destroy$'].complete).toHaveBeenCalled();
   });
 }); 

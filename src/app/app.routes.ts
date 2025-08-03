@@ -55,10 +55,6 @@ export const routes: Routes = [
         loadComponent: () => import('./views/dashboard/record/select-program/select-program.component').then(m => m.SelectProgramComponent)
       },
       {
-        path: 'record/program-recap/:id',
-        loadComponent: () => import('./views/dashboard/record/program-recap/program-recap.component').then(m => m.ProgramRecapComponent)
-      },
-      {
         path: 'record/training/:id',
         loadComponent: () => import('./views/dashboard/record/training/training.component').then(m => m.TrainingComponent)
       },

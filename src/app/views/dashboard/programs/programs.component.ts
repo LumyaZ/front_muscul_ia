@@ -404,20 +404,6 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * Navigates to the create new program page.
-   * Navigue vers la page de création d'un nouveau programme.
-   * 
-   * This method navigates to a page where users can create
-   * a new training program from scratch.
-   * 
-   * Cette méthode navigue vers une page où les utilisateurs peuvent
-   * créer un nouveau programme d'entraînement à partir de zéro.
-   */
-  createNewProgram(): void {
-    this.router.navigate(['/dashboard/programs/create']);
-  }
-
-  /**
    * Add a training program to the user's programs.
    * Ajouter un programme d'entraînement aux programmes de l'utilisateur.
    * 

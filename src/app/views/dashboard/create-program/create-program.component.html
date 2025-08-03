@@ -1,9 +1,7 @@
 <div class="create-program-container">
-  <!-- Header Component -->
   <app-header></app-header>
 
   <main class="create-program-content">
-    <!-- Bouton retour -->
     <div class="back-button">
       <button class="back-btn" (click)="goBackToPrograms()">
         <span>‹</span>
@@ -11,13 +9,11 @@
       </button>
     </div>
 
-    <!-- En-tête de la page -->
     <div class="page-header">
       <h1>Créer un nouveau programme</h1>
       <p>Créez votre programme d'entraînement personnalisé</p>
     </div>
 
-    <!-- Messages d'erreur et de succès -->
     <div *ngIf="error" class="error-message">
       <span>❌</span>
       {{ error }}
@@ -28,38 +24,45 @@
       {{ success }}
     </div>
 
-    <!-- Formulaire de création -->
-    <div class="form-container">
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Création du programme en cours...</p>
+    </div>
+
+    <div *ngIf="!loading" class="form-container">
       <form [formGroup]="createProgramForm" (ngSubmit)="onSubmit()" class="create-program-form">
-        <!-- Informations de base -->
         <div class="form-section">
           <h2>Informations de base</h2>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="name">Nom du programme *</label>
-              <input 
-                type="text" 
-                id="name" 
-                formControlName="name" 
-                placeholder="Ex: Programme débutant musculation"
-                [class.error]="createProgramForm.get('name')?.invalid && createProgramForm.get('name')?.touched"
-              >
+              <label for="name">Nom du programme</label>
+              <div class="input-container">
+                <input 
+                  type="text" 
+                  id="name" 
+                  formControlName="name" 
+                  placeholder="Ex: Programme débutant musculation"
+                  [class.error]="createProgramForm.get('name')?.invalid && createProgramForm.get('name')?.touched"
+                >
+              </div>
               <div *ngIf="createProgramForm.get('name')?.invalid && createProgramForm.get('name')?.touched" class="error-text">
                 {{ getErrorMessage('name') }}
               </div>
             </div>
 
             <div class="form-group">
-              <label for="category">Catégorie *</label>
-              <select 
-                id="category" 
-                formControlName="category"
-                [class.error]="createProgramForm.get('category')?.invalid && createProgramForm.get('category')?.touched"
-              >
-                <option value="">Sélectionnez une catégorie</option>
-                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-              </select>
+              <label for="category">Catégorie</label>
+              <div class="input-container">
+                <select 
+                  id="category" 
+                  formControlName="category"
+                  [class.error]="createProgramForm.get('category')?.invalid && createProgramForm.get('category')?.touched"
+                >
+                  <option value="">Sélectionnez une catégorie</option>
+                  <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                </select>
+              </div>
               <div *ngIf="createProgramForm.get('category')?.invalid && createProgramForm.get('category')?.touched" class="error-text">
                 {{ getErrorMessage('category') }}
               </div>
@@ -68,49 +71,54 @@
 
           <div class="form-group">
             <label for="description">Description</label>
-            <textarea 
-              id="description" 
-              formControlName="description" 
-              rows="4"
-              placeholder="Décrivez votre programme d'entraînement..."
-              [class.error]="createProgramForm.get('description')?.invalid && createProgramForm.get('description')?.touched"
-            ></textarea>
+            <div class="input-container">
+              <textarea 
+                id="description" 
+                formControlName="description" 
+                rows="4"
+                placeholder="Décrivez votre programme d'entraînement..."
+                [class.error]="createProgramForm.get('description')?.invalid && createProgramForm.get('description')?.touched"
+              ></textarea>
+            </div>
             <div *ngIf="createProgramForm.get('description')?.invalid && createProgramForm.get('description')?.touched" class="error-text">
               {{ getErrorMessage('description') }}
             </div>
           </div>
         </div>
 
-        <!-- Niveau et public cible -->
         <div class="form-section">
           <h2>Niveau et public cible</h2>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="difficultyLevel">Niveau de difficulté *</label>
-              <select 
-                id="difficultyLevel" 
-                formControlName="difficultyLevel"
-                [class.error]="createProgramForm.get('difficultyLevel')?.invalid && createProgramForm.get('difficultyLevel')?.touched"
-              >
-                <option value="">Sélectionnez un niveau</option>
-                <option *ngFor="let level of difficultyLevels" [value]="level">{{ level }}</option>
-              </select>
+              <label for="difficultyLevel">Niveau de difficulté</label>
+              <div class="input-container">
+                <select 
+                  id="difficultyLevel" 
+                  formControlName="difficultyLevel"
+                  [class.error]="createProgramForm.get('difficultyLevel')?.invalid && createProgramForm.get('difficultyLevel')?.touched"
+                >
+                  <option value="">Sélectionnez un niveau</option>
+                  <option *ngFor="let level of difficultyLevels" [value]="level">{{ level }}</option>
+                </select>
+              </div>
               <div *ngIf="createProgramForm.get('difficultyLevel')?.invalid && createProgramForm.get('difficultyLevel')?.touched" class="error-text">
                 {{ getErrorMessage('difficultyLevel') }}
               </div>
             </div>
 
             <div class="form-group">
-              <label for="targetAudience">Public cible *</label>
-              <select 
-                id="targetAudience" 
-                formControlName="targetAudience"
-                [class.error]="createProgramForm.get('targetAudience')?.invalid && createProgramForm.get('targetAudience')?.touched"
-              >
-                <option value="">Sélectionnez un public</option>
-                <option *ngFor="let audience of targetAudiences" [value]="audience">{{ audience }}</option>
-              </select>
+              <label for="targetAudience">Public cible</label>
+              <div class="input-container">
+                <select 
+                  id="targetAudience" 
+                  formControlName="targetAudience"
+                  [class.error]="createProgramForm.get('targetAudience')?.invalid && createProgramForm.get('targetAudience')?.touched"
+                >
+                  <option value="">Sélectionnez un public</option>
+                  <option *ngFor="let audience of targetAudiences" [value]="audience">{{ audience }}</option>
+                </select>
+              </div>
               <div *ngIf="createProgramForm.get('targetAudience')?.invalid && createProgramForm.get('targetAudience')?.touched" class="error-text">
                 {{ getErrorMessage('targetAudience') }}
               </div>
@@ -118,98 +126,99 @@
           </div>
         </div>
 
-        <!-- Durée et fréquence -->
         <div class="form-section">
           <h2>Durée et fréquence</h2>
           
           <div class="form-row">
             <div class="form-group">
-              <label for="durationWeeks">Durée (semaines) *</label>
-              <input 
-                type="number" 
-                id="durationWeeks" 
-                formControlName="durationWeeks" 
-                min="1" 
-                max="52"
-                placeholder="Ex: 8"
-                [class.error]="createProgramForm.get('durationWeeks')?.invalid && createProgramForm.get('durationWeeks')?.touched"
-              >
+              <label for="durationWeeks">Durée (semaines)</label>
+              <div class="input-container">
+                <input 
+                  type="number" 
+                  id="durationWeeks" 
+                  formControlName="durationWeeks" 
+                  min="1" 
+                  max="52"
+                  [class.error]="createProgramForm.get('durationWeeks')?.invalid && createProgramForm.get('durationWeeks')?.touched"
+                >
+              </div>
               <div *ngIf="createProgramForm.get('durationWeeks')?.invalid && createProgramForm.get('durationWeeks')?.touched" class="error-text">
                 {{ getErrorMessage('durationWeeks') }}
               </div>
             </div>
 
             <div class="form-group">
-              <label for="sessionsPerWeek">Sessions par semaine *</label>
-              <input 
-                type="number" 
-                id="sessionsPerWeek" 
-                formControlName="sessionsPerWeek" 
-                min="1" 
-                max="7"
-                placeholder="Ex: 3"
-                [class.error]="createProgramForm.get('sessionsPerWeek')?.invalid && createProgramForm.get('sessionsPerWeek')?.touched"
-              >
+              <label for="sessionsPerWeek">Sessions par semaine</label>
+              <div class="input-container">
+                <input 
+                  type="number" 
+                  id="sessionsPerWeek" 
+                  formControlName="sessionsPerWeek" 
+                  min="1" 
+                  max="7"
+                  [class.error]="createProgramForm.get('sessionsPerWeek')?.invalid && createProgramForm.get('sessionsPerWeek')?.touched"
+                >
+              </div>
               <div *ngIf="createProgramForm.get('sessionsPerWeek')?.invalid && createProgramForm.get('sessionsPerWeek')?.touched" class="error-text">
                 {{ getErrorMessage('sessionsPerWeek') }}
               </div>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label for="estimatedDurationMinutes">Durée estimée par session (minutes) *</label>
+          <div class="form-group">
+            <label for="estimatedDurationMinutes">Durée estimée par session (minutes)</label>
+            <div class="input-container">
               <input 
                 type="number" 
                 id="estimatedDurationMinutes" 
                 formControlName="estimatedDurationMinutes" 
                 min="15" 
                 max="180"
-                placeholder="Ex: 60"
                 [class.error]="createProgramForm.get('estimatedDurationMinutes')?.invalid && createProgramForm.get('estimatedDurationMinutes')?.touched"
               >
-              <div *ngIf="createProgramForm.get('estimatedDurationMinutes')?.invalid && createProgramForm.get('estimatedDurationMinutes')?.touched" class="error-text">
-                {{ getErrorMessage('estimatedDurationMinutes') }}
-              </div>
+            </div>
+            <div *ngIf="createProgramForm.get('estimatedDurationMinutes')?.invalid && createProgramForm.get('estimatedDurationMinutes')?.touched" class="error-text">
+              {{ getErrorMessage('estimatedDurationMinutes') }}
             </div>
           </div>
         </div>
 
-        <!-- Équipement et visibilité -->
-        <div class="form-section">
+        <div class="form-section equipment-visibility-section">
           <h2>Équipement et visibilité</h2>
           
           <div class="form-group">
             <label for="equipmentRequired">Équipement requis</label>
-            <input 
-              type="text" 
-              id="equipmentRequired" 
-              formControlName="equipmentRequired" 
-              placeholder="Ex: Haltères, tapis de yoga, barre de traction"
-              [class.error]="createProgramForm.get('equipmentRequired')?.invalid && createProgramForm.get('equipmentRequired')?.touched"
-            >
+            <div class="input-container">
+              <input 
+                type="text" 
+                id="equipmentRequired" 
+                formControlName="equipmentRequired" 
+                placeholder="Ex: Haltères, tapis de sol, barre de traction..."
+                [class.error]="createProgramForm.get('equipmentRequired')?.invalid && createProgramForm.get('equipmentRequired')?.touched"
+              >
+            </div>
             <div *ngIf="createProgramForm.get('equipmentRequired')?.invalid && createProgramForm.get('equipmentRequired')?.touched" class="error-text">
               {{ getErrorMessage('equipmentRequired') }}
             </div>
           </div>
 
           <div class="checkbox-group">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="isPublic">
-              <span class="checkmark"></span>
-              Rendre ce programme public
-            </label>
-            <p class="checkbox-description">
-              Si activé, ce programme sera visible par tous les utilisateurs
-            </p>
+            <div class="checkbox-item">
+              <input type="checkbox" id="isPublic" formControlName="isPublic">
+              <div class="checkbox-content">
+                <label for="isPublic">Rendre ce programme public</label>
+                <p>Si activé, ce programme sera visible par tous les utilisateurs</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Actions du formulaire -->
         <div class="form-actions">
-          <button type="button" class="cancel-btn" (click)="goBackToPrograms()">
+          <button type="button" class="btn-secondary" (click)="goBackToPrograms()">
             Annuler
           </button>
-          <button type="submit" class="submit-btn" [disabled]="loading || createProgramForm.invalid">
-            <span *ngIf="loading" class="loading-spinner"></span>
+          <button type="submit" class="btn-primary" [disabled]="loading || createProgramForm.invalid">
+            <span *ngIf="loading" class="spinner"></span>
             {{ loading ? 'Création en cours...' : 'Créer le programme' }}
           </button>
         </div>
@@ -217,6 +226,5 @@
     </div>
   </main>
 
-  <!-- Navigation Component -->
-  <app-nav-bar [currentRoute]="'/dashboard/programs'"></app-nav-bar>
+  <app-nav-bar [currentRoute]="'/dashboard/programs/create'"></app-nav-bar>
 </div> 

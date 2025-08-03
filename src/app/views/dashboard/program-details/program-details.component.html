@@ -1,9 +1,7 @@
 <div class="program-details-container">
-  <!-- Header Component -->
   <app-header></app-header>
 
   <main class="program-details-content">
-    <!-- Bouton retour -->
     <div class="back-button">
       <button class="back-btn" (click)="goBack()">
         <span>‹</span>
@@ -11,21 +9,17 @@
       </button>
     </div>
 
-    <!-- État de chargement -->
     <div *ngIf="loading" class="loading">
       <div class="spinner"></div>
       <p>Chargement du programme...</p>
     </div>
 
-    <!-- Message d'erreur -->
     <div *ngIf="error" class="error-message">
       <p>{{ error }}</p>
       <button (click)="loadProgramDetails()">Réessayer</button>
     </div>
 
-    <!-- Détails du programme -->
     <div *ngIf="!loading && !error && program" class="program-details">
-      <!-- En-tête du programme -->
       <div class="program-header" [style.background]="getCategoryColor(program.category)">
         <div class="header-content">
           <div class="program-info">
@@ -59,15 +53,18 @@
           </div>
 
           <div class="program-actions">
-            <button class="start-program-btn" (click)="startProgram()">
-              <span>▶️</span>
-              Commencer le programme
+            <button 
+              *ngIf="canAddProgram"
+              class="add-program-btn" 
+              (click)="addProgramToUser()"
+            >
+              <span>➕</span>
+              Ajouter le programme
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Statistiques du programme -->
       <div class="program-stats">
         <div class="stat-card">
           <div class="stat-icon">🏋️</div>
@@ -99,7 +96,6 @@
         </div>
       </div>
 
-      <!-- Informations détaillées -->
       <div class="program-details-grid">
         <div class="detail-section">
           <h2>Informations générales</h2>
@@ -142,15 +138,19 @@
         </div>
       </div>
 
-      <!-- Liste des exercices -->
       <div class="exercises-section">
         <div class="exercises-header">
           <h2>Exercices du programme</h2>
-          <button class="add-exercise-btn" (click)="addExerciseToProgram()">
+          <button 
+            *ngIf="canModifyProgram" 
+            class="add-exercise-btn" 
+            (click)="addExerciseToProgram()"
+          >
             <span>➕</span>
             Ajouter un exercice
           </button>
         </div>
+        
         <div class="exercises-list">
           <div 
             *ngFor="let programExercise of program.exercises; let i = index" 
@@ -204,6 +204,5 @@
     </div>
   </main>
 
-  <!-- Navigation Bar Component -->
   <app-nav-bar [currentRoute]="'/dashboard/programs'"></app-nav-bar>
 </div> 

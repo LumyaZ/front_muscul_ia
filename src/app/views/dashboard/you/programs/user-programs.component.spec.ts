@@ -5,6 +5,10 @@ import { UserTrainingProgramService, UserTrainingProgram } from '../../../../ser
 import { AuthService } from '../../../../services/auth.service';
 import { of, throwError } from 'rxjs';
 
+/**
+ * Tests pour le composant UserProgramsComponent
+ * Tests for UserProgramsComponent
+ */
 describe('UserProgramsComponent', () => {
   let component: UserProgramsComponent;
   let fixture: ComponentFixture<UserProgramsComponent>;
@@ -86,7 +90,7 @@ describe('UserProgramsComponent', () => {
     mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
   });
 
-  describe('Component Initialization', () => {
+  describe('Initialisation du composant', () => {
     it('should create', () => {
       expect(component).toBeTruthy();
     });
@@ -99,7 +103,7 @@ describe('UserProgramsComponent', () => {
     });
   });
 
-  describe('User Data Loading', () => {
+  describe('Chargement des données utilisateur', () => {
     it('should load user data successfully', () => {
       mockAuthService.getCurrentUser.and.returnValue(mockUser);
       mockUserTrainingProgramService.getUserPrograms.and.returnValue(of(mockUserPrograms));
@@ -130,7 +134,7 @@ describe('UserProgramsComponent', () => {
     });
   });
 
-  describe('Programs Loading', () => {
+  describe('Chargement des programmes', () => {
     beforeEach(() => {
       component.currentUser = mockUser;
     });
@@ -192,11 +196,18 @@ describe('UserProgramsComponent', () => {
     });
   });
 
-  describe('Navigation Methods', () => {
-    it('should navigate to create program', () => {
+  describe('Méthodes de navigation', () => {
+    it('should navigate to create program with provenance parameters', () => {
+      component.currentUser = mockUser;
+      
       component.createNewProgram();
       
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs/create']);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs/create'], {
+        queryParams: {
+          from: 'you-programs',
+          userId: mockUser.id
+        }
+      });
     });
 
     it('should navigate to all programs', () => {
@@ -205,15 +216,22 @@ describe('UserProgramsComponent', () => {
       expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs']);
     });
 
-    it('should navigate to program details', () => {
+    it('should navigate to program details with provenance parameters', () => {
       const programId = 1;
+      component.currentUser = mockUser;
+      
       component.viewProgramDetails(programId);
       
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs', programId]);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs', programId], {
+        queryParams: {
+          from: 'you-programs',
+          userId: mockUser.id
+        }
+      });
     });
   });
 
-  describe('Program Management', () => {
+  describe('Gestion des programmes', () => {
     beforeEach(() => {
       component.currentUser = mockUser;
       component.userPrograms = mockUserPrograms;
@@ -269,7 +287,7 @@ describe('UserProgramsComponent', () => {
     });
   });
 
-  describe('Status Methods', () => {
+  describe('Méthodes de statut', () => {
     it('should return correct status colors', () => {
       expect(component.getStatusColor('IN_PROGRESS')).toBe('#4CAF50');
       expect(component.getStatusColor('COMPLETED')).toBe('#2196F3');
@@ -287,7 +305,7 @@ describe('UserProgramsComponent', () => {
     });
   });
 
-  describe('Utility Methods', () => {
+  describe('Méthodes utilitaires', () => {
     it('should track by program id', () => {
       const userProgram = mockUserPrograms[0];
       const result = component.trackByProgramId(0, userProgram);
@@ -296,7 +314,7 @@ describe('UserProgramsComponent', () => {
     });
   });
 
-  describe('Component Destruction', () => {
+  describe('Destruction du composant', () => {
     it('should complete destroy subject on destroy', () => {
       const destroySpy = spyOn(component['destroy$'], 'next');
       const completeSpy = spyOn(component['destroy$'], 'complete');

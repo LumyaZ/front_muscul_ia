@@ -5,6 +5,10 @@ import { Subject, takeUntil } from 'rxjs';
 import { UserTrainingProgramService, UserTrainingProgram } from '../../../../services/user-training-program.service';
 import { AuthService } from '../../../../services/auth.service';
 
+/**
+ * Interface pour les statuts de programme
+ * Interface for program statuses
+ */
 interface ProgramStatus {
   IN_PROGRESS: string;
   COMPLETED: string;
@@ -12,6 +16,10 @@ interface ProgramStatus {
   NOT_STARTED: string;
 }
 
+/**
+ * Composant pour afficher les programmes de l'utilisateur
+ * Component for displaying user programs
+ */
 @Component({
   selector: 'app-user-programs',
   standalone: true,
@@ -115,7 +123,12 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
    * Navigate to program creation page
    */
   createNewProgram(): void {
-    this.router.navigate(['/dashboard/programs/create']);
+    this.router.navigate(['/dashboard/programs/create'], { 
+      queryParams: { 
+        from: 'you-programs',
+        userId: this.currentUser?.id 
+      } 
+    });
   }
 
   /**
@@ -139,7 +152,12 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
    * Navigate to program details
    */
   viewProgramDetails(programId: number): void {
-    this.router.navigate(['/dashboard/programs', programId]);
+    this.router.navigate(['/dashboard/programs', programId], {
+      queryParams: {
+        from: 'you-programs',
+        userId: this.currentUser?.id
+      }
+    });
   }
 
   /**

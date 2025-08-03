@@ -1,27 +1,20 @@
 <div class="programs-container">
-  <!-- Header Component -->
   <app-header></app-header>
 
   <main class="programs-content">
-    <!-- En-tête avec titre et boutons d'action -->
     <div class="header">
       <div class="title-section">
         <h1>Programmes d'entraînement</h1>
-        <p>Découvrez et choisissez parmi nos programmes d'entraînement</p>
+        <p>Découvrez et choisissez parmi nos programmes d'entraînement personnalisés</p>
       </div>
       <div class="header-actions">
         <button class="create-program-btn" (click)="createNewProgram()">
           <span>➕</span>
           Créer un programme
         </button>
-        <button class="refresh-btn" (click)="loadPrograms()">
-          <span>🔄</span>
-          Actualiser
-        </button>
       </div>
     </div>
 
-    <!-- Filtres et recherche -->
     <div class="filters-section">
       <div class="search-bar">
         <input 
@@ -30,69 +23,60 @@
           [(ngModel)]="searchTerm"
           (input)="onSearchChange()"
           class="search-input"
+          [disabled]="loading"
         >
       </div>
 
       <div class="filters">
-        <select [(ngModel)]="selectedDifficulty" (change)="onFilterChange()" class="filter-select">
+        <select [(ngModel)]="selectedDifficulty" (change)="onFilterChange()" class="filter-select" [disabled]="loading">
           <option value="">Toutes les difficultés</option>
           <option *ngFor="let difficulty of difficultyLevels" [value]="difficulty">
             {{ difficulty }}
           </option>
         </select>
 
-        <select [(ngModel)]="selectedAudience" (change)="onFilterChange()" class="filter-select">
+        <select [(ngModel)]="selectedAudience" (change)="onFilterChange()" class="filter-select" [disabled]="loading">
           <option value="">Tous les publics</option>
           <option *ngFor="let audience of audiences" [value]="audience">
             {{ audience }}
           </option>
         </select>
 
-        <button class="clear-filters-btn" (click)="clearFilters()">
+        <button class="clear-filters-btn" (click)="clearFilters()" [disabled]="loading">
           Effacer les filtres
         </button>
       </div>
     </div>
 
-    <!-- État de chargement -->
     <div *ngIf="loading" class="loading">
       <div class="spinner"></div>
       <p>Chargement des programmes...</p>
     </div>
 
-    <!-- Message d'erreur -->
-    <div *ngIf="error" class="error-message">
+    <div *ngIf="error && !loading" class="error-message">
       <p>{{ error }}</p>
       <button (click)="loadPrograms()">Réessayer</button>
     </div>
 
-    <!-- Résultats -->
-    <div *ngIf="!loading && !error" class="results-section">
-      <div class="results-info">
-        <p>{{ getTotalPrograms() }} programme(s) trouvé(s) dans {{ categoryGroups.length }} catégorie(s)</p>
-      </div>
-
-      <!-- Catégories de programmes -->
+    <div *ngIf="!loading && !error" class="results-section" [class.animating]="isAnimating">
       <div class="categories-container">
         <div 
           *ngFor="let categoryGroup of categoryGroups; let i = index" 
           class="category-section"
           [style.background]="getCategoryColor(categoryGroup.category)"
         >
-          <!-- En-tête de catégorie -->
           <div class="category-header">
             <div class="category-info">
               <span class="category-icon">{{ categoryGroup.icon }}</span>
               <h2 class="category-title">{{ categoryGroup.category }}</h2>
-              <span class="program-count">{{ categoryGroup.programs.length }} programme(s)</span>
             </div>
             
-            <!-- Boutons de navigation -->
             <div class="category-nav">
               <button 
                 class="nav-btn nav-left" 
                 (click)="scrollLeft(i)"
                 [disabled]="categoryGroup.programs.length <= 3"
+                title="Faire défiler vers la gauche"
               >
                 ‹
               </button>
@@ -100,21 +84,22 @@
                 class="nav-btn nav-right" 
                 (click)="scrollRight(i)"
                 [disabled]="categoryGroup.programs.length <= 3"
+                title="Faire défiler vers la droite"
               >
                 ›
               </button>
             </div>
           </div>
 
-          <!-- Grille horizontale des programmes -->
           <div class="programs-scroll-container" [id]="'category-' + i">
             <div class="programs-row">
               <div 
-                *ngFor="let program of categoryGroup.programs" 
+                *ngFor="let program of categoryGroup.programs; let j = index" 
                 class="program-card"
                 [class.private]="!program.isPublic"
+                [style.animation-delay]="(j * 0.1) + 's'"
+                [style.background]="getCardColor(categoryGroup.category)"
               >
-                <!-- En-tête de la carte -->
                 <div class="card-header">
                   <div class="difficulty-badge" [style.background-color]="getDifficultyColor(program.difficultyLevel)">
                     {{ program.difficultyLevel }}
@@ -124,7 +109,6 @@
                   </div>
                 </div>
 
-                <!-- Contenu de la carte -->
                 <div class="card-content">
                   <h3 class="program-name">{{ program.name }}</h3>
                   <p class="program-description">{{ program.description }}</p>
@@ -154,10 +138,13 @@
                   </div>
                 </div>
 
-                <!-- Actions de la carte -->
                 <div class="card-actions">
-                  <button class="view-btn" (click)="viewProgram(program.id)">Voir le programme</button>
-                  <button class="start-btn" (click)="startProgram(program.id)">Commencer</button>
+                  <button class="view-btn" (click)="viewProgram(program.id)" title="Voir les détails du programme">
+                    Voir le programme
+                  </button>
+                  <button class="add-btn" (click)="addProgramToUser(program.id)" title="Ajouter ce programme à mes programmes">
+                    Ajouter
+                  </button>
                 </div>
               </div>
             </div>
@@ -165,7 +152,6 @@
         </div>
       </div>
 
-      <!-- Message si aucun résultat -->
       <div *ngIf="categoryGroups.length === 0" class="no-results">
         <p>Aucun programme ne correspond à vos critères de recherche.</p>
         <button (click)="clearFilters()">Effacer les filtres</button>
@@ -173,6 +159,5 @@
     </div>
   </main>
 
-  <!-- Navigation Bar Component -->
   <app-nav-bar [currentRoute]="'/dashboard/programs'"></app-nav-bar>
 </div> 

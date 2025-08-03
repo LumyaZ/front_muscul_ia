@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { HeaderComponent } from '../../../../components/header/header.component';
 import { NavBarComponent } from '../../../../components/nav-bar/nav-bar.component';
 import { UserTrainingProgramService, UserTrainingProgram } from '../../../../services/user-training-program.service';
@@ -13,69 +14,124 @@ import { AuthService } from '../../../../services/auth.service';
   templateUrl: './select-program.component.html',
   styleUrls: ['./select-program.component.scss']
 })
-export class SelectProgramComponent implements OnInit {
+export class SelectProgramComponent implements OnInit, OnDestroy {
+  
+  private router = inject(Router);
+  private userTrainingProgramService = inject(UserTrainingProgramService);
+  private authService = inject(AuthService);
+  private destroy$ = new Subject<void>();
   
   userPrograms: UserTrainingProgram[] = [];
   selectedProgram: UserTrainingProgram | null = null;
   loading = false;
-  error = '';
-
-  constructor(
-    private router: Router,
-    private userTrainingProgramService: UserTrainingProgramService,
-    private authService: AuthService
-  ) {}
+  error: string | null = null;
 
   ngOnInit(): void {
     this.loadUserPrograms();
   }
 
-  loadUserPrograms(): void {
-    this.loading = true;
-    this.error = '';
-    
-    const currentUser = this.authService.getCurrentUser();
-    if (!currentUser) {
-      this.error = 'Utilisateur non connecté';
-      this.loading = false;
-      return;
-    }
-
-    this.userTrainingProgramService.getUserPrograms(currentUser.id!).subscribe({
-      next: (programs) => {
-        this.userPrograms = programs;
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des programmes:', error);
-        this.error = 'Erreur lors du chargement des programmes';
-        this.loading = false;
-      }
-    });
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
+  /**
+   * Charge les programmes d'entraînement de l'utilisateur
+   * Load user training programs
+   */
+  loadUserPrograms(): void {
+    this.loading = true;
+    this.error = null;
+    
+    try {
+      const currentUser = this.authService.getCurrentUser();
+      if (!currentUser) {
+        this.error = 'Utilisateur non connecté. Redirection vers la page de connexion.';
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+        return;
+      }
+
+      this.userTrainingProgramService.getUserPrograms(currentUser.id!)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (programs) => {
+            this.userPrograms = programs;
+            this.loading = false;
+          },
+          error: (error) => {
+            console.error('Erreur lors du chargement des programmes:', error);
+            this.error = 'Erreur lors du chargement des programmes';
+            this.loading = false;
+          }
+        });
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation:', error);
+      this.error = 'Erreur lors de l\'initialisation';
+      this.loading = false;
+    }
+  }
+
+  /**
+   * Sélectionne un programme d'entraînement
+   * Select a training program
+   */
   selectProgram(program: UserTrainingProgram): void {
+    if (this.loading) return;
     this.selectedProgram = program;
   }
 
+  /**
+   * Vérifie si un programme est sélectionné
+   * Check if a program is selected
+   */
   isProgramSelected(program: UserTrainingProgram): boolean {
     return this.selectedProgram?.id === program.id;
   }
 
+  /**
+   * Vérifie si on peut procéder à l'étape suivante
+   * Check if we can proceed to next step
+   */
   canProceed(): boolean {
-    return this.selectedProgram !== null;
+    return this.selectedProgram !== null && !this.loading;
   }
 
+  /**
+   * Navigue vers l'étape suivante
+   * Navigate to next step
+   */
   onNext(): void {
-    if (this.selectedProgram) {
-      this.router.navigate(['/dashboard/record/program-recap', this.selectedProgram.trainingProgram.id]);
+    if (this.loading || !this.selectedProgram) return;
+    
+    try {
+      this.router.navigate(['/dashboard/record/training', this.selectedProgram.trainingProgram.id]);
+    } catch (error) {
+      console.error('Erreur lors de la navigation vers l\'entraînement:', error);
+      this.error = 'Erreur lors de la navigation';
     }
   }
 
+  /**
+   * Retourne à la page précédente
+   * Go back to previous page
+   */
   onBack(): void {
-    this.router.navigate(['/dashboard/record']);
+    if (this.loading) return;
+    
+    try {
+      this.router.navigate(['/dashboard/record']);
+    } catch (error) {
+      console.error('Erreur lors du retour:', error);
+      this.error = 'Erreur lors du retour';
+    }
   }
 
+  /**
+   * Groupe les programmes par catégorie
+   * Group programs by category
+   */
   getProgramsByCategory(): { [key: string]: UserTrainingProgram[] } {
     const categories: { [key: string]: UserTrainingProgram[] } = {};
     
@@ -90,6 +146,10 @@ export class SelectProgramComponent implements OnInit {
     return categories;
   }
 
+  /**
+   * Obtient le libellé du statut
+   * Get status label
+   */
   getStatusLabel(status: string | undefined): string {
     if (!status) return 'Non commencé';
     
@@ -102,6 +162,10 @@ export class SelectProgramComponent implements OnInit {
     return statusLabels[status] || status;
   }
 
+  /**
+   * Calcule le pourcentage de progression
+   * Calculate progress percentage
+   */
   getProgressPercentage(program: UserTrainingProgram): number {
     if (!program.status || program.status === 'NOT_STARTED') return 0;
     if (program.status === 'COMPLETED') return 100;
@@ -109,5 +173,14 @@ export class SelectProgramComponent implements OnInit {
     const totalWeeks = program.trainingProgram?.duration || 1;
     const currentWeek = program.currentWeek || 0;
     return Math.round((currentWeek / totalWeeks) * 100);
+  }
+
+  /**
+   * Efface le message d'erreur
+   * Clear error message
+   */
+  clearError(): void {
+    this.error = null;
+    this.loadUserPrograms();
   }
 } 

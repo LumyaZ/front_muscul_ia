@@ -61,7 +61,6 @@ describe('RecordComponent', () => {
       
       expect(component.error).toBe('Utilisateur non connecté. Redirection vers la page de connexion.');
       
-      // Wait for the timeout to complete
       setTimeout(() => {
         expect(router.navigate).toHaveBeenCalledWith(['/login']);
         done();

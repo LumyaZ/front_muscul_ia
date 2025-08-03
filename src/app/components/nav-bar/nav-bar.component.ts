@@ -49,9 +49,9 @@ export class NavBarComponent implements OnInit, OnChanges {
       route: '/dashboard/home'
     },
     {
-      label: 'Entraînements',
-      icon: 'fas fa-dumbbell',
-      route: '/dashboard/trainings'
+      label: 'Amis',
+      icon: 'fas fa-users',
+      route: '/dashboard/friends'
     },
     {
       label: 'Enregistrer',

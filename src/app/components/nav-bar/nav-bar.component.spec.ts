@@ -49,7 +49,7 @@ describe('NavBarComponent', () => {
   it('should have correct navigation items structure', () => {
     const expectedItems = [
       { label: 'Accueil', icon: 'fas fa-home', route: '/dashboard/home' },
-      { label: 'Entraînements', icon: 'fas fa-dumbbell', route: '/dashboard/trainings' },
+      { label: 'Amis', icon: 'fas fa-users', route: '/dashboard/friends' },
       { label: 'Enregistrer', icon: 'fas fa-plus-circle', route: '/dashboard/record' },
       { label: 'Programmes', icon: 'fas fa-list-alt', route: '/dashboard/programs' },
       { label: 'Vous', icon: 'fas fa-user', route: '/dashboard/you' }
@@ -80,12 +80,12 @@ describe('NavBarComponent', () => {
    * Test de mise à jour de l'état actif lors des changements
    */
   it('should update active state on changes', () => {
-    component.currentRoute = '/dashboard/trainings';
+    component.currentRoute = '/dashboard/friends';
     
     component.ngOnChanges();
     
-    const trainingsItem = component.navItems.find(item => item.route === '/dashboard/trainings');
-    expect(trainingsItem?.isActive).toBeTrue();
+    const friendsItem = component.navItems.find(item => item.route === '/dashboard/friends');
+    expect(friendsItem?.isActive).toBeTrue();
   });
 
   /**

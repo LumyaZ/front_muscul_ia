@@ -7,7 +7,7 @@ import { ProfileComponent } from './views/profile/profile.component';
 
 // Import des nouvelles pages du dashboard
 import { HomeComponent } from './views/dashboard/home/home.component';
-import { TrainingsComponent } from './views/dashboard/trainings/trainings.component';
+import { FriendsComponent } from './views/dashboard/friends/friends.component';
 import { RecordComponent } from './views/dashboard/record/record.component';
 import { ProgramsComponent } from './views/dashboard/programs/programs.component';
 import { ProfileComponent as DashboardProfileComponent } from './views/dashboard/profile/profile.component';
@@ -43,8 +43,8 @@ export const routes: Routes = [
         loadComponent: () => import('./views/dashboard/home/home.component').then(m => m.HomeComponent)
       },
       {
-        path: 'trainings',
-        loadComponent: () => import('./views/dashboard/trainings/trainings.component').then(m => m.TrainingsComponent)
+        path: 'friends',
+        loadComponent: () => import('./views/dashboard/friends/friends.component').then(m => m.FriendsComponent)
       },
       {
         path: 'record',

@@ -10,7 +10,6 @@ import { HomeComponent } from './views/dashboard/home/home.component';
 import { FriendsComponent } from './views/dashboard/friends/friends.component';
 import { RecordComponent } from './views/dashboard/record/record.component';
 import { ProgramsComponent } from './views/dashboard/programs/programs.component';
-import { ProfileComponent as DashboardProfileComponent } from './views/dashboard/profile/profile.component';
 
 export const routes: Routes = [
   {
@@ -78,10 +77,7 @@ export const routes: Routes = [
         path: 'programs/:id',
         loadComponent: () => import('./views/dashboard/program-details/program-details.component').then(m => m.ProgramDetailsComponent)
       },
-      {
-        path: 'profile',
-        loadComponent: () => import('./views/dashboard/profile/profile.component').then(m => m.ProfileComponent)
-      },
+
       {
         path: 'you',
         loadComponent: () => import('./views/dashboard/you/you.component').then(m => m.YouComponent)

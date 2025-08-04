@@ -1,175 +1,623 @@
+@import '../../../../styles/variables';
+
 .home-container {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  background: $background-dark;
 }
 
 .home-content {
   flex: 1;
-  padding: 20px;
-  padding-top: 90px; // Space for header
-  padding-bottom: 100px; // Space for nav bar
+  padding: 90px 20px 70px 20px;
   max-width: 1200px;
   margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
 
-  @media (max-width: 768px) {
-    padding: 16px;
-    padding-top: 85px;
-    padding-bottom: 90px;
+  @media (max-width: $breakpoint-sm) {
+    padding: 100px 15px 80px 15px;
   }
 
-  @media (max-width: 480px) {
-    padding: 12px;
-    padding-top: 80px;
-    padding-bottom: 80px;
+  @media (max-width: $breakpoint-xs) {
+    padding: 95px 15px 75px 15px;
   }
 }
-
-.welcome-section {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  
+.loading-container {
+  @include flex-center;
+  padding: 40px 20px;
+  color: $text-white;
   text-align: center;
 
-  h2 {
-    margin: 0 0 8px 0;
-    color: #333;
-    font-size: 1.5rem;
-    font-weight: 600;
+  .loading-spinner {
+    @include flex-center;
+    flex-direction: column;
+    gap: 15px;
 
-    @media (max-width: 768px) {
-      font-size: 1.3rem;
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid $text-white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    @media (max-width: 480px) {
-      font-size: 1.2rem;
+    p {
+      font-size: 1rem;
+      margin: 0;
+      color: $text-white;
     }
-  }
-
-  p {
-    margin: 0;
-    color: #666;
-    font-size: 1rem;
-
-    @media (max-width: 480px) {
-      font-size: 0.9rem;
-    }
-  }
-
-  @media (max-width: 768px) {
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 16px;
-    margin-bottom: 16px;
   }
 }
 
-.dashboard-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+.error-container {
+  @include flex-center;
+  padding: 40px 20px;
+  color: $text-white;
+  text-align: center;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
+  .error-card {
+    @include glass-effect;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 400px;
+    width: 100%;
 
-  @media (max-width: 480px) {
-    gap: 12px;
+    i {
+      font-size: 2.5rem;
+      color: $error-color;
+      margin-bottom: 15px;
+    }
+
+    h3 {
+      color: $text-white;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    p {
+      color: $text-white;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .btn-retry {
+      @include button-hover;
+      background: $primary-color;
+      color: $text-white;
+      padding: 12px 24px;
+      border-radius: 25px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        font-size: 0.9rem;
+        margin: 0;
+      }
+    }
   }
 }
 
-.card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+.main-content {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 200px;
+  gap: 30px;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  }
+  .welcome-section {
+    @include glass-effect;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
 
-  h3 {
-    margin: 0 0 12px 0;
-    color: #333;
-    font-size: 1.3rem;
-    font-weight: 600;
+    .welcome-content {
+      h1 {
+        @include gradient-text;
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        font-weight: 700;
 
-    @media (max-width: 768px) {
-      font-size: 1.2rem;
-    }
+        @media (max-width: $breakpoint-sm) {
+          font-size: 2rem;
+        }
+      }
 
-    @media (max-width: 480px) {
-      font-size: 1.1rem;
-    }
-  }
-
-  p {
-    margin: 0 0 20px 0;
-    color: #666;
-    font-size: 1rem;
-    line-height: 1.5;
-    flex: 1;
-
-    @media (max-width: 480px) {
-      font-size: 0.9rem;
-      margin-bottom: 16px;
+      p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.1rem;
+        margin: 0;
+        line-height: 1.5;
+      }
     }
   }
 
-  @media (max-width: 768px) {
-    padding: 20px;
-    min-height: 180px;
+  .quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .action-card {
+      @include glass-effect;
+      padding: 25px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      &.primary {
+        border: 2px solid $primary-color;
+        
+        .action-icon i {
+          color: $primary-color;
+        }
+      }
+
+      &.secondary {
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        
+        .action-icon i {
+          color: $text-white;
+        }
+      }
+
+      .action-icon {
+        i {
+          font-size: 2rem;
+        }
+      }
+
+      .action-content {
+        flex: 1;
+
+        h3 {
+          color: $text-white;
+          font-size: 1.3rem;
+          margin-bottom: 8px;
+          font-weight: 600;
+        }
+
+        p {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 0.95rem;
+          margin: 0;
+          line-height: 1.4;
+        }
+      }
+    }
   }
 
-  @media (max-width: 480px) {
-    padding: 16px;
-    min-height: 160px;
+  .recent-trainings-section {
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+
+      h2 {
+        @include gradient-text;
+        font-size: 1.8rem;
+        margin: 0;
+        font-weight: 600;
+      }
+
+      .btn-view-all {
+        @include button-hover;
+        background: $primary-color;
+        color: $text-white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        border: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        i {
+          font-size: 0.8rem;
+        }
+      }
+    }
+
+    .empty-state {
+      @include glass-effect;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+
+      .empty-icon {
+        margin-bottom: 20px;
+
+        i {
+          font-size: 3rem;
+          color: rgba(255, 255, 255, 0.5);
+        }
+      }
+
+      h3 {
+        color: $text-white;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      p {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        margin-bottom: 25px;
+        line-height: 1.5;
+      }
+
+      .btn-start-training {
+        @include button-hover;
+        background: $primary-color;
+        color: $text-white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+
+        i {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .trainings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+
+      @media (max-width: $breakpoint-sm) {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .training-card {
+        @include glass-effect;
+        padding: 25px;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .training-header {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          margin-bottom: 20px;
+
+          .training-icon {
+            i {
+              font-size: 1.5rem;
+              color: $primary-color;
+            }
+          }
+
+          .training-info {
+            flex: 1;
+
+            h3 {
+              color: $text-white;
+              font-size: 1.2rem;
+              margin-bottom: 5px;
+              font-weight: 600;
+            }
+
+            .training-date {
+              color: rgba(255, 255, 255, 0.7);
+              font-size: 0.9rem;
+              margin: 0;
+            }
+          }
+        }
+
+        .training-details {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 15px;
+          margin-bottom: 15px;
+
+          .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+
+            i {
+              color: $primary-color;
+              font-size: 0.8rem;
+            }
+          }
+        }
+
+        .training-description {
+          margin-bottom: 20px;
+
+          p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0;
+          }
+        }
+
+        .training-actions {
+          .btn-view-training {
+            @include button-hover;
+            background: rgba(255, 255, 255, 0.1);
+            color: $text-white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+
+            i {
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .stats-section {
+    h2 {
+      @include gradient-text;
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+
+      @media (max-width: $breakpoint-sm) {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+      }
+
+      .stat-card {
+        @include glass-effect;
+        padding: 25px;
+        border-radius: 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-icon {
+          margin-bottom: 15px;
+
+          i {
+            font-size: 2rem;
+            color: $primary-color;
+          }
+        }
+
+        .stat-content {
+          h3 {
+            color: $text-white;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+          }
+
+          p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin: 0;
+          }
+        }
+      }
+    }
   }
 }
 
-.card-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  align-self: flex-start;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+@media (max-width: $breakpoint-sm) {
+  .home-content {
+    padding: 100px 15px 80px 15px;
   }
 
-  &:active {
-    transform: translateY(0);
+  .main-content {
+    gap: 25px;
+
+    .welcome-section {
+      padding: 25px;
+
+      .welcome-content {
+        h1 {
+          font-size: 2rem;
+        }
+
+        p {
+          font-size: 1rem;
+        }
+      }
+    }
+
+    .quick-actions {
+      .action-card {
+        padding: 20px;
+        gap: 15px;
+
+        .action-icon i {
+          font-size: 1.5rem;
+        }
+
+        .action-content {
+          h3 {
+            font-size: 1.1rem;
+          }
+
+          p {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
+
+    .recent-trainings-section {
+      .section-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+
+        h2 {
+          font-size: 1.5rem;
+        }
+      }
+
+      .trainings-grid {
+        .training-card {
+          padding: 20px;
+
+          .training-header {
+            gap: 12px;
+
+            .training-info {
+              h3 {
+                font-size: 1.1rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .stats-section {
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .stats-grid {
+        .stat-card {
+          padding: 20px;
+
+          .stat-content {
+            h3 {
+              font-size: 1.5rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-xs) {
+  .home-content {
+    padding: 95px 15px 75px 15px;
   }
 
-  @media (max-width: 768px) {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
+  .main-content {
+    gap: 20px;
 
-  @media (max-width: 480px) {
-    padding: 8px 16px;
-    font-size: 0.85rem;
+    .welcome-section {
+      padding: 20px;
+
+      .welcome-content {
+        h1 {
+          font-size: 1.8rem;
+        }
+      }
+    }
+
+    .quick-actions {
+      .action-card {
+        padding: 18px;
+        gap: 12px;
+
+        .action-icon i {
+          font-size: 1.3rem;
+        }
+
+        .action-content {
+          h3 {
+            font-size: 1rem;
+          }
+
+          p {
+            font-size: 0.85rem;
+          }
+        }
+      }
+    }
+
+    .recent-trainings-section {
+      .trainings-grid {
+        .training-card {
+          padding: 18px;
+
+          .training-header {
+            gap: 10px;
+
+            .training-info {
+              h3 {
+                font-size: 1rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .stats-section {
+      .stats-grid {
+        .stat-card {
+          padding: 18px;
+
+          .stat-content {
+            h3 {
+              font-size: 1.3rem;
+            }
+          }
+        }
+      }
+    }
   }
 } 

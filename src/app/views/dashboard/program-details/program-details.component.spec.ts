@@ -187,7 +187,7 @@ describe('ProgramDetailsComponent', () => {
       component.fromYouPrograms = true;
 
       if (component.program && component.currentUser) {
-        component.isProgramCreator = component.program.createdByUserId === component.currentUser.id;
+        component.isProgramCreator = (component.program as any).createdByUserId === component.currentUser.id;
         component.canModifyProgram = component.fromYouPrograms && component.isProgramCreator;
       }
 

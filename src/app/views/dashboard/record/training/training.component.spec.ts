@@ -26,31 +26,37 @@ describe('TrainingComponent', () => {
   const mockExercises = [
     {
       id: 1,
+      trainingSessionId: 1,
+      exerciseId: 1,
       exerciseName: 'Développé couché',
       exerciseDescription: 'Exercice pour les pectoraux',
       exerciseMuscleGroup: 'CHEST',
       setsCount: 3,
       repsCount: 10,
       durationSeconds: 60,
-      restDurationSeconds: 90,
       weightKg: 50,
       notes: 'Exercice de base',
-      isOptional: false,
-      orderInProgram: 1
+      isCompleted: false,
+      orderIndex: 1,
+      createdAt: '2024-01-01T10:00:00Z',
+      updatedAt: '2024-01-01T10:00:00Z'
     },
     {
       id: 2,
+      trainingSessionId: 1,
+      exerciseId: 2,
       exerciseName: 'Écarté couché',
       exerciseDescription: 'Exercice d\'isolation',
       exerciseMuscleGroup: 'CHEST',
       setsCount: 4,
       repsCount: 12,
       durationSeconds: 45,
-      restDurationSeconds: 60,
       weightKg: 20,
       notes: 'Isolation pectoraux',
-      isOptional: true,
-      orderInProgram: 2
+      isCompleted: false,
+      orderIndex: 2,
+      createdAt: '2024-01-01T10:00:00Z',
+      updatedAt: '2024-01-01T10:00:00Z'
     }
   ];
 
@@ -248,8 +254,10 @@ describe('TrainingComponent', () => {
     component.session = {
       userId: 1,
       trainingProgramId: 1,
-      startTime: new Date(),
-      duration: 0,
+      name: 'Test Session',
+      startTime: new Date().toISOString(),
+      durationMinutes: 0,
+      isCompleted: false,
       exercises: []
     };
     component.currentUser = mockUser;
@@ -267,8 +275,10 @@ describe('TrainingComponent', () => {
     component.session = {
       userId: 1,
       trainingProgramId: 1,
-      startTime: new Date(),
-      duration: 0,
+      name: 'Test Session',
+      startTime: new Date().toISOString(),
+      durationMinutes: 0,
+      isCompleted: false,
       exercises: []
     };
     component.currentUser = mockUser;
@@ -283,8 +293,10 @@ describe('TrainingComponent', () => {
     component.session = {
       userId: 1,
       trainingProgramId: 1,
-      startTime: new Date(),
-      duration: 0,
+      name: 'Test Session',
+      startTime: new Date().toISOString(),
+      durationMinutes: 0,
+      isCompleted: false,
       exercises: []
     };
     component.currentUser = mockUser;
@@ -302,8 +314,10 @@ describe('TrainingComponent', () => {
     component.session = {
       userId: 1,
       trainingProgramId: 1,
-      startTime: new Date(),
-      duration: 0,
+      name: 'Test Session',
+      startTime: new Date().toISOString(),
+      durationMinutes: 0,
+      isCompleted: false,
       exercises: []
     };
     component.currentUser = mockUser;
@@ -321,8 +335,10 @@ describe('TrainingComponent', () => {
     component.session = {
       userId: 1,
       trainingProgramId: 1,
-      startTime: new Date(),
-      duration: 0,
+      name: 'Test Session',
+      startTime: new Date().toISOString(),
+      durationMinutes: 0,
+      isCompleted: false,
       exercises: []
     };
 

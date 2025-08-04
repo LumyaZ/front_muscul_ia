@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TrainingProgramService, TrainingProgram, CreateTrainingProgramRequest, UpdateTrainingProgramRequest, ProgramExerciseRequest } from './training-program.service';
+import { TrainingProgramService } from './training-program.service';
+import { TrainingProgram, CreateTrainingProgramRequest, UpdateTrainingProgramRequest } from '../models/training-program.model';
+import { CreateProgramExerciseRequest } from '../models/program-exercise.model';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
@@ -17,13 +19,11 @@ describe('TrainingProgramService', () => {
     difficultyLevel: 'BEGINNER',
     durationWeeks: 8,
     sessionsPerWeek: 3,
-    estimatedDurationMinutes: 60,
     category: 'STRENGTH',
     targetAudience: 'BEGINNERS',
-    equipmentRequired: 'BASIC',
     isPublic: true,
     isActive: true,
-    createdByUserId: 1,
+    userId: 1,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
   };
@@ -34,12 +34,9 @@ describe('TrainingProgramService', () => {
     difficultyLevel: 'BEGINNER',
     durationWeeks: 8,
     sessionsPerWeek: 3,
-    estimatedDurationMinutes: 60,
     category: 'STRENGTH',
     targetAudience: 'BEGINNERS',
-    equipmentRequired: 'BASIC',
-    isPublic: true,
-    exercises: []
+    isPublic: true
   };
 
   const mockUpdateRequest: UpdateTrainingProgramRequest = {

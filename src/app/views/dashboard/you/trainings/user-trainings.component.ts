@@ -62,7 +62,6 @@ export class UserTrainingsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (sessions) => {
-          console.log('Training sessions loaded:', sessions);
           this.trainingSessions = sessions;
           this.isLoading = false;
         },
@@ -136,7 +135,6 @@ export class UserTrainingsComponent implements OnInit, OnDestroy {
    * Navigate to training session details
    */
   viewTrainingSession(sessionId: number): void {
-    console.log('Voir la session:', sessionId);
     this.router.navigate(['/dashboard/trainings', sessionId]);
   }
 
@@ -152,7 +150,6 @@ export class UserTrainingsComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            console.log('Session supprimée avec succès');
             this.loadTrainingSessions();
           },
           error: (error) => {

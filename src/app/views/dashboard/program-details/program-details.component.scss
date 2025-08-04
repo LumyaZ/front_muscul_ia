@@ -1,4 +1,4 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables' as *;
 
 .program-details-container {
   min-height: 100vh;
@@ -70,7 +70,7 @@
     padding: 10px 20px;
     border-radius: 20px;
     color: $text-white;
-    background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
+    background: linear-gradient(135deg, $primary-color, darken-color($primary-color, 10%));
     border: none;
     font-weight: 600;
     cursor: pointer;
@@ -191,7 +191,7 @@
       align-items: center;
       gap: 10px;
       padding: 15px 25px;
-      background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
+      background: linear-gradient(135deg, $primary-color, darken-color($primary-color, 10%));
       border: none;
       border-radius: 25px;
       color: $text-white;
@@ -335,7 +335,7 @@
       align-items: center;
       gap: 8px;
       padding: 12px 20px;
-      background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
+      background: linear-gradient(135deg, $primary-color, darken-color($primary-color, 10%));
       border: none;
       border-radius: 25px;
       color: $text-white;

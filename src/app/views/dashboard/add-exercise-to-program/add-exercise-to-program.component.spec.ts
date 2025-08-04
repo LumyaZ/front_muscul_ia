@@ -45,8 +45,9 @@ describe('AddExerciseToProgramComponent', () => {
       description: 'Classic push-ups',
       category: 'Strength',
       muscleGroup: 'Chest',
-      equipmentNeeded: 'None',
+      equipment: 'None',
       difficultyLevel: 'Beginner',
+      instructions: 'Perform push-ups with proper form',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
     },
@@ -56,8 +57,9 @@ describe('AddExerciseToProgramComponent', () => {
       description: 'Bodyweight squats',
       category: 'Strength',
       muscleGroup: 'Legs',
-      equipmentNeeded: 'None',
+      equipment: 'None',
       difficultyLevel: 'Beginner',
+      instructions: 'Perform squats with proper form',
       createdAt: '2024-01-01',
       updatedAt: '2024-01-01'
     }
@@ -109,7 +111,7 @@ describe('AddExerciseToProgramComponent', () => {
       exerciseMuscleGroup: 'Chest',
       exerciseEquipmentNeeded: 'None',
       exerciseDifficultyLevel: 'Beginner',
-      orderInProgram: 1,
+      orderIndex: 1,
       setsCount: 3,
       repsCount: 10,
       restDurationSeconds: 60,

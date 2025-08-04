@@ -61,32 +61,32 @@
                 (click)="selectProgram(program)"
               >
                 <div class="program-header">
-                  <h3 class="program-name">{{ program.trainingProgram?.name || 'Programme sans nom' }}</h3>
-                  <div class="program-status" [class]="(program.status || 'NOT_STARTED').toLowerCase()">
-                    {{ getStatusLabel(program.status) }}
+                  <h3 class="program-name">{{ program.trainingProgramName || 'Programme sans nom' }}</h3>
+                  <div class="program-status" [class]="(program.isCompleted ? 'completed' : 'in-progress').toLowerCase()">
+                    {{ program.isCompleted ? 'Terminé' : 'En cours' }}
                   </div>
                 </div>
                 
                 <div class="program-details">
-                  <p class="program-description">{{ program.trainingProgram?.description || 'Aucune description' }}</p>
+                  <p class="program-description">{{ program.trainingProgramDescription || 'Aucune description' }}</p>
                   <div class="program-info">
                     <span class="info-item">
                       <i class="fas fa-calendar"></i>
-                      {{ program.trainingProgram?.duration || 0 }} semaines
+                      {{ program.trainingProgramDurationWeeks || 0 }} semaines
                     </span>
                     <span class="info-item">
                       <i class="fas fa-clock"></i>
-                      {{ program.trainingProgram?.sessionsPerWeek || 0 }} sessions/semaine
+                      {{ program.trainingProgramSessionsPerWeek || 0 }} sessions/semaine
                     </span>
                   </div>
                 </div>
                 
-                <div class="program-progress" *ngIf="program.status !== 'NOT_STARTED'">
+                <div class="program-progress" *ngIf="!program.isCompleted">
                   <div class="progress-container">
                     <div class="progress-bar">
                       <div class="progress-fill" [style.width.%]="getProgressPercentage(program)"></div>
                     </div>
-                    <span class="progress-text">Semaine {{ program.currentWeek || 0 }}/{{ program.trainingProgram?.duration || 0 }}</span>
+                    <span class="progress-text">Semaine {{ program.currentWeek || 0 }}/{{ program.trainingProgramDurationWeeks || 0 }}</span>
                   </div>
                 </div>
 

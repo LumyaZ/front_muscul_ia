@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
-import { TrainingProgramService, TrainingProgram } from '../../../services/training-program.service';
+import { TrainingProgramService } from '../../../services/training-program.service';
+import { TrainingProgram } from '../../../models/training-program.model';
 
 /**
  * Interface representing a group of programs by category.
@@ -410,7 +411,6 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
    * @param programId - The program ID to add to user
    */
   addProgramToUser(programId: number): void {
-    console.log('Ajout du programme à l\'utilisateur:', programId);
     
     const token = localStorage.getItem('auth_token');
     if (!token) {

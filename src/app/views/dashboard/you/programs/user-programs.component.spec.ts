@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { UserProgramsComponent } from './user-programs.component';
-import { UserTrainingProgramService, UserTrainingProgram } from '../../../../services/user-training-program.service';
+import { UserTrainingProgramService } from '../../../../services/user-training-program.service';
+import { UserTrainingProgram } from '../../../../models/user-training-program.model';
 import { AuthService } from '../../../../services/auth.service';
 import { of, throwError } from 'rxjs';
 
@@ -24,43 +25,42 @@ describe('UserProgramsComponent', () => {
   const mockUserPrograms: UserTrainingProgram[] = [
     {
       id: 1,
-      user: mockUser,
-      trainingProgram: {
-        id: 1,
-        name: 'Programme Force Débutant',
-        description: 'Programme de musculation pour débutants',
-        difficultyLevel: 'Débutant',
-        durationWeeks: 8,
-        sessionsPerWeek: 3,
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      status: 'IN_PROGRESS',
+      userId: 1,
+      trainingProgramId: 1,
+      trainingProgramName: 'Programme Force Débutant',
+      trainingProgramDescription: 'Programme de musculation pour débutants',
+      trainingProgramCategory: 'Musculation',
+      trainingProgramDifficultyLevel: 'Débutant',
+      trainingProgramDurationWeeks: 8,
+      trainingProgramSessionsPerWeek: 3,
+      trainingProgramIsPublic: true,
       currentWeek: 3,
-      currentSession: 2,
-      startedAt: '2024-01-01T00:00:00Z',
-      isFavorite: false,
+      currentDay: 2,
+      isCompleted: false,
+      startDate: '2024-01-01T00:00:00Z',
+      progressPercentage: 25,
+      isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z'
     },
     {
       id: 2,
-      user: mockUser,
-      trainingProgram: {
-        id: 2,
-        name: 'Programme Cardio Avancé',
-        description: 'Programme cardio intensif',
-        difficultyLevel: 'Avancé',
-        durationWeeks: 12,
-        sessionsPerWeek: 4,
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      status: 'COMPLETED',
+      userId: 1,
+      trainingProgramId: 2,
+      trainingProgramName: 'Programme Cardio Avancé',
+      trainingProgramDescription: 'Programme cardio intensif',
+      trainingProgramCategory: 'Cardio',
+      trainingProgramDifficultyLevel: 'Avancé',
+      trainingProgramDurationWeeks: 12,
+      trainingProgramSessionsPerWeek: 4,
+      trainingProgramIsPublic: true,
       currentWeek: 12,
-      currentSession: 4,
-      startedAt: '2024-01-01T00:00:00Z',
-      isFavorite: true,
+      currentDay: 4,
+      isCompleted: true,
+      startDate: '2024-01-01T00:00:00Z',
+      completionDate: '2024-03-01T00:00:00Z',
+      progressPercentage: 100,
+      isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z'
     }
@@ -254,7 +254,7 @@ describe('UserProgramsComponent', () => {
       
       expect(mockUserTrainingProgramService.unsubscribeUserFromProgram).toHaveBeenCalledWith(mockUser.id, programId);
       expect(component.userPrograms.length).toBe(1);
-      expect(component.userPrograms[0].trainingProgram.id).toBe(2);
+      expect(component.userPrograms[0].trainingProgramId).toBe(2);
     });
 
     it('should not unsubscribe if user cancels', () => {
@@ -310,7 +310,7 @@ describe('UserProgramsComponent', () => {
       const userProgram = mockUserPrograms[0];
       const result = component.trackByProgramId(0, userProgram);
       
-      expect(result).toBe(userProgram.trainingProgram.id);
+      expect(result).toBe(userProgram.trainingProgramId);
     });
   });
 

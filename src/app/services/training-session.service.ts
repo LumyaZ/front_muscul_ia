@@ -2,55 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, tap, catchError } from "rxjs";
 import { environment } from "../../environments/environment";
-
-/**
- * Interface representing a training exercise.
- * Interface représentant un exercice d'entraînement.
- */
-export interface TrainingExercise {
-  id: number;
-  exerciseName: string;
-  exerciseDescription: string;
-  exerciseMuscleGroup: string;
-  setsCount: number;
-  repsCount: number;
-  durationSeconds: number;
-  restDurationSeconds: number;
-  weightKg: number | null;
-  notes: string;
-  isOptional: boolean;
-  completedSets: boolean[];
-}
-
-/**
- * Interface representing a training session.
- * Interface représentant une session d'entraînement.
- */
-export interface TrainingSession {
-  id?: number;
-  userId: number;
-  trainingProgramId: number;
-  startTime: Date;
-  endTime?: Date;
-  duration: number;
-  exercises: TrainingExercise[];
-  notes?: string;
-  rating?: number;
-  title?: string;
-}
-
-/**
- * Interface for creating a training session request.
- * Interface pour la requête de création d'une session d'entraînement.
- */
-export interface CreateTrainingSessionRequest {
-  name: string;
-  description?: string;
-  sessionDate: string; // Format ISO string
-  durationMinutes: number;
-  sessionType?: string;
-  trainingProgramId?: number;
-}
+import { TrainingSession, TrainingExercise, CreateTrainingSessionRequest, CreateTrainingExerciseRequest, UpdateTrainingSessionRequest } from "../models/training-session.model";
 
 /**
  * Interface for training session DTO from backend.

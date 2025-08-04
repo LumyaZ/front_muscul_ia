@@ -2,24 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-
-/**
- * Interface representing an exercise.
- * Interface représentant un exercice.
- */
-export interface Exercise {
-  id: number;
-  name: string;
-  description: string;
-  category: string;
-  muscleGroup: string;
-  equipmentNeeded: string;
-  difficultyLevel: string;
-  videoUrl?: string;
-  imageUrl?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Exercise, CreateExerciseRequest, UpdateExerciseRequest } from '../models/exercise.model';
 
 /**
  * Service for managing exercise operations.

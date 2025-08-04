@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProgramsComponent } from './programs.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TrainingProgramService, TrainingProgram } from '../../../services/training-program.service';
+import { TrainingProgramService } from '../../../services/training-program.service';
+import { TrainingProgram } from '../../../models/training-program.model';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -83,13 +84,11 @@ describe('ProgramsComponent', () => {
           difficultyLevel: 'Débutant',
           durationWeeks: 4,
           sessionsPerWeek: 3,
-          estimatedDurationMinutes: 45,
           category: 'Musculation',
           targetAudience: 'Débutants',
-          equipmentRequired: 'Poids du corps',
           isPublic: true,
           isActive: true,
-          createdByUserId: 1,
+          userId: 1,
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z'
         }
@@ -141,13 +140,11 @@ describe('ProgramsComponent', () => {
           difficultyLevel: 'Débutant',
           durationWeeks: 4,
           sessionsPerWeek: 3,
-          estimatedDurationMinutes: 45,
           category: 'Musculation',
           targetAudience: 'Débutants',
-          equipmentRequired: 'Poids du corps',
           isPublic: true,
           isActive: true,
-          createdByUserId: 1,
+          userId: 1,
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z'
         }
@@ -176,13 +173,11 @@ describe('ProgramsComponent', () => {
           difficultyLevel: 'Débutant',
           durationWeeks: 4,
           sessionsPerWeek: 3,
-          estimatedDurationMinutes: 45,
           category: 'Musculation',
           targetAudience: 'Débutants',
-          equipmentRequired: 'Poids du corps',
           isPublic: true,
           isActive: true,
-          createdByUserId: 1,
+          userId: 1,
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z'
         },
@@ -193,13 +188,11 @@ describe('ProgramsComponent', () => {
           difficultyLevel: 'Débutant',
           durationWeeks: 3,
           sessionsPerWeek: 2,
-          estimatedDurationMinutes: 30,
           category: 'Cardio',
           targetAudience: 'Tous niveaux',
-          equipmentRequired: 'Tapis de course',
           isPublic: true,
           isActive: true,
-          createdByUserId: 1,
+          userId: 1,
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z'
         }
@@ -222,13 +215,11 @@ describe('ProgramsComponent', () => {
           difficultyLevel: 'Débutant',
           durationWeeks: 4,
           sessionsPerWeek: 3,
-          estimatedDurationMinutes: 45,
           category: 'Musculation',
           targetAudience: 'Débutants',
-          equipmentRequired: 'Poids du corps',
           isPublic: true,
           isActive: true,
-          createdByUserId: 1,
+          userId: 1,
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z'
         },
@@ -239,13 +230,11 @@ describe('ProgramsComponent', () => {
           difficultyLevel: 'Avancé',
           durationWeeks: 6,
           sessionsPerWeek: 4,
-          estimatedDurationMinutes: 60,
           category: 'Musculation',
           targetAudience: 'Sportifs confirmés',
-          equipmentRequired: 'Haltères',
           isPublic: true,
           isActive: true,
-          createdByUserId: 1,
+          userId: 1,
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z'
         }
@@ -310,13 +299,11 @@ describe('ProgramsComponent', () => {
           difficultyLevel: 'Débutant',
           durationWeeks: 4,
           sessionsPerWeek: 3,
-          estimatedDurationMinutes: 45,
           category: 'Musculation',
           targetAudience: 'Débutants',
-          equipmentRequired: 'Poids du corps',
           isPublic: true,
           isActive: true,
-          createdByUserId: 1,
+          userId: 1,
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z'
         },
@@ -327,13 +314,11 @@ describe('ProgramsComponent', () => {
           difficultyLevel: 'Intermédiaire',
           durationWeeks: 6,
           sessionsPerWeek: 4,
-          estimatedDurationMinutes: 60,
           category: 'Cardio',
           targetAudience: 'Sportifs confirmés',
-          equipmentRequired: 'Haltères',
           isPublic: true,
           isActive: true,
-          createdByUserId: 1,
+          userId: 1,
           createdAt: '2024-01-01T00:00:00Z',
           updatedAt: '2024-01-01T00:00:00Z'
         }

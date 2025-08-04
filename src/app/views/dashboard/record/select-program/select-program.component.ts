@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { HeaderComponent } from '../../../../components/header/header.component';
 import { NavBarComponent } from '../../../../components/nav-bar/nav-bar.component';
-import { UserTrainingProgramService, UserTrainingProgram } from '../../../../services/user-training-program.service';
+import { UserTrainingProgramService } from '../../../../services/user-training-program.service';
+import { UserTrainingProgram } from '../../../../models/user-training-program.model';
 import { AuthService } from '../../../../services/auth.service';
 
 @Component({
@@ -106,7 +107,7 @@ export class SelectProgramComponent implements OnInit, OnDestroy {
     if (this.loading || !this.selectedProgram) return;
     
     try {
-      this.router.navigate(['/dashboard/record/training', this.selectedProgram.trainingProgram.id]);
+      this.router.navigate(['/dashboard/record/training', this.selectedProgram.trainingProgramId]);
     } catch (error) {
       console.error('Erreur lors de la navigation vers l\'entraînement:', error);
       this.error = 'Erreur lors de la navigation';
@@ -136,7 +137,7 @@ export class SelectProgramComponent implements OnInit, OnDestroy {
     const categories: { [key: string]: UserTrainingProgram[] } = {};
     
     this.userPrograms.forEach(program => {
-      const category = program.trainingProgram.category || 'Autre';
+      const category = program.trainingProgramCategory || 'Autre';
       if (!categories[category]) {
         categories[category] = [];
       }
@@ -167,12 +168,12 @@ export class SelectProgramComponent implements OnInit, OnDestroy {
    * Calculate progress percentage
    */
   getProgressPercentage(program: UserTrainingProgram): number {
-    if (!program.status || program.status === 'NOT_STARTED') return 0;
-    if (program.status === 'COMPLETED') return 100;
+    if (program.isCompleted) return 100;
     
-    const totalWeeks = program.trainingProgram?.duration || 1;
+    const totalWeeks = program.trainingProgramDurationWeeks || 1;
     const currentWeek = program.currentWeek || 0;
-    return Math.round((currentWeek / totalWeeks) * 100);
+    const percentage = Math.round((currentWeek / totalWeeks) * 100);
+    return Math.min(percentage, 100);
   }
 
   /**

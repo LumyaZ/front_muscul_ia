@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ExerciseService, Exercise } from './exercise.service';
+import { ExerciseService } from './exercise.service';
+import { Exercise } from '../models/exercise.model';
 import { environment } from '../../environments/environment';
 
 describe('ExerciseService', () => {
@@ -14,10 +15,12 @@ describe('ExerciseService', () => {
     description: 'Classic bodyweight exercise for chest and triceps',
     category: 'Bodyweight',
     muscleGroup: 'Chest',
-    equipmentNeeded: 'None',
+    equipment: 'None',
     difficultyLevel: 'Beginner',
-    videoUrl: 'https://example.com/pushups',
-    imageUrl: 'https://example.com/pushups.jpg',
+    instructions: 'Perform push-ups with proper form',
+    tips: 'Keep your body straight',
+    mediaUrl: 'https://example.com/pushups',
+    isActive: true,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
   };

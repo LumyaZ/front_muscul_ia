@@ -1,4 +1,4 @@
-@import '../../../../styles/variables';
+@use '../../../../styles/variables' as *;
 
 .add-exercise-container {
   min-height: 100vh;
@@ -103,7 +103,7 @@
     padding: 10px 20px;
     border-radius: 20px;
     color: $text-white;
-    background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
+    background: linear-gradient(135deg, $primary-color, darken-color($primary-color, 10%));
     border: none;
     font-weight: 600;
     cursor: pointer;
@@ -318,7 +318,7 @@
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, $primary-color, darken($primary-color, 10%));
+    background: linear-gradient(135deg, $primary-color, darken-color($primary-color, 10%));
     color: $text-white;
     box-shadow: 0 4px 15px rgba($primary-color, 0.18);
 

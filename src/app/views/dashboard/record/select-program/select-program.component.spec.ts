@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { SelectProgramComponent } from './select-program.component';
-import { UserTrainingProgramService, UserTrainingProgram } from '../../../../services/user-training-program.service';
+import { UserTrainingProgramService } from '../../../../services/user-training-program.service';
 import { AuthService } from '../../../../services/auth.service';
 import { User } from '../../../../models/user.model';
 
@@ -22,41 +22,41 @@ describe('SelectProgramComponent', () => {
   const mockUserTrainingPrograms = [
     {
       id: 1,
-      user: { id: 1, email: 'test@test.com' },
-      trainingProgram: {
-        id: 1,
-        name: 'Programme Débutant',
-        description: 'Programme pour débutants',
-        difficultyLevel: 'BEGINNER',
-        duration: 4,
-        category: 'STRENGTH',
-        sessionsPerWeek: 3
-      },
-      startedAt: null,
-      status: 'NOT_STARTED',
+      userId: 1,
+      trainingProgramId: 1,
+      trainingProgramName: 'Programme Débutant',
+      trainingProgramDescription: 'Programme pour débutants',
+      trainingProgramCategory: 'STRENGTH',
+      trainingProgramDifficultyLevel: 'BEGINNER',
+      trainingProgramDurationWeeks: 4,
+      trainingProgramSessionsPerWeek: 3,
+      trainingProgramIsPublic: true,
       currentWeek: 0,
-      currentSession: 0,
-      progress: 0,
+      currentDay: 0,
+      isCompleted: false,
+      startDate: null,
+      progressPercentage: 0,
+      isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z'
     },
     {
       id: 2,
-      user: { id: 1, email: 'test@test.com' },
-      trainingProgram: {
-        id: 2,
-        name: 'Programme Intermédiaire',
-        description: 'Programme pour intermédiaires',
-        difficultyLevel: 'INTERMEDIATE',
-        duration: 6,
-        category: 'STRENGTH',
-        sessionsPerWeek: 4
-      },
-      startedAt: '2024-01-01T00:00:00Z',
-      status: 'IN_PROGRESS',
+      userId: 1,
+      trainingProgramId: 2,
+      trainingProgramName: 'Programme Intermédiaire',
+      trainingProgramDescription: 'Programme pour intermédiaires',
+      trainingProgramCategory: 'STRENGTH',
+      trainingProgramDifficultyLevel: 'INTERMEDIATE',
+      trainingProgramDurationWeeks: 6,
+      trainingProgramSessionsPerWeek: 4,
+      trainingProgramIsPublic: true,
       currentWeek: 3,
-      currentSession: 2,
-      progress: 50,
+      currentDay: 2,
+      isCompleted: false,
+      startDate: '2024-01-01T00:00:00Z',
+      progressPercentage: 50,
+      isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z'
     }
@@ -185,7 +185,7 @@ describe('SelectProgramComponent', () => {
       
       component.onNext();
       
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/record/training', 1]);
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/record/training', mockUserTrainingPrograms[0].trainingProgramId]);
     });
 
     it('should not navigate when no program selected', () => {
@@ -214,6 +214,8 @@ describe('SelectProgramComponent', () => {
       
       expect(categories['STRENGTH']).toBeDefined();
       expect(categories['STRENGTH'].length).toBe(2);
+      expect(categories['STRENGTH'][0].trainingProgramCategory).toBe('STRENGTH');
+      expect(categories['STRENGTH'][1].trainingProgramCategory).toBe('STRENGTH');
     });
 
     it('should get status label', () => {

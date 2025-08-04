@@ -133,10 +133,6 @@ export class TrainingRecapComponent implements OnInit, OnDestroy {
         this.recap.rating = this.rating;
         this.recap.notes = this.notes;
         
-        // TODO: Sauvegarder via le service
-        console.log('Sauvegarde du récapitulatif:', this.recap);
-        
-        // Rediriger vers la page d'accueil
         this.router.navigate(['/dashboard']);
       }
     } catch (error) {

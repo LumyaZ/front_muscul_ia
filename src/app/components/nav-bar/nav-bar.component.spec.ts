@@ -93,12 +93,10 @@ describe('NavBarComponent', () => {
    * Test de navigation réussie
    */
   it('should handle successful navigation', () => {
-    spyOn(console, 'log');
     const testItem: NavItem = component.navItems[0];
     
     component.onNavItemClick(testItem);
     
-    expect(console.log).toHaveBeenCalledWith(`Navigation vers: ${testItem.route}`);
     expect(mockRouter.navigate).toHaveBeenCalledWith([testItem.route]);
     expect(component.isLoading).toBeFalse();
     expect(component.error).toBeNull();

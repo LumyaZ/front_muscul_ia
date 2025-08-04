@@ -3,35 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
-import { TrainingProgramService, TrainingProgram } from '../../../services/training-program.service';
-import { ProgramExerciseService, ProgramExercise as ProgramExerciseData } from '../../../services/program-exercise.service';
+import { TrainingProgramService } from '../../../services/training-program.service';
+import { ProgramExerciseService } from '../../../services/program-exercise.service';
 import { AuthService } from '../../../services/auth.service';
 import { User } from '../../../models/user.model';
-
-/**
- * Interface représentant un exercice dans un programme d'entraînement
- * Interface representing an exercise within a training program
- */
-interface ProgramExercise {
-  id: number;
-  exerciseId: number;
-  orderInProgram: number;
-  setsCount: number;
-  repsCount?: number;
-  durationSeconds?: number;
-  restDurationSeconds: number;
-  weightKg?: number;
-  isOptional: boolean;
-  exercise: { 
-    id: number;
-    name: string;
-    description: string;
-    category: string;
-    muscleGroup: string;
-    equipmentNeeded: string;
-    difficultyLevel: string;
-  };
-}
+import { TrainingProgram } from '../../../models/training-program.model';
+import { ProgramExercise } from '../../../models/program-exercise.model';
 
 /**
  * Interface étendant TrainingProgram avec la liste des exercices
@@ -134,25 +111,22 @@ export class ProgramDetailsComponent implements OnInit {
       next: (exercises) => {
         if (this.program) {
           this.program.exercises = exercises.map(exercise => ({
-            id: exercise.id,
+            id: exercise.id || 0,
+            trainingProgramId: this.programId,
             exerciseId: exercise.exerciseId,
-            orderInProgram: exercise.orderInProgram,
+            exerciseName: exercise.exerciseName,
+            exerciseDescription: exercise.exerciseDescription,
+            exerciseMuscleGroup: exercise.exerciseMuscleGroup,
+            orderIndex: exercise.orderIndex || 0,
             setsCount: exercise.setsCount,
             repsCount: exercise.repsCount,
             durationSeconds: exercise.durationSeconds,
             restDurationSeconds: exercise.restDurationSeconds,
             weightKg: exercise.weightKg,
-            distanceMeters: exercise.distanceMeters,
+            notes: exercise.notes,
             isOptional: exercise.isOptional,
-            exercise: {
-              id: exercise.exerciseId,
-              name: exercise.exerciseName,
-              description: exercise.exerciseDescription,
-              category: exercise.exerciseCategory,
-              muscleGroup: exercise.exerciseMuscleGroup,
-              equipmentNeeded: exercise.exerciseEquipmentNeeded,
-              difficultyLevel: exercise.exerciseDifficultyLevel
-            }
+            createdAt: exercise.createdAt,
+            updatedAt: exercise.updatedAt
           }));
           this.loading = false;
         }
@@ -191,7 +165,7 @@ export class ProgramDetailsComponent implements OnInit {
    */
   private updateModificationPermissions(): void {
     if (this.program && this.currentUser) {
-      this.isProgramCreator = this.program.createdByUserId === this.currentUser.id;
+      this.isProgramCreator = this.program.userId === this.currentUser.id;
       this.canModifyProgram = this.fromYouPrograms && this.isProgramCreator;
     }
   }
@@ -351,8 +325,6 @@ export class ProgramDetailsComponent implements OnInit {
     if (!this.currentUser || !this.program) {
       return;
     }
-
-    console.log('Ajouter le programme', this.program.id, 'à l\'utilisateur', this.currentUser.id);
     alert('Programme ajouté à vos programmes !');
   }
 } 

@@ -3,79 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-
-/**
- * Interface representing a training program.
- * Interface représentant un programme d'entraînement.
- */
-export interface TrainingProgram {
-  id: number;
-  name: string;
-  description: string;
-  difficultyLevel: string;
-  durationWeeks: number;
-  sessionsPerWeek: number;
-  estimatedDurationMinutes: number;
-  category: string;
-  targetAudience: string;
-  equipmentRequired: string;
-  isPublic: boolean;
-  isActive: boolean;
-  createdByUserId: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
- * Interface for creating a new training program.
- * Interface pour créer un nouveau programme d'entraînement.
- */
-export interface CreateTrainingProgramRequest {
-  name: string;
-  description: string;
-  difficultyLevel: string;
-  durationWeeks: number;
-  sessionsPerWeek: number;
-  estimatedDurationMinutes: number;
-  category: string;
-  targetAudience: string;
-  equipmentRequired: string;
-  isPublic: boolean;
-  exercises: ProgramExerciseRequest[];
-}
-
-/**
- * Interface for program exercise requests.
- * Interface pour les requêtes d'exercices de programme.
- */
-export interface ProgramExerciseRequest {
-  exerciseId: number;
-  orderInProgram: number;
-  setsCount: number;
-  repsCount?: number;
-  durationSeconds?: number;
-  restDurationSeconds: number;
-  weightKg?: number;
-  isOptional: boolean;
-}
-
-/**
- * Interface for updating a training program.
- * Interface pour mettre à jour un programme d'entraînement.
- */
-export interface UpdateTrainingProgramRequest {
-  name?: string;
-  description?: string;
-  difficultyLevel?: string;
-  durationWeeks?: number;
-  sessionsPerWeek?: number;
-  estimatedDurationMinutes?: number;
-  category?: string;
-  targetAudience?: string;
-  equipmentRequired?: string;
-  isPublic?: boolean;
-  exercises?: ProgramExerciseRequest[];
-}
+import { TrainingProgram, CreateTrainingProgramRequest, UpdateTrainingProgramRequest } from '../models/training-program.model';
+import { CreateProgramExerciseRequest } from '../models/program-exercise.model';
 
 /**
  * Service for managing training programs.

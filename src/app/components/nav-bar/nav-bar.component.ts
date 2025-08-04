@@ -105,7 +105,6 @@ export class NavBarComponent implements OnInit, OnChanges {
     this.error = null;
 
     try {
-      console.log(`Navigation vers: ${item.route}`);
       this.router.navigate([item.route]);
       this.isLoading = false;
     } catch (error) {

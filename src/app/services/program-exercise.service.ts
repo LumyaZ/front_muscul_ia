@@ -2,33 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-
-/**
- * Interface representing an exercise within a training program.
- * Interface représentant un exercice dans un programme d'entraînement.
- */
-export interface ProgramExercise {
-  id: number;
-  trainingProgramId: number;
-  exerciseId: number;
-  exerciseName: string;
-  exerciseDescription: string;
-  exerciseCategory: string;
-  exerciseMuscleGroup: string;
-  exerciseEquipmentNeeded: string;
-  exerciseDifficultyLevel: string;
-  orderInProgram: number;
-  setsCount: number;
-  repsCount: number;
-  durationSeconds: number;
-  restDurationSeconds: number;
-  weightKg: number;
-  distanceMeters: number;
-  notes: string;
-  isOptional: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { ProgramExercise, CreateProgramExerciseRequest, UpdateProgramExerciseRequest } from '../models/program-exercise.model';
 
 /**
  * Service for managing program exercise operations.

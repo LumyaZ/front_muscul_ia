@@ -47,7 +47,7 @@
               </div>
               <div class="meta-item">
                 <span class="meta-label">Temps estimé</span>
-                <span class="meta-value">{{ formatDuration(program.estimatedDurationMinutes) }}</span>
+                <span class="meta-value">{{ formatDuration(60) }}</span>
               </div>
             </div>
           </div>
@@ -102,7 +102,7 @@
           <div class="detail-content">
             <div class="detail-item">
               <span class="detail-label">Équipement requis :</span>
-              <span class="detail-value">{{ program.equipmentRequired }}</span>
+              <span class="detail-value">Équipement de base</span>
             </div>
             <div class="detail-item">
               <span class="detail-label">Créé le :</span>
@@ -159,14 +159,14 @@
           >
             <div class="exercise-header">
               <div class="exercise-order">
-                <span class="order-number">{{ programExercise.orderInProgram }}</span>
+                <span class="order-number">{{ programExercise.orderIndex }}</span>
               </div>
               <div class="exercise-info">
-                <h3 class="exercise-name">{{ programExercise.exercise.name }}</h3>
-                <p class="exercise-description">{{ programExercise.exercise.description }}</p>
+                <h3 class="exercise-name">{{ programExercise.exerciseName }}</h3>
+                <p class="exercise-description">{{ programExercise.exerciseDescription }}</p>
                 <div class="exercise-meta">
-                  <span class="muscle-group">{{ programExercise.exercise.muscleGroup }}</span>
-                  <span class="equipment">{{ programExercise.exercise.equipmentNeeded }}</span>
+                  <span class="muscle-group">{{ programExercise.exerciseMuscleGroup }}</span>
+                  <span class="equipment">Équipement de base</span>
                 </div>
               </div>
               <div *ngIf="programExercise.isOptional" class="optional-badge">

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TrainingSessionService, CreateTrainingSessionRequest, TrainingSessionDto } from './training-session.service';
+import { TrainingSessionService, TrainingSessionDto } from './training-session.service';
+import { CreateTrainingSessionRequest } from '../models/training-session.model';
 import { environment } from '../../environments/environment';
 
 describe('TrainingSessionService', () => {
@@ -22,12 +23,13 @@ describe('TrainingSessionService', () => {
   };
 
   const mockCreateRequest: CreateTrainingSessionRequest = {
+    userId: 1,
     name: 'Test Training Session',
     description: 'Test description',
-    sessionDate: '2024-01-01T10:00:00Z',
+    startTime: '2024-01-01T10:00:00Z',
     durationMinutes: 60,
-    sessionType: 'Cardio',
-    trainingProgramId: 1
+    isCompleted: true,
+    exercises: []
   };
 
   beforeEach(() => {

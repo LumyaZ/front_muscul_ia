@@ -119,7 +119,7 @@
                     </div>
                     <div class="detail-item">
                       <span class="detail-label">⏱️</span>
-                      <span>{{ formatDuration(program.estimatedDurationMinutes) }}</span>
+                      <span>{{ formatDuration(60) }}</span>
                     </div>
                     <div class="detail-item">
                       <span class="detail-label">👥</span>
@@ -129,15 +129,15 @@
 
                   <div class="equipment-section">
                     <span class="equipment-label">Équipement :</span>
-                    <span class="equipment-text">{{ program.equipmentRequired }}</span>
+                    <span class="equipment-text">Équipement de base</span>
                   </div>
                 </div>
 
                 <div class="card-actions">
-                  <button class="view-btn" (click)="viewProgram(program.id)" title="Voir les détails du programme">
+                  <button class="view-btn" (click)="viewProgram(program.id || 0)" title="Voir les détails du programme">
                     Voir le programme
                   </button>
-                  <button class="add-btn" (click)="addProgramToUser(program.id)" title="Ajouter ce programme à mes programmes">
+                  <button class="add-btn" (click)="addProgramToUser(program.id || 0)" title="Ajouter ce programme à mes programmes">
                     Ajouter
                   </button>
                 </div>

@@ -43,48 +43,48 @@
       <article *ngFor="let userProgram of userPrograms; trackBy: trackByProgramId" 
                class="program-item" 
                role="listitem"
-               [attr.aria-label]="'Programme: ' + userProgram.trainingProgram.name">
+               [attr.aria-label]="'Programme: ' + userProgram.trainingProgramName">
         <header class="program-header">
-          <h3>{{ userProgram.trainingProgram.name }}</h3>
+          <h3>{{ userProgram.trainingProgramName }}</h3>
           <div class="program-status" 
-               [style.background-color]="getStatusColor(userProgram.status)"
-               [attr.aria-label]="'Statut: ' + getStatusText(userProgram.status)">
-            {{ getStatusText(userProgram.status) }}
+               [style.background-color]="getStatusColor(userProgram.isCompleted ? 'COMPLETED' : 'IN_PROGRESS')"
+               [attr.aria-label]="'Statut: ' + (userProgram.isCompleted ? 'Terminé' : 'En cours')">
+            {{ userProgram.isCompleted ? 'Terminé' : 'En cours' }}
           </div>
         </header>
         
         <div class="program-details">
-          <p class="program-description">{{ userProgram.trainingProgram.description }}</p>
+          <p class="program-description">{{ userProgram.trainingProgramDescription }}</p>
           
           <div class="program-info" role="group" aria-label="Informations du programme">
             <div class="info-item">
               <span class="label">Difficulté:</span>
-              <span class="value">{{ userProgram.trainingProgram.difficultyLevel }}</span>
+              <span class="value">{{ userProgram.trainingProgramDifficultyLevel }}</span>
             </div>
             <div class="info-item">
               <span class="label">Durée:</span>
-              <span class="value">{{ userProgram.trainingProgram.durationWeeks }} semaines</span>
+              <span class="value">{{ userProgram.trainingProgramDurationWeeks }} semaines</span>
             </div>
             <div class="info-item">
               <span class="label">Sessions/semaine:</span>
-              <span class="value">{{ userProgram.trainingProgram.sessionsPerWeek }}</span>
+              <span class="value">{{ userProgram.trainingProgramSessionsPerWeek }}</span>
             </div>
-            <div class="info-item" *ngIf="userProgram.status === 'IN_PROGRESS'">
+            <div class="info-item" *ngIf="!userProgram.isCompleted">
               <span class="label">Progression:</span>
-              <span class="value">Semaine {{ userProgram.currentWeek }}, Session {{ userProgram.currentSession }}</span>
+              <span class="value">Semaine {{ userProgram.currentWeek }}, Jour {{ userProgram.currentDay }}</span>
             </div>
           </div>
         </div>
         
         <div class="program-actions" role="group" aria-label="Actions pour le programme">
           <button class="action-btn view-btn" 
-                  (click)="viewProgramDetails(userProgram.trainingProgram.id)"
-                  [attr.aria-label]="'Voir les détails de ' + userProgram.trainingProgram.name">
+                  (click)="viewProgramDetails(userProgram.trainingProgramId)"
+                  [attr.aria-label]="'Voir les détails de ' + userProgram.trainingProgramName">
             Voir les détails
           </button>
           <button class="action-btn unsubscribe-btn" 
-                  (click)="unsubscribeFromProgram(userProgram.trainingProgram.id)"
-                  [attr.aria-label]="'Se désabonner de ' + userProgram.trainingProgram.name">
+                  (click)="unsubscribeFromProgram(userProgram.trainingProgramId)"
+                  [attr.aria-label]="'Se désabonner de ' + userProgram.trainingProgramName">
             Se désabonner
           </button>
         </div>

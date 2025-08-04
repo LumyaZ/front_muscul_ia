@@ -14,6 +14,17 @@ $error-color: #A855F7;
 $success-color: #10B981;
 $danger-color: #EF4444;
 
+// Fonctions de couleur modernes
+@use "sass:color";
+
+@function darken-color($color, $amount: 10%) {
+  @return color.adjust($color, $lightness: -$amount);
+}
+
+@function lighten-color($color, $amount: 10%) {
+  @return color.adjust($color, $lightness: $amount);
+}
+
 // Mixins principaux
 @mixin flex-center {
   display: flex;

@@ -1,4 +1,4 @@
-@import '../../../styles/variables';
+@use '../../../styles/variables' as *;
 
 .modal-backdrop {
   position: fixed;
@@ -568,7 +568,7 @@
   color: white;
 
   &:hover:not(:disabled) {
-    background: darken($primary-color, 5%);
+    background: darken-color($primary-color, 5%);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba($primary-color, 0.3);
   }

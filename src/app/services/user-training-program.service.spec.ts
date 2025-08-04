@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { UserTrainingProgramService, UserTrainingProgram } from './user-training-program.service';
+import { UserTrainingProgramService } from './user-training-program.service';
+import { UserTrainingProgram } from '../models/user-training-program.model';
 import { environment } from '../../environments/environment';
 
 describe('UserTrainingProgramService', () => {
@@ -10,26 +11,46 @@ describe('UserTrainingProgramService', () => {
 
   const mockUserTrainingProgram: UserTrainingProgram = {
     id: 1,
-    user: { id: 1, email: 'test@test.com' },
-    trainingProgram: { id: 1, name: 'Program 1' },
-    startedAt: '2024-01-01',
-    status: 'IN_PROGRESS',
+    userId: 1,
+    trainingProgramId: 1,
+    trainingProgramName: 'Program 1',
+    trainingProgramDescription: 'Test program',
+    trainingProgramCategory: 'Strength',
+    trainingProgramDifficultyLevel: 'Beginner',
+    trainingProgramDurationWeeks: 8,
+    trainingProgramSessionsPerWeek: 3,
+    trainingProgramIsPublic: true,
     currentWeek: 1,
-    currentSession: 1,
-    isFavorite: true,
-    createdAt: '2024-01-01'
+    currentDay: 1,
+    isCompleted: false,
+    startDate: '2024-01-01',
+    progressPercentage: 25,
+    notes: 'Test notes',
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   };
 
   const mockNewSubscription: UserTrainingProgram = {
     id: 1,
-    user: { id: 1, email: 'test@test.com' },
-    trainingProgram: { id: 1, name: 'Program 1' },
-    startedAt: '2024-01-01',
-    status: 'NOT_STARTED',
+    userId: 1,
+    trainingProgramId: 1,
+    trainingProgramName: 'Program 1',
+    trainingProgramDescription: 'Test program',
+    trainingProgramCategory: 'Strength',
+    trainingProgramDifficultyLevel: 'Beginner',
+    trainingProgramDurationWeeks: 8,
+    trainingProgramSessionsPerWeek: 3,
+    trainingProgramIsPublic: true,
     currentWeek: 1,
-    currentSession: 1,
-    isFavorite: false,
-    createdAt: '2024-01-01'
+    currentDay: 1,
+    isCompleted: false,
+    startDate: '2024-01-01',
+    progressPercentage: 0,
+    notes: 'New subscription',
+    isActive: true,
+    createdAt: '2024-01-01',
+    updatedAt: '2024-01-01'
   };
 
   beforeEach(() => {
@@ -58,7 +79,7 @@ describe('UserTrainingProgramService', () => {
         expect(programs).toEqual(mockPrograms);
         expect(programs.length).toBe(1);
         expect(programs[0].id).toBe(1);
-        expect(programs[0].status).toBe('IN_PROGRESS');
+        expect(programs[0].isCompleted).toBe(false);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/user/${userId}`);
@@ -74,8 +95,8 @@ describe('UserTrainingProgramService', () => {
 
       service.subscribeUserToProgram(userId, trainingProgramId).subscribe(response => {
         expect(response).toEqual(mockNewSubscription);
-        expect(response.status).toBe('NOT_STARTED');
-        expect(response.isFavorite).toBe(false);
+        expect(response.isCompleted).toBe(false);
+        expect(response.progressPercentage).toBe(0);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/subscribe?userId=${userId}&trainingProgramId=${trainingProgramId}`);
@@ -106,8 +127,8 @@ describe('UserTrainingProgramService', () => {
 
       service.getUserProgram(userId, trainingProgramId).subscribe(response => {
         expect(response).toEqual(mockUserTrainingProgram);
-        expect(response?.status).toBe('IN_PROGRESS');
-        expect(response?.isFavorite).toBe(true);
+        expect(response?.isCompleted).toBe(false);
+        expect(response?.progressPercentage).toBe(25);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/user/${userId}/program/${trainingProgramId}`);

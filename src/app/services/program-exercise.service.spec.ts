@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ProgramExerciseService, ProgramExercise } from './program-exercise.service';
+import { ProgramExerciseService } from './program-exercise.service';
+import { ProgramExercise } from '../models/program-exercise.model';
 import { environment } from '../../environments/environment';
 
 describe('ProgramExerciseService', () => {
@@ -13,17 +14,13 @@ describe('ProgramExerciseService', () => {
     exerciseId: 1,
     exerciseName: 'Pompes',
     exerciseDescription: 'Exercice de musculation pour les pectoraux',
-    exerciseCategory: 'Musculation',
     exerciseMuscleGroup: 'Pectoraux',
-    exerciseEquipmentNeeded: 'Poids du corps',
-    exerciseDifficultyLevel: 'Débutant',
-    orderInProgram: 1,
+    orderIndex: 1,
     setsCount: 3,
     repsCount: 12,
     durationSeconds: 60,
     restDurationSeconds: 90,
     weightKg: 0,
-    distanceMeters: 0,
     notes: 'Exercice de base',
     isOptional: false,
     createdAt: '2024-01-01T00:00:00',

@@ -72,7 +72,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (sessions) => {
-          console.log('All trainings loaded:', sessions);
           this.recentTrainings = sessions;
           this.isLoading = false;
         },

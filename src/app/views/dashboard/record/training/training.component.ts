@@ -6,8 +6,17 @@ import { HeaderComponent } from '../../../../components/header/header.component'
 import { NavBarComponent } from '../../../../components/nav-bar/nav-bar.component';
 import { TrainingProgramService } from '../../../../services/training-program.service';
 import { ProgramExerciseService } from '../../../../services/program-exercise.service';
-import { TrainingSessionService, TrainingSession, TrainingExercise, CreateTrainingSessionRequest } from '../../../../services/training-session.service';
+import { TrainingSessionService } from '../../../../services/training-session.service';
+import { TrainingSession, TrainingExercise, CreateTrainingSessionRequest } from '../../../../models/training-session.model';
 import { AuthService } from '../../../../services/auth.service';
+
+/**
+ * Interface étendant TrainingExercise avec les propriétés nécessaires pour l'entraînement
+ * Interface extending TrainingExercise with properties needed for training
+ */
+interface TrainingExerciseExtended extends TrainingExercise {
+  completedSets: boolean[];
+}
 
 @Component({
   selector: 'app-training',
@@ -27,7 +36,7 @@ export class TrainingComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   
   programId: number | null = null;
-  exercises: TrainingExercise[] = [];
+  exercises: TrainingExerciseExtended[] = [];
   loading = false;
   error: string | null = null;
   
@@ -129,8 +138,10 @@ export class TrainingComponent implements OnInit, OnDestroy {
     this.session = {
       userId: this.currentUser.id,
       trainingProgramId: this.programId!,
-      startTime: this.startTime,
-      duration: 0,
+      name: 'Session d\'entraînement',
+      startTime: this.startTime.toISOString(),
+      durationMinutes: 0,
+      isCompleted: false,
       exercises: this.exercises
     };
   }
@@ -256,8 +267,9 @@ export class TrainingComponent implements OnInit, OnDestroy {
     
     try {
       if (this.session) {
-        this.session.endTime = new Date();
-        this.session.duration = this.elapsedTime;
+        this.session.endTime = new Date().toISOString();
+        this.session.durationMinutes = Math.floor(this.elapsedTime / 60);
+        this.session.isCompleted = true;
         this.isTrainingComplete = true;
         
         this.saveTrainingSession();
@@ -277,8 +289,9 @@ export class TrainingComponent implements OnInit, OnDestroy {
     
     try {
       if (this.session) {
-        this.session.endTime = new Date();
-        this.session.duration = this.elapsedTime;
+        this.session.endTime = new Date().toISOString();
+        this.session.durationMinutes = Math.floor(this.elapsedTime / 60);
+        this.session.isCompleted = false;
         this.isTrainingComplete = false;
         
         this.saveTrainingSession();
@@ -301,15 +314,7 @@ export class TrainingComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Vérifier l'authentification
     const token = this.authService.getToken();
-    console.log('=== TRAINING COMPONENT: SAVE SESSION ===');
-    console.log('Current user:', this.currentUser);
-    console.log('Token exists:', !!token);
-    console.log('Token value:', token ? token.substring(0, 20) + '...' : 'null');
-    console.log('Session data:', this.session);
-    console.log('Elapsed time:', this.elapsedTime);
-
     if (!token) {
       console.error('No authentication token found');
       this.error = 'Erreur d\'authentification. Veuillez vous reconnecter.';
@@ -321,26 +326,24 @@ export class TrainingComponent implements OnInit, OnDestroy {
 
     try {
       const createRequest: CreateTrainingSessionRequest = {
+        userId: this.currentUser.id,
         name: `Entraînement ${this.programId} - ${new Date().toLocaleDateString()}`,
         description: this.generateSessionDescription(),
-        sessionDate: this.startTime.toISOString(),
+        startTime: this.startTime.toISOString(),
         durationMinutes: Math.floor(this.elapsedTime / 60),
-        sessionType: 'Musculation',
-        trainingProgramId: this.programId!
+        isCompleted: this.isTrainingComplete,
+        exercises: []
       };
-
-      console.log('Create request:', createRequest);
 
       this.trainingSessionService.createTrainingSession(createRequest)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
-            console.log('Session d\'entraînement sauvegardée:', response);
             
             this.router.navigate(['/dashboard/record/training-recap'], {
               queryParams: {
                 sessionId: response.id,
-                duration: this.session!.duration,
+                duration: this.session!.durationMinutes,
                 completed: this.isTrainingComplete
               }
             });

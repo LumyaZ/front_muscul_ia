@@ -2,7 +2,8 @@ import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { UserTrainingProgramService, UserTrainingProgram } from '../../../../services/user-training-program.service';
+import { UserTrainingProgramService } from '../../../../services/user-training-program.service';
+import { UserTrainingProgram } from '../../../../models/user-training-program.model';
 import { AuthService } from '../../../../services/auth.service';
 
 /**
@@ -177,7 +178,7 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            this.userPrograms = this.userPrograms.filter(p => p.trainingProgram.id !== programId);
+            this.userPrograms = this.userPrograms.filter(p => p.trainingProgramId !== programId);
             this.isLoading = false;
           },
           error: (err: any) => {
@@ -220,6 +221,6 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
    * TrackBy function to optimize list performance
    */
   trackByProgramId(index: number, userProgram: UserTrainingProgram): number {
-    return userProgram.trainingProgram.id;
+    return userProgram.trainingProgramId;
   }
 } 

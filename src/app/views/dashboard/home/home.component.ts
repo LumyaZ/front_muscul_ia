@@ -64,21 +64,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Charge les entraînements récents de l'utilisateur
-   * Load user's recent training sessions
+   * Charge tous les entraînements de l'utilisateur
+   * Load all user's training sessions
    */
   private loadRecentTrainings(): void {
     this.trainingSessionService.getUserTrainingSessions()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (sessions) => {
-          console.log('Recent trainings loaded:', sessions);
-          this.recentTrainings = sessions.slice(0, 3);
+          console.log('All trainings loaded:', sessions);
+          this.recentTrainings = sessions;
           this.isLoading = false;
         },
         error: (error) => {
-          console.error('Erreur lors du chargement des entraînements récents:', error);
-          this.error = 'Erreur lors du chargement des entraînements récents';
+          console.error('Erreur lors du chargement des entraînements:', error);
+          this.error = 'Erreur lors du chargement des entraînements';
           this.isLoading = false;
         }
       });
@@ -158,19 +158,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       return `${hours}h${minutes > 0 ? ` ${minutes}min` : ''}`;
     }
     return `${minutes}min`;
-  }
-
-  /**
-   * Navigue vers la page des entraînements
-   * Navigate to trainings page
-   */
-  viewAllTrainings(): void {
-    try {
-      this.router.navigate(['/dashboard/you/trainings']);
-    } catch (error) {
-      console.error('Erreur lors de la navigation:', error);
-      this.error = 'Erreur lors de la navigation';
-    }
   }
 
   /**

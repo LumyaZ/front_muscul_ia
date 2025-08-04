@@ -22,14 +22,6 @@
     </div>
 
     <div *ngIf="!isLoading && !error" class="main-content">
-      <!-- Welcome Section -->
-      <div class="welcome-section" *ngIf="currentUser">
-        <div class="welcome-content">
-          <h1>Bienvenue, {{ currentUser.email }} !</h1>
-          <p>Retrouvez vos entraînements récents et démarrez votre session</p>
-        </div>
-      </div>
-
       <!-- Quick Actions -->
       <div class="quick-actions">
         <div class="action-card primary" (click)="startNewTraining()">
@@ -53,21 +45,53 @@
         </div>
       </div>
 
-      <!-- Recent Trainings Section -->
+      <!-- Stats Section -->
+      <div class="stats-section">
+        <h2>Vos Statistiques</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+              <h3>{{ recentTrainings.length }}</h3>
+              <p>Entraînements au total</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+              <h3>{{ getTotalDuration() }}</h3>
+              <p>Heures d'entraînement</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon">
+              <i class="fas fa-trophy"></i>
+            </div>
+            <div class="stat-content">
+              <h3>{{ getAverageDuration() }}</h3>
+              <p>Durée moyenne</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- All Trainings Section -->
       <div class="recent-trainings-section">
         <div class="section-header">
-          <h2>Entraînements Récents</h2>
-          <button (click)="viewAllTrainings()" class="btn-view-all">
-            Voir tout
-            <i class="fas fa-arrow-right"></i>
-          </button>
+          <h2>Tous les Entraînements</h2>
         </div>
 
         <div *ngIf="recentTrainings.length === 0" class="empty-state">
           <div class="empty-icon">
             <i class="fas fa-dumbbell"></i>
           </div>
-          <h3>Aucun entraînement récent</h3>
+          <h3>Aucun entraînement</h3>
           <p>Commencez votre premier entraînement pour voir votre historique ici</p>
           <button (click)="startNewTraining()" class="btn-start-training">
             <i class="fas fa-play"></i>
@@ -107,42 +131,6 @@
                 <i class="fas fa-eye"></i>
                 Voir détails
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Stats Section -->
-      <div class="stats-section">
-        <h2>Vos Statistiques</h2>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-calendar-check"></i>
-            </div>
-            <div class="stat-content">
-              <h3>{{ recentTrainings.length }}</h3>
-              <p>Entraînements ce mois</p>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-clock"></i>
-            </div>
-            <div class="stat-content">
-              <h3>{{ getTotalDuration() }}</h3>
-              <p>Heures d'entraînement</p>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-trophy"></i>
-            </div>
-            <div class="stat-content">
-              <h3>{{ getAverageDuration() }}</h3>
-              <p>Durée moyenne</p>
             </div>
           </div>
         </div>

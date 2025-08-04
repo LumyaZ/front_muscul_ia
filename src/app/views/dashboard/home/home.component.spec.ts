@@ -81,7 +81,7 @@ describe('HomeComponent', () => {
     expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
     expect(mockTrainingSessionService.getUserTrainingSessions).toHaveBeenCalled();
     expect(component.currentUser).toEqual(mockUser);
-    expect(component.recentTrainings).toEqual(mockTrainings.slice(0, 3));
+    expect(component.recentTrainings).toEqual(mockTrainings);
     expect(component.isLoading).toBe(false);
     expect(component.error).toBeNull();
   });
@@ -100,7 +100,7 @@ describe('HomeComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.error).toBe('Erreur lors du chargement des entraînements récents');
+    expect(component.error).toBe('Erreur lors du chargement des entraînements');
     expect(component.isLoading).toBe(false);
   });
 
@@ -143,10 +143,7 @@ describe('HomeComponent', () => {
     expect(component.getAverageDuration()).toBe('0min');
   });
 
-  it('should navigate to trainings page', () => {
-    component.viewAllTrainings();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/you/trainings']);
-  });
+
 
   it('should navigate to record page', () => {
     component.startNewTraining();

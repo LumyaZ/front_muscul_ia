@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './views/auth/login/login.component';
 import { SignupComponent } from './views/auth/signup/signup.component';
-import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { TrainingInfoFormComponent } from './views/training-info/training-info-form.component';
 import { ProfileComponent } from './views/profile/profile.component';
 

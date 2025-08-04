@@ -205,7 +205,8 @@ describe('SignupComponent', () => {
    */
   it('should call authService.createUserWithProfile when form is valid', () => {
     const mockResponse = {
-      user: { id: 1, email: 'test@example.com' },
+      user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
+      profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' },
       token: 'mock-token'
     };
     mockAuthService.createUserWithProfile.and.returnValue(of(mockResponse));
@@ -262,7 +263,8 @@ describe('SignupComponent', () => {
    */
   it('should handle form with optional phone number', () => {
     const mockResponse = {
-      user: { id: 1, email: 'test@example.com' },
+      user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
+      profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' },
       token: 'mock-token'
     };
     mockAuthService.createUserWithProfile.and.returnValue(of(mockResponse));
@@ -394,7 +396,8 @@ describe('SignupComponent', () => {
    */
   it('should navigate to training-info after successful signup', () => {
     const mockResponse = {
-      user: { id: 1, email: 'test@example.com' },
+      user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
+      profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' },
       token: 'mock-token'
     };
     mockAuthService.createUserWithProfile.and.returnValue(of(mockResponse));
@@ -421,7 +424,8 @@ describe('SignupComponent', () => {
     spyOn(localStorage, 'setItem');
     
     const mockResponse = {
-      user: { id: 1, email: 'test@example.com' },
+      user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
+      profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' },
       token: 'mock-token'
     };
     mockAuthService.createUserWithProfile.and.returnValue(of(mockResponse));

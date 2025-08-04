@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Exercise, CreateExerciseRequest, UpdateExerciseRequest } from '../models/exercise.model';
+import { Exercise, CreateExerciseRequest } from '../models/exercise.model';
 
 /**
  * Service for managing exercise operations.
@@ -29,6 +29,30 @@ export class ExerciseService {
    */
   getExerciseById(id: number): Observable<Exercise> {
     return this.http.get<Exercise>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Create a new exercise.
+   * Créer un nouvel exercice.
+   */
+  createExercise(request: CreateExerciseRequest): Observable<Exercise> {
+    return this.http.post<Exercise>(this.apiUrl, request);
+  }
+
+  /**
+   * Update an existing exercise.
+   * Mettre à jour un exercice existant.
+   */
+  updateExercise(id: number, request: CreateExerciseRequest): Observable<Exercise> {
+    return this.http.put<Exercise>(`${this.apiUrl}/${id}`, request);
+  }
+
+  /**
+   * Delete an exercise.
+   * Supprimer un exercice.
+   */
+  deleteExercise(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   /**

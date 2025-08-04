@@ -3,8 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
-import { TrainingProgram, CreateTrainingProgramRequest, UpdateTrainingProgramRequest } from '../models/training-program.model';
-import { CreateProgramExerciseRequest } from '../models/program-exercise.model';
+import { TrainingProgram, CreateTrainingProgramRequest } from '../models/training-program.model';
 
 /**
  * Service for managing training programs.
@@ -52,19 +51,10 @@ export class TrainingProgramService {
   }
 
   /**
-   * Create a training program with simplified data.
-   * Créer un programme d'entraînement avec des données simplifiées.
-   */
-  createTrainingProgram(programData: any, userId: number): Observable<TrainingProgram> {
-    const params = new HttpParams().set('userId', userId.toString());
-    return this.http.post<TrainingProgram>(this.apiUrl, programData, { params });
-  }
-
-  /**
    * Update an existing training program.
    * Mettre à jour un programme d'entraînement existant.
    */
-  updateProgram(id: number, program: UpdateTrainingProgramRequest): Observable<TrainingProgram> {
+  updateProgram(id: number, program: CreateTrainingProgramRequest): Observable<TrainingProgram> {
     return this.http.put<TrainingProgram>(`${this.apiUrl}/${id}`, program);
   }
 
@@ -84,8 +74,7 @@ export class TrainingProgramService {
     name?: string,
     difficultyLevel?: string,
     category?: string,
-    targetAudience?: string,
-    isPublic?: boolean
+    targetAudience?: string
   ): Observable<TrainingProgram[]> {
     let params = new HttpParams();
     
@@ -93,7 +82,6 @@ export class TrainingProgramService {
     if (difficultyLevel) params = params.set('difficultyLevel', difficultyLevel);
     if (category) params = params.set('category', category);
     if (targetAudience) params = params.set('targetAudience', targetAudience);
-    if (isPublic !== undefined) params = params.set('isPublic', isPublic.toString());
 
     return this.http.get<TrainingProgram[]>(`${this.apiUrl}/search`, { params });
   }

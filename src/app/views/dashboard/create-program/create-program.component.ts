@@ -189,61 +189,59 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Handle form submission to create a new training program.
-   * Gère la soumission du formulaire pour créer un nouveau programme d'entraînement.
+   * Soumet le formulaire de création de programme
+   * Submit program creation form
    */
   onSubmit(): void {
-    if (this.createProgramForm.invalid) {
+    if (this.createProgramForm.valid) {
+      if (!this.currentUser?.id) {
+        this.error = 'Vous devez être connecté pour créer un programme.';
+        return;
+      }
+
+      this.loading = true;
+      this.error = '';
+      this.success = '';
+
+      const formData = this.createProgramForm.value;
+      const programData = {
+        name: formData.name,
+        description: formData.description,
+        difficultyLevel: formData.difficultyLevel,
+        category: formData.category,
+        targetAudience: formData.targetAudience
+      };
+
+      this.trainingProgramService.createProgram(programData, this.currentUser.id)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response: any) => {
+            this.loading = false;
+            this.success = 'Programme créé avec succès !';
+            
+            this.createProgramForm.reset({
+              category: 'Musculation',
+              difficultyLevel: 'Débutant',
+              targetAudience: 'Tous niveaux'
+            });
+            
+            setTimeout(() => {
+              if (this.fromYouPrograms) {
+                this.router.navigate(['/dashboard/you'], { queryParams: { from: 'you-programs' } });
+              } else {
+                this.router.navigate(['/dashboard/programs']);
+              }
+            }, 2000);
+          },
+          error: (error: any) => {
+            this.loading = false;
+            this.error = 'Erreur lors de la création du programme';
+            console.error('Erreur création programme:', error);
+          }
+        });
+    } else {
       this.markFormGroupTouched();
-      return;
     }
-
-    if (!this.currentUser || !this.currentUser.id) {
-      this.error = 'Vous devez être connecté pour créer un programme.';
-      return;
-    }
-
-    this.loading = true;
-    this.error = '';
-    this.success = '';
-
-    const formData = this.createProgramForm.value;
-    const programData = {
-      ...formData,
-      createdByUserId: this.currentUser.id
-    };
-
-    this.trainingProgramService.createTrainingProgram(programData, this.currentUser.id)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          this.loading = false;
-          this.success = 'Programme créé avec succès !';
-          
-          this.createProgramForm.reset({
-            category: 'Musculation',
-            difficultyLevel: 'Débutant',
-            targetAudience: 'Tous niveaux',
-            durationWeeks: 4,
-            sessionsPerWeek: 3,
-            estimatedDurationMinutes: 60,
-            isPublic: true
-          });
-          
-          setTimeout(() => {
-            if (this.fromYouPrograms) {
-              this.router.navigate(['/dashboard/you'], { queryParams: { from: 'you-programs' } });
-            } else {
-              this.router.navigate(['/dashboard/programs']);
-            }
-          }, 2000);
-        },
-        error: (error) => {
-          this.loading = false;
-          this.error = 'Erreur lors de la création du programme';
-          console.error('Erreur création programme:', error);
-        }
-      });
   }
 
   /**

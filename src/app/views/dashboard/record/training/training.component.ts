@@ -136,13 +136,15 @@ export class TrainingComponent implements OnInit, OnDestroy {
    */
   private initializeSession(): void {
     this.session = {
-      userId: this.currentUser.id,
+      sessionDate: this.startTime.toISOString(),
+      sessionType: 'Musculation',
       trainingProgramId: this.programId!,
-      name: 'Session d\'entraînement',
-      startTime: this.startTime.toISOString(),
+      trainingProgramName: 'Programme d\'entraînement',
       durationMinutes: 0,
-      isCompleted: false,
-      exercises: this.exercises
+      notes: '',
+      userId: this.currentUser.id,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
   }
 
@@ -326,13 +328,12 @@ export class TrainingComponent implements OnInit, OnDestroy {
 
     try {
       const createRequest: CreateTrainingSessionRequest = {
-        userId: this.currentUser.id,
         name: `Entraînement ${this.programId} - ${new Date().toLocaleDateString()}`,
         description: this.generateSessionDescription(),
-        startTime: this.startTime.toISOString(),
+        sessionDate: this.startTime.toISOString(),
+        sessionType: 'Musculation',
         durationMinutes: Math.floor(this.elapsedTime / 60),
-        isCompleted: this.isTrainingComplete,
-        exercises: []
+        trainingProgramId: this.programId!
       };
 
       this.trainingSessionService.createTrainingSession(createRequest)

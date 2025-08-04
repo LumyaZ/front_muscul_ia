@@ -103,7 +103,7 @@ export class ProgramDetailsComponent implements OnInit {
   }
 
   /**
-   * Charge les exercices du programme d'entraînement
+   * Charge les exercices du programme
    * Load program exercises
    */
   loadProgramExercises(): void {
@@ -118,15 +118,12 @@ export class ProgramDetailsComponent implements OnInit {
             exerciseDescription: exercise.exerciseDescription,
             exerciseMuscleGroup: exercise.exerciseMuscleGroup,
             orderIndex: exercise.orderIndex || 0,
-            setsCount: exercise.setsCount,
+            setsCount: exercise.setsCount || 0,
             repsCount: exercise.repsCount,
-            durationSeconds: exercise.durationSeconds,
             restDurationSeconds: exercise.restDurationSeconds,
             weightKg: exercise.weightKg,
             notes: exercise.notes,
-            isOptional: exercise.isOptional,
-            createdAt: exercise.createdAt,
-            updatedAt: exercise.updatedAt
+            isOptional: exercise.isOptional || false
           }));
           this.loading = false;
         }
@@ -165,7 +162,7 @@ export class ProgramDetailsComponent implements OnInit {
    */
   private updateModificationPermissions(): void {
     if (this.program && this.currentUser) {
-      this.isProgramCreator = this.program.userId === this.currentUser.id;
+      this.isProgramCreator = this.program.createdByUserId === this.currentUser.id;
       this.canModifyProgram = this.fromYouPrograms && this.isProgramCreator;
     }
   }
@@ -187,7 +184,9 @@ export class ProgramDetailsComponent implements OnInit {
    * Obtient l'icône en fonction de la catégorie de l'exercice
    * Get icon based on exercise category
    */
-  getCategoryIcon(category: string): string {
+  getCategoryIcon(category?: string): string {
+    if (!category) return '🏋️';
+    
     switch (category) {
       case 'Musculation': return '💪';
       case 'Cardio': return '❤️';
@@ -201,7 +200,9 @@ export class ProgramDetailsComponent implements OnInit {
    * Obtient la couleur en fonction de la catégorie de l'exercice
    * Get color based on exercise category
    */
-  getCategoryColor(category: string): string {
+  getCategoryColor(category?: string): string {
+    if (!category) return 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    
     switch (category) {
       case 'Musculation': return 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
       case 'Cardio': return 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
@@ -225,16 +226,20 @@ export class ProgramDetailsComponent implements OnInit {
   }
 
   /**
-   * Formate une durée de repos en secondes en une chaîne de caractères
-   * Format rest duration in seconds to a string
+   * Formate la durée de repos
+   * Format rest duration
    */
-  formatRestDuration(seconds: number): string {
-    if (seconds < 60) {
-      return `${seconds}s`;
-    }
+  formatRestDuration(seconds?: number): string {
+    if (!seconds) return '0s';
+    
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return remainingSeconds > 0 ? `${minutes}m${remainingSeconds}s` : `${minutes}m`;
+    
+    if (minutes > 0) {
+      return `${minutes}m ${remainingSeconds}s`;
+    } else {
+      return `${remainingSeconds}s`;
+    }
   }
 
   /**
@@ -299,22 +304,28 @@ export class ProgramDetailsComponent implements OnInit {
   }
 
   /**
-   * Obtient le temps total estimé du programme
-   * Get estimated total time of the program
+   * Calcule le temps total estimé
+   * Calculate estimated total time
    */
   getEstimatedTotalTime(): string {
-    if (!this.program?.exercises?.length) {
-      return '0 min';
-    }
+    if (!this.program?.exercises) return '0 min';
 
-    const totalMinutes = this.program.exercises.reduce((total, exercise) => {
+    let totalMinutes = 0;
+    this.program.exercises.forEach(exercise => {
       const exerciseTime = exercise.durationSeconds ? exercise.durationSeconds / 60 : 0;
       const restTime = exercise.restDurationSeconds ? exercise.restDurationSeconds / 60 : 0;
-      const setsTime = exercise.setsCount * (exerciseTime + restTime);
-      return total + setsTime;
-    }, 0);
+      const setsTime = (exercise.setsCount || 0) * (exerciseTime + restTime);
+      totalMinutes += setsTime;
+    });
 
-    return `${Math.round(totalMinutes)} min`;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.floor(totalMinutes % 60);
+
+    if (hours > 0) {
+      return `${hours}h ${minutes}min`;
+    } else {
+      return `${minutes}min`;
+    }
   }
 
   /**

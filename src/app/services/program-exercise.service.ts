@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ProgramExercise, CreateProgramExerciseRequest, UpdateProgramExerciseRequest } from '../models/program-exercise.model';
+import { ProgramExercise, CreateProgramExerciseRequest } from '../models/program-exercise.model';
 
 /**
  * Service for managing program exercise operations.
@@ -32,10 +32,34 @@ export class ProgramExerciseService {
   }
 
   /**
+   * Create a new program exercise.
+   * Créer un nouvel exercice de programme.
+   */
+  createProgramExercise(request: CreateProgramExerciseRequest): Observable<ProgramExercise> {
+    return this.http.post<ProgramExercise>(this.apiUrl, request);
+  }
+
+  /**
+   * Update an existing program exercise.
+   * Mettre à jour un exercice de programme existant.
+   */
+  updateProgramExercise(id: number, request: CreateProgramExerciseRequest): Observable<ProgramExercise> {
+    return this.http.put<ProgramExercise>(`${this.apiUrl}/${id}`, request);
+  }
+
+  /**
+   * Delete a program exercise.
+   * Supprimer un exercice de programme.
+   */
+  deleteProgramExercise(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
    * Add an exercise to a training program.
    * Ajouter un exercice à un programme d'entraînement.
    */
-  addExerciseToProgram(programId: number, exerciseData: any): Observable<ProgramExercise> {
+  addExerciseToProgram(programId: number, exerciseData: CreateProgramExerciseRequest): Observable<ProgramExercise> {
     return this.http.post<ProgramExercise>(`${this.apiUrl}/program/${programId}`, exerciseData);
   }
 } 

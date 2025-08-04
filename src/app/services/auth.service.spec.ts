@@ -1,7 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Router } from '@angular/router';
-import { AuthService, LoginRequest, RegisterRequest } from './auth.service';
+import { AuthService } from './auth.service';
+import { LoginRequest, RegisterRequest } from '../models/user.model';
 import { User } from '../models/user.model';
 import { CreateUserWithProfileRequest } from '../models/user-profile.model';
 import { environment } from '../../environments/environment';
@@ -109,8 +110,7 @@ describe('AuthService', () => {
 
       const mockResponse = {
         user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
-        profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' },
-        token: 'jwt.token.here'
+        profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' }
       };
 
       service.createUserWithProfile(request).subscribe(response => {

@@ -2,19 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { UserProfile, CreateUserProfileRequest, UpdateUserProfileRequest } from '../models/user-profile.model';
-
-/**
- * Interface for creating a user profile with email (public endpoint).
- * Interface pour créer un profil utilisateur avec email (endpoint public).
- */
-export interface CreateUserProfileWithEmailRequest {
-  email: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  phoneNumber?: string;
-}
+import { 
+  UserProfile, 
+  CreateUserProfileRequest, 
+  UpdateUserProfileRequest,
+  CreateUserProfileWithEmailRequest 
+} from '../models/user-profile.model';
 
 /**
  * Service for managing user profile operations.
@@ -25,7 +18,7 @@ export interface CreateUserProfileWithEmailRequest {
 })
 export class UserProfileService {
   private http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/profiles`;
+  private readonly apiUrl = `${environment.apiUrl}/user-profiles`;
 
   /**
    * Create a new user profile (requires authentication).

@@ -3,30 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { CreateUserWithProfileRequest, CreateUserWithProfileResponse } from '../../../models/user-profile.model';
 
 interface PasswordStrength {
   score: number;
   label: string;
   color: string;
-}
-
-interface SignupRequest {
-  userData: {
-    email: string;
-    password: string;
-    confirmPassword: string;
-  };
-  profileData: {
-    firstName: string;
-    lastName: string;
-    dateOfBirth: string;
-    phoneNumber?: string;
-  };
-}
-
-interface AuthResponse {
-  user: any;
-  token: string;
 }
 
 @Component({
@@ -104,21 +86,21 @@ export class SignupComponent {
   }
 
   /**
-   * Obtient le message d'erreur pour le champ mot de passe
-   * Get error message for password field
+   * Retourne le message d'erreur pour le mot de passe
+   * Returns the error message for password
    */
   getPasswordErrorMessage(): string {
     const passwordControl = this.signupForm.get('password');
-    if (!passwordControl?.errors) return '';
-
-    if (passwordControl.errors['required']) {
-      return 'Le mot de passe est obligatoire';
-    }
-    if (passwordControl.errors['minlength']) {
-      return 'Le mot de passe doit contenir au moins 12 caractères';
-    }
-    if (passwordControl.errors['pattern']) {
-      return 'Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&)';
+    if (passwordControl?.errors) {
+      if (passwordControl.errors['required']) {
+        return 'Le mot de passe est requis.';
+      }
+      if (passwordControl.errors['minlength']) {
+        return 'Le mot de passe doit contenir au moins 12 caractères.';
+      }
+      if (passwordControl.errors['pattern']) {
+        return 'Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial.';
+      }
     }
     return '';
   }
@@ -130,26 +112,28 @@ export class SignupComponent {
   getPasswordStrength(): PasswordStrength {
     const password = this.signupForm.get('password')?.value || '';
     let score = 0;
-    
+
     if (password.length >= 12) score++;
     if (/[a-z]/.test(password)) score++;
     if (/[A-Z]/.test(password)) score++;
     if (/\d/.test(password)) score++;
     if (/[@$!%*?&]/.test(password)) score++;
-    
-    const labels = ['Très faible', 'Faible', 'Moyen', 'Fort', 'Très fort'];
-    const colors = ['#dc3545', '#fd7e14', '#ffc107', '#28a745', '#20c997'];
-    
-    return {
-      score: Math.min(score, 5),
-      label: labels[Math.min(score - 1, 4)],
-      color: colors[Math.min(score - 1, 4)]
-    };
+
+    const strengths = [
+      { score: 0, label: 'Très faible', color: '#ff4444' },
+      { score: 1, label: 'Faible', color: '#ff8800' },
+      { score: 2, label: 'Moyen', color: '#ffaa00' },
+      { score: 3, label: 'Bon', color: '#88cc00' },
+      { score: 4, label: 'Très bon', color: '#44cc44' },
+      { score: 5, label: 'Excellent', color: '#00cc00' }
+    ];
+
+    return strengths.find(s => s.score === score) || strengths[0];
   }
 
   /**
-   * Vérifie si le mot de passe a au moins 12 caractères
-   * Check if password has at least 12 characters
+   * Vérifie si le mot de passe a la longueur minimale
+   * Check if password has minimum length
    */
   hasMinLength(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -157,8 +141,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe contient au moins une minuscule
-   * Check if password contains at least one lowercase letter
+   * Vérifie si le mot de passe contient une minuscule
+   * Check if password contains lowercase
    */
   hasLowercase(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -166,8 +150,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe contient au moins une majuscule
-   * Check if password contains at least one uppercase letter
+   * Vérifie si le mot de passe contient une majuscule
+   * Check if password contains uppercase
    */
   hasUppercase(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -175,8 +159,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe contient au moins un chiffre
-   * Check if password contains at least one number
+   * Vérifie si le mot de passe contient un chiffre
+   * Check if password contains number
    */
   hasNumber(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -184,8 +168,8 @@ export class SignupComponent {
   }
 
   /**
-   * Vérifie si le mot de passe contient au moins un caractère spécial
-   * Check if password contains at least one special character
+   * Vérifie si le mot de passe contient un caractère spécial
+   * Check if password contains special character
    */
   hasSpecialChar(): boolean {
     const password = this.signupForm.get('password')?.value || '';
@@ -194,31 +178,31 @@ export class SignupComponent {
 
   /**
    * Soumet le formulaire d'inscription
-   * Submit the registration form
+   * Submit signup form
    */
   onSubmit(): void {
     if (this.signupForm.valid) {
       this.isLoading = true;
       this.error = null;
 
-      const request: SignupRequest = {
+      const request: CreateUserWithProfileRequest = {
         userData: {
           email: this.signupForm.get('email')?.value,
           password: this.signupForm.get('password')?.value,
-          confirmPassword: this.signupForm.get('confirmPassword')?.value
+          confirmPassword: this.signupForm.get('confirmPassword')?.value,
         },
         profileData: {
           firstName: this.signupForm.get('firstName')?.value,
           lastName: this.signupForm.get('lastName')?.value,
           dateOfBirth: this.signupForm.get('dateOfBirth')?.value,
-          phoneNumber: this.signupForm.get('phoneNumber')?.value || undefined
-        }
+          phoneNumber: this.signupForm.get('phoneNumber')?.value,
+        },
       };
 
       this.authService.createUserWithProfile(request).subscribe({
-        next: (response: AuthResponse) => {
+        next: (response: CreateUserWithProfileResponse) => {
           this.isLoading = false;
-          this.saveAuthData(response.user, response.token);
+          // Les données d'authentification sont maintenant sauvegardées automatiquement par le service
           this.router.navigate(['/training-info']);
         },
         error: (error: any) => {
@@ -259,15 +243,6 @@ export class SignupComponent {
   }
 
   /**
-   * Sauvegarde les données d'authentification dans localStorage
-   * Save authentication data to localStorage
-   */
-  private saveAuthData(user: any, token: string): void {
-    localStorage.setItem('auth_token', token);
-    localStorage.setItem('current_user', JSON.stringify(user));
-  }
-
-  /**
    * Navigue vers la page de connexion
    * Navigate to login page
    */
@@ -276,8 +251,8 @@ export class SignupComponent {
   }
 
   /**
-   * Retourne la date maximale pour la date de naissance (aujourd'hui)
-   * Returns the maximum date for date of birth (today)
+   * Retourne la date maximale pour l'âge (aujourd'hui)
+   * Returns the maximum date for age (today)
    */
   getMaxDate(): string {
     const today = new Date();

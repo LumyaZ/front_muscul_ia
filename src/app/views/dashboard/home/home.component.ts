@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { TrainingSessionService, TrainingSessionDto } from '../../../services/training-session.service';
+import { TrainingSessionService } from '../../../services/training-session.service';
 import { User } from '../../../models/user.model';
+import { TrainingSession } from '../../../models/training-session.model';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
 
@@ -23,7 +24,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   currentUser: User | null = null;
-  recentTrainings: TrainingSessionDto[] = [];
+  recentTrainings: TrainingSession[] = [];
   isLoading = false;
   error: string | null = null;
 

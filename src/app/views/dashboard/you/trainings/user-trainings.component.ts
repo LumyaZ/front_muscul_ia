@@ -2,9 +2,10 @@ import { Component, OnInit, inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-import { TrainingSessionService, TrainingSessionDto } from '../../../../services/training-session.service';
+import { TrainingSessionService } from '../../../../services/training-session.service';
 import { AuthService } from '../../../../services/auth.service';
 import { User } from '../../../../models/user.model';
+import { TrainingSession } from '../../../../models/training-session.model';
 
 @Component({
   selector: 'app-user-trainings',
@@ -20,9 +21,10 @@ export class UserTrainingsComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
 
-  trainingSessions: TrainingSessionDto[] = [];
+  trainingSessions: TrainingSession[] = [];
   isLoading = false;
   error: string | null = null;
+  success: string | null = null;
   currentUser: User | null = null;
 
   ngOnInit(): void {
@@ -131,32 +133,37 @@ export class UserTrainingsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Navigue vers les détails d'une session d'entraînement
-   * Navigate to training session details
+   * Affiche les détails d'une session d'entraînement
+   * View training session details
    */
-  viewTrainingSession(sessionId: number): void {
-    this.router.navigate(['/dashboard/trainings', sessionId]);
+  viewTrainingSession(sessionId?: number): void {
+    if (sessionId) {
+      this.router.navigate(['/dashboard/record/training-recap'], {
+        queryParams: { sessionId: sessionId }
+      });
+    }
   }
 
   /**
    * Supprime une session d'entraînement
    * Delete training session
    */
-  deleteTrainingSession(sessionId: number): void {
+  deleteTrainingSession(sessionId?: number): void {
+    if (!sessionId) return;
+    
     if (confirm('Êtes-vous sûr de vouloir supprimer cette session d\'entraînement ?')) {
-      this.isLoading = true;
-      
-      this.trainingSessionService.deleteTrainingSession(sessionId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.loadTrainingSessions();
-          },
-          error: (error) => {
-            console.error('Erreur lors de la suppression:', error);
-            this.handleError(error, 'Erreur lors de la suppression de la session');
-          }
-        });
+      this.trainingSessionService.deleteTrainingSession(sessionId).subscribe({
+        next: () => {
+          this.trainingSessions = this.trainingSessions.filter(s => s.id !== sessionId);
+          this.success = 'Session supprimée avec succès';
+          setTimeout(() => this.success = '', 3000);
+        },
+        error: (error: any) => {
+          console.error('Erreur lors de la suppression:', error);
+          this.error = 'Erreur lors de la suppression de la session';
+          setTimeout(() => this.error = '', 3000);
+        }
+      });
     }
   }
 
@@ -164,7 +171,7 @@ export class UserTrainingsComponent implements OnInit, OnDestroy {
    * Fonction de tracking pour optimiser les performances de la liste
    * TrackBy function to optimize list performance
    */
-  trackBySessionId(index: number, session: TrainingSessionDto): number {
-    return session.id;
+  trackBySessionId(index: number, session: TrainingSession): number {
+    return session.id || index;
   }
 } 

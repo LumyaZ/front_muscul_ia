@@ -39,6 +39,7 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
   error: string | null = null;
   userPrograms: UserTrainingProgram[] = [];
   currentUser: any = null;
+  success: string | null = null;
 
   readonly STATUS_CONFIG: ProgramStatus = {
     IN_PROGRESS: 'En cours',
@@ -149,43 +150,37 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Navigue vers les détails d'un programme
-   * Navigate to program details
+   * Affiche les détails d'un programme
+   * View program details
    */
-  viewProgramDetails(programId: number): void {
-    this.router.navigate(['/dashboard/programs', programId], {
-      queryParams: {
-        from: 'you-programs',
-        userId: this.currentUser?.id
-      }
-    });
+  viewProgramDetails(programId?: number): void {
+    if (programId) {
+      this.router.navigate(['/dashboard/programs', programId], {
+        queryParams: { from: 'you-programs' }
+      });
+    }
   }
 
   /**
-   * Désabonne l'utilisateur d'un programme
-   * Unsubscribe user from program
+   * Se désabonne d'un programme
+   * Unsubscribe from a program
    */
-  unsubscribeFromProgram(programId: number): void {
-    if (!this.currentUser || !this.currentUser.id) {
-      this.error = 'Erreur: Utilisateur non connecté';
-      return;
-    }
-
+  unsubscribeFromProgram(programId?: number): void {
+    if (!programId) return;
+    
     if (confirm('Êtes-vous sûr de vouloir vous désabonner de ce programme ?')) {
-      this.isLoading = true;
-      
-      this.userTrainingProgramService.unsubscribeUserFromProgram(this.currentUser.id, programId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            this.userPrograms = this.userPrograms.filter(p => p.trainingProgramId !== programId);
-            this.isLoading = false;
-          },
-          error: (err: any) => {
-            this.handleError(err, 'Erreur lors du désabonnement');
-            this.isLoading = false;
-          }
-        });
+      this.userTrainingProgramService.unsubscribeUserFromProgram(this.currentUser.id, programId).subscribe({
+        next: () => {
+          this.userPrograms = this.userPrograms.filter(p => p.trainingProgramId !== programId);
+          this.success = 'Désabonnement réussi';
+          setTimeout(() => this.success = '', 3000);
+        },
+        error: (error: any) => {
+          console.error('Erreur lors du désabonnement:', error);
+          this.error = 'Erreur lors du désabonnement';
+          setTimeout(() => this.error = '', 3000);
+        }
+      });
     }
   }
 
@@ -217,10 +212,10 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Fonction de tracking pour optimiser les performances de la liste
+   * TrackBy function pour optimiser les performances de la liste
    * TrackBy function to optimize list performance
    */
   trackByProgramId(index: number, userProgram: UserTrainingProgram): number {
-    return userProgram.trainingProgramId;
+    return userProgram.trainingProgramId || index;
   }
 } 

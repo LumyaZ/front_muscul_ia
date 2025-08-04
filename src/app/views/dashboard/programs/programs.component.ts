@@ -12,31 +12,11 @@ import { TrainingProgram } from '../../../models/training-program.model';
  * Interface représentant un groupe de programmes par catégorie.
  */
 interface CategoryGroup {
-  /** Category name */
   category: string;
-  /** Icon for the category */
   icon: string;
-  /** Programs in this category */
   programs: TrainingProgram[];
 }
 
-/**
- * Component for displaying and managing training programs.
- * Composant pour afficher et gérer les programmes d'entraînement.
- * 
- * This component handles the display, filtering, and organization of training
- * programs. It provides functionality to search programs, filter by difficulty
- * and audience, group programs by category, and navigate to program details.
- * 
- * Ce composant gère l'affichage, le filtrage et l'organisation des programmes
- * d'entraînement. Il fournit des fonctionnalités pour rechercher des programmes,
- * filtrer par difficulté et audience, grouper les programmes par catégorie et
- * naviguer vers les détails des programmes.
- * 
- * @author Muscul IA Team
- * @version 1.0
- * @since 2024-01-01
- */
 @Component({
   selector: 'app-programs',
   standalone: true,
@@ -46,79 +26,28 @@ interface CategoryGroup {
 })
 export class ProgramsComponent implements OnInit, AfterViewInit {
   
-  /**
-   * List of all training programs.
-   * Liste de tous les programmes d'entraînement.
-   */
   programs: TrainingProgram[] = [];
   
-  /**
-   * Programs grouped by category for display.
-   * Programmes groupés par catégorie pour l'affichage.
-   */
   categoryGroups: CategoryGroup[] = [];
   
-  /**
-   * Loading state indicator.
-   * Indicateur d'état de chargement.
-   */
   loading = false;
   
-  /**
-   * Error message if any operation fails.
-   * Message d'erreur si une opération échoue.
-   */
   error = '';
 
-  /**
-   * Search term for filtering programs.
-   * Terme de recherche pour filtrer les programmes.
-   */
   searchTerm = '';
   
-  /**
-   * Selected difficulty level filter.
-   * Filtre de niveau de difficulté sélectionné.
-   */
   selectedDifficulty = '';
   
-  /**
-   * Selected target audience filter.
-   * Filtre d'audience cible sélectionnée.
-   */
   selectedAudience = '';
   
-  /**
-   * Flag to show only public programs.
-   * Indicateur pour afficher uniquement les programmes publics.
-   */
   showOnlyPublic = true;
 
-  /**
-   * Available difficulty levels for filtering.
-   * Niveaux de difficulté disponibles pour le filtrage.
-   */
   difficultyLevels = ['Débutant', 'Intermédiaire', 'Avancé'];
   
-  /**
-   * Available target audiences for filtering.
-   * Audiences cibles disponibles pour le filtrage.
-   */
   audiences = ['Débutants', 'Sportifs confirmés', 'Athlètes expérimentés', 'Sportifs de compétition', 'Tous niveaux'];
 
-  /**
-   * Animation state for smooth transitions.
-   * État d'animation pour les transitions fluides.
-   */
   isAnimating = false;
 
-  /**
-   * Constructor for ProgramsComponent.
-   * Constructeur pour ProgramsComponent.
-   * 
-   * @param trainingProgramService - Service for training program operations
-   * @param router - Angular router for navigation
-   */
   constructor(
     private trainingProgramService: TrainingProgramService,
     private router: Router
@@ -156,12 +85,6 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
   /**
    * Load training programs from the service.
    * Charger les programmes d'entraînement depuis le service.
-   * 
-   * This method fetches public training programs and organizes them by category.
-   * It handles loading states and error management.
-   * 
-   * Cette méthode récupère les programmes d'entraînement publics et les organise
-   * par catégorie. Elle gère les états de chargement et la gestion des erreurs.
    */
   loadPrograms(): void {
     this.loading = true;
@@ -185,28 +108,21 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * Group programs by category and apply filters.
-   * Grouper les programmes par catégorie et appliquer les filtres.
-   * 
-   * This method filters programs based on search term, difficulty, audience,
-   * and visibility settings, then groups them by category for display.
-   * 
-   * Cette méthode filtre les programmes selon le terme de recherche, la difficulté,
-   * l'audience et les paramètres de visibilité, puis les groupe par catégorie
-   * pour l'affichage.
+   * Groupe les programmes par catégorie
+   * Group programs by category
    */
   groupProgramsByCategory(): void {
     const filteredPrograms = this.programs.filter(program => {
       const matchesSearch = !this.searchTerm || 
         program.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         program.description.toLowerCase().includes(this.searchTerm.toLowerCase());
-
+      
       const matchesDifficulty = !this.selectedDifficulty || 
         program.difficultyLevel === this.selectedDifficulty;
-
+      
       const matchesAudience = !this.selectedAudience || 
         program.targetAudience === this.selectedAudience;
-
+      
       const matchesVisibility = !this.showOnlyPublic || program.isPublic;
 
       return matchesSearch && matchesDifficulty && matchesAudience && matchesVisibility;
@@ -215,10 +131,11 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
     const categoryMap = new Map<string, TrainingProgram[]>();
     
     filteredPrograms.forEach(program => {
-      if (!categoryMap.has(program.category)) {
-        categoryMap.set(program.category, []);
+      const category = program.category || 'Autre';
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, []);
       }
-      categoryMap.get(program.category)!.push(program);
+      categoryMap.get(category)!.push(program);
     });
 
     this.categoryGroups = Array.from(categoryMap.entries()).map(([category, programs]) => ({

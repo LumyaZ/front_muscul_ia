@@ -2,29 +2,10 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
-import { User } from '../models/user.model';
+import { User, LoginRequest, RegisterRequest } from '../models/user.model';
 import { environment } from '../../environments/environment';
-import { CreateUserWithProfileRequest } from '../models/user-profile.model';
+import { CreateUserWithProfileRequest, CreateUserWithProfileResponse } from '../models/user-profile.model';
 import { STORAGE_KEYS } from '../constants/storage.constants';
-
-/**
- * Interface for login request.
- * Interface pour la requête de connexion.
- */
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-/**
- * Interface for registration request.
- * Interface pour la requête d'inscription.
- */
-export interface RegisterRequest {
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
 
 /**
  * Interface for authentication response.
@@ -51,8 +32,8 @@ export class AuthService {
    * Login user with email and password.
    * Connexion utilisateur avec email et mot de passe.
    */
-  login(request: LoginRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/login`, request).pipe(
+  login(request: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(
       tap((response) => {
         this.saveAuthData(response.user, response.token);
         this.router.navigate(['/dashboard']);
@@ -64,8 +45,8 @@ export class AuthService {
    * Register a new user.
    * Inscription d'un nouvel utilisateur.
    */
-  signup(request: RegisterRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, request).pipe(
+  signup(request: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request).pipe(
       tap((response) => {
         this.saveAuthData(response.user, response.token);
         this.router.navigate(['/dashboard']);
@@ -121,15 +102,11 @@ export class AuthService {
    * Create a new user with profile in one request.
    * Créer un nouvel utilisateur avec profil en une seule requête.
    */
-  createUserWithProfile(request: CreateUserWithProfileRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/create-user-with-profile`, request);
-  }
-
-  /**
-   * Register a new user (legacy method - deprecated).
-   * Inscrire un nouvel utilisateur (méthode legacy - dépréciée).
-   */
-  signupLegacy(userData: RegisterRequest): Observable<User> {
-    return this.http.post<User>(`${this.apiUrl}/register`, userData);
+  createUserWithProfile(request: CreateUserWithProfileRequest): Observable<CreateUserWithProfileResponse> {
+    return this.http.post<CreateUserWithProfileResponse>(`${this.apiUrl}/create-user-with-profile`, request).pipe(
+      tap((response) => {
+        this.saveAuthData(response.user, response.token);
+      }),
+    );
   }
 }

@@ -2,24 +2,7 @@ import { Injectable, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, tap, catchError } from "rxjs";
 import { environment } from "../../environments/environment";
-import { TrainingSession, TrainingExercise, CreateTrainingSessionRequest, CreateTrainingExerciseRequest, UpdateTrainingSessionRequest } from "../models/training-session.model";
-
-/**
- * Interface for training session DTO from backend.
- * Interface pour le DTO de session d'entraînement du backend.
- */
-export interface TrainingSessionDto {
-  id: number;
-  userId: number;
-  name: string;
-  description?: string;
-  sessionDate: string;
-  durationMinutes: number;
-  sessionType?: string;
-  trainingProgramId?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { TrainingSession, CreateTrainingSessionRequest } from "../models/training-session.model";
 
 /**
  * Service for managing training sessions.
@@ -36,8 +19,8 @@ export class TrainingSessionService {
    * Create a new training session.
    * Créer une nouvelle session d'entraînement.
    */
-  createTrainingSession(request: CreateTrainingSessionRequest): Observable<TrainingSessionDto> {
-    return this.http.post<TrainingSessionDto>(this.apiUrl, request).pipe(
+  createTrainingSession(request: CreateTrainingSessionRequest): Observable<TrainingSession> {
+    return this.http.post<TrainingSession>(this.apiUrl, request).pipe(
       tap(response => {
         // Success callback
       }),
@@ -51,8 +34,8 @@ export class TrainingSessionService {
    * Get training session by ID.
    * Obtenir une session d'entraînement par ID.
    */
-  getTrainingSession(sessionId: number): Observable<TrainingSessionDto> {
-    return this.http.get<TrainingSessionDto>(`${this.apiUrl}/${sessionId}`).pipe(
+  getTrainingSession(sessionId: number): Observable<TrainingSession> {
+    return this.http.get<TrainingSession>(`${this.apiUrl}/${sessionId}`).pipe(
       tap(response => {
         // Success callback
       }),
@@ -66,8 +49,8 @@ export class TrainingSessionService {
    * Update training session.
    * Mettre à jour une session d'entraînement.
    */
-  updateTrainingSession(sessionId: number, request: CreateTrainingSessionRequest): Observable<TrainingSessionDto> {
-    return this.http.put<TrainingSessionDto>(`${this.apiUrl}/${sessionId}`, request).pipe(
+  updateTrainingSession(sessionId: number, request: CreateTrainingSessionRequest): Observable<TrainingSession> {
+    return this.http.put<TrainingSession>(`${this.apiUrl}/${sessionId}`, request).pipe(
       tap(response => {
         // Success callback
       }),
@@ -81,8 +64,8 @@ export class TrainingSessionService {
    * Get all training sessions for the current user.
    * Obtenir toutes les sessions d'entraînement de l'utilisateur actuel.
    */
-  getUserTrainingSessions(): Observable<TrainingSessionDto[]> {
-    return this.http.get<TrainingSessionDto[]>(this.apiUrl).pipe(
+  getUserTrainingSessions(): Observable<TrainingSession[]> {
+    return this.http.get<TrainingSession[]>(this.apiUrl).pipe(
       tap(response => {
         // Success callback
       }),
@@ -111,8 +94,8 @@ export class TrainingSessionService {
    * Get training sessions by date range.
    * Obtenir les sessions d'entraînement par plage de dates.
    */
-  getTrainingSessionsByDateRange(startDate: string, endDate: string): Observable<TrainingSessionDto[]> {
-    return this.http.get<TrainingSessionDto[]>(`${this.apiUrl}/date-range?startDate=${startDate}&endDate=${endDate}`).pipe(
+  getTrainingSessionsByDateRange(startDate: string, endDate: string): Observable<TrainingSession[]> {
+    return this.http.get<TrainingSession[]>(`${this.apiUrl}/date-range?startDate=${startDate}&endDate=${endDate}`).pipe(
       tap(response => {
         // Success callback
       }),
@@ -126,8 +109,8 @@ export class TrainingSessionService {
    * Get training sessions by type.
    * Obtenir les sessions d'entraînement par type.
    */
-  getTrainingSessionsByType(sessionType: string): Observable<TrainingSessionDto[]> {
-    return this.http.get<TrainingSessionDto[]>(`${this.apiUrl}/type/${sessionType}`).pipe(
+  getTrainingSessionsByType(sessionType: string): Observable<TrainingSession[]> {
+    return this.http.get<TrainingSession[]>(`${this.apiUrl}/type/${sessionType}`).pipe(
       tap(response => {
         // Success callback
       }),
@@ -141,8 +124,8 @@ export class TrainingSessionService {
    * Get training sessions by program.
    * Obtenir les sessions d'entraînement par programme.
    */
-  getTrainingSessionsByProgram(trainingProgramId: number): Observable<TrainingSessionDto[]> {
-    return this.http.get<TrainingSessionDto[]>(`${this.apiUrl}/program/${trainingProgramId}`).pipe(
+  getTrainingSessionsByProgram(trainingProgramId: number): Observable<TrainingSession[]> {
+    return this.http.get<TrainingSession[]>(`${this.apiUrl}/program/${trainingProgramId}`).pipe(
       tap(response => {
         // Success callback
       }),
@@ -156,8 +139,8 @@ export class TrainingSessionService {
    * Search training sessions by name.
    * Rechercher des sessions d'entraînement par nom.
    */
-  searchTrainingSessionsByName(name: string): Observable<TrainingSessionDto[]> {
-    return this.http.get<TrainingSessionDto[]>(`${this.apiUrl}/search?name=${name}`).pipe(
+  searchTrainingSessionsByName(name: string): Observable<TrainingSession[]> {
+    return this.http.get<TrainingSession[]>(`${this.apiUrl}/search?name=${name}`).pipe(
       tap(response => {
         // Success callback
       }),
@@ -171,8 +154,8 @@ export class TrainingSessionService {
    * Get most recent training session.
    * Obtenir la session d'entraînement la plus récente.
    */
-  getMostRecentTrainingSession(): Observable<TrainingSessionDto> {
-    return this.http.get<TrainingSessionDto>(`${this.apiUrl}/recent`).pipe(
+  getMostRecentTrainingSession(): Observable<TrainingSession> {
+    return this.http.get<TrainingSession>(`${this.apiUrl}/recent`).pipe(
       tap(response => {
         // Success callback
       }),

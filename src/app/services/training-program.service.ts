@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -80,34 +80,18 @@ export interface UpdateTrainingProgramRequest {
 /**
  * Service for managing training programs.
  * Service pour la gestion des programmes d'entraînement.
- * 
- * This service provides methods to interact with the training program API,
- * including CRUD operations, searching, and filtering capabilities.
- * 
- * Ce service fournit des méthodes pour interagir avec l'API des programmes
- * d'entraînement, incluant les opérations CRUD, la recherche et les capacités
- * de filtrage.
- * 
- * @author Muscul IA Team
- * @version 1.0
- * @since 2024-01-01
  */
 @Injectable({
   providedIn: 'root'
 })
 export class TrainingProgramService {
-  private apiUrl = `${environment.apiUrl}/training-programs`;
-
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  private readonly apiUrl = `${environment.apiUrl}/training-programs`;
 
   /**
    * Get all public training programs.
    * Récupérer tous les programmes d'entraînement publics.
-   * 
-   * @returns Observable<TrainingProgram[]> - List of public training programs
    */
   getPublicPrograms(): Observable<TrainingProgram[]> {
     return this.http.get<TrainingProgram[]>(`${this.apiUrl}/public`);
@@ -116,8 +100,6 @@ export class TrainingProgramService {
   /**
    * Get all training programs for the current user.
    * Récupérer tous les programmes d'entraînement de l'utilisateur connecté.
-   * 
-   * @returns Observable<TrainingProgram[]> - List of user's training programs
    */
   getUserPrograms(): Observable<TrainingProgram[]> {
     return this.http.get<TrainingProgram[]>(`${this.apiUrl}/user`);
@@ -126,9 +108,6 @@ export class TrainingProgramService {
   /**
    * Get a training program by its ID.
    * Récupérer un programme d'entraînement par son ID.
-   * 
-   * @param id - Training program ID
-   * @returns Observable<TrainingProgram> - Training program details
    */
   getProgramById(id: number): Observable<TrainingProgram> {
     return this.http.get<TrainingProgram>(`${this.apiUrl}/${id}`);
@@ -137,10 +116,6 @@ export class TrainingProgramService {
   /**
    * Create a new training program.
    * Créer un nouveau programme d'entraînement.
-   * 
-   * @param program - The training program data
-   * @param userId - The ID of the user creating the program
-   * @returns Observable of the created training program
    */
   createProgram(program: CreateTrainingProgramRequest, userId: number): Observable<TrainingProgram> {
     const params = new HttpParams().set('userId', userId.toString());
@@ -150,10 +125,6 @@ export class TrainingProgramService {
   /**
    * Create a training program with simplified data.
    * Créer un programme d'entraînement avec des données simplifiées.
-   * 
-   * @param programData - Simplified program data
-   * @param userId - The ID of the user creating the program
-   * @returns Observable of the created training program
    */
   createTrainingProgram(programData: any, userId: number): Observable<TrainingProgram> {
     const params = new HttpParams().set('userId', userId.toString());
@@ -163,10 +134,6 @@ export class TrainingProgramService {
   /**
    * Update an existing training program.
    * Mettre à jour un programme d'entraînement existant.
-   * 
-   * @param id - Training program ID to update
-   * @param program - Updated training program data
-   * @returns Observable<TrainingProgram> - Updated training program
    */
   updateProgram(id: number, program: UpdateTrainingProgramRequest): Observable<TrainingProgram> {
     return this.http.put<TrainingProgram>(`${this.apiUrl}/${id}`, program);
@@ -175,15 +142,15 @@ export class TrainingProgramService {
   /**
    * Delete a training program.
    * Supprimer un programme d'entraînement.
-   * 
-   * @param id - Training program ID to delete
-   * @returns Observable<void> - Success response
    */
   deleteProgram(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  // Rechercher des programmes
+  /**
+   * Search training programs.
+   * Rechercher des programmes d'entraînement.
+   */
   searchPrograms(
     name?: string,
     difficultyLevel?: string,
@@ -202,12 +169,18 @@ export class TrainingProgramService {
     return this.http.get<TrainingProgram[]>(`${this.apiUrl}/search`, { params });
   }
 
-  // Récupérer les programmes par difficulté
+  /**
+   * Get programs by difficulty level.
+   * Récupérer les programmes par niveau de difficulté.
+   */
   getProgramsByDifficulty(difficulty: string): Observable<TrainingProgram[]> {
     return this.http.get<TrainingProgram[]>(`${this.apiUrl}/difficulty/${difficulty}`);
   }
 
-  // Récupérer les programmes par catégorie
+  /**
+   * Get programs by category.
+   * Récupérer les programmes par catégorie.
+   */
   getProgramsByCategory(category: string): Observable<TrainingProgram[]> {
     return this.http.get<TrainingProgram[]>(`${this.apiUrl}/category/${category}`);
   }
@@ -215,9 +188,6 @@ export class TrainingProgramService {
   /**
    * Add a training program to the current user's programs.
    * Ajouter un programme d'entraînement aux programmes de l'utilisateur connecté.
-   * 
-   * @param programId - The training program ID to add
-   * @returns Observable<any> - Success response
    */
   addProgramToUser(programId: number): Observable<any> {
     const currentUser = this.authService.getCurrentUser();

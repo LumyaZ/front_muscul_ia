@@ -4,11 +4,8 @@ import { Router } from '@angular/router';
 import { AuthService, LoginRequest, RegisterRequest } from './auth.service';
 import { User } from '../models/user.model';
 import { CreateUserWithProfileRequest } from '../models/user-profile.model';
+import { environment } from '../../environments/environment';
 
-/**
- * Tests for authentication service.
- * Tests pour le service d'authentification.
- */
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
@@ -29,7 +26,6 @@ describe('AuthService', () => {
     httpMock = TestBed.inject(HttpTestingController);
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
-    // Clear localStorage before each test
     localStorage.clear();
   });
 
@@ -38,10 +34,10 @@ describe('AuthService', () => {
     localStorage.clear();
   });
 
-  /**
-   * Test successful login.
-   * Test de connexion réussie.
-   */
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
   describe('login', () => {
     it('should login user and save auth data', () => {
       const loginRequest: LoginRequest = {
@@ -56,7 +52,7 @@ describe('AuthService', () => {
 
       service.login(loginRequest).subscribe();
 
-      const req = httpMock.expectOne('http://localhost:8080/api/auth/login');
+      const req = httpMock.expectOne(`${environment.apiUrl}/auth/login`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(loginRequest);
 
@@ -68,10 +64,6 @@ describe('AuthService', () => {
     });
   });
 
-  /**
-   * Test successful signup.
-   * Test d'inscription réussie.
-   */
   describe('signup', () => {
     it('should register user and save auth data', () => {
       const signupRequest: RegisterRequest = {
@@ -87,7 +79,7 @@ describe('AuthService', () => {
 
       service.signup(signupRequest).subscribe();
 
-      const req = httpMock.expectOne('http://localhost:8080/api/auth/register');
+      const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(signupRequest);
 
@@ -99,10 +91,6 @@ describe('AuthService', () => {
     });
   });
 
-  /**
-   * Test create user with profile.
-   * Test de création d'utilisateur avec profil.
-   */
   describe('createUserWithProfile', () => {
     it('should create user with profile', () => {
       const request: CreateUserWithProfileRequest = {
@@ -129,7 +117,7 @@ describe('AuthService', () => {
         expect(response).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne('http://localhost:8080/api/auth/create-user-with-profile');
+      const req = httpMock.expectOne(`${environment.apiUrl}/auth/create-user-with-profile`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(request);
 
@@ -137,10 +125,6 @@ describe('AuthService', () => {
     });
   });
 
-  /**
-   * Test get current user.
-   * Test de récupération de l'utilisateur actuel.
-   */
   describe('getCurrentUser', () => {
     it('should return current user from localStorage', () => {
       const mockUser: User = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
@@ -156,10 +140,6 @@ describe('AuthService', () => {
     });
   });
 
-  /**
-   * Test get token.
-   * Test de récupération du token.
-   */
   describe('getToken', () => {
     it('should return token from localStorage', () => {
       const token = 'jwt.token.here';
@@ -175,10 +155,6 @@ describe('AuthService', () => {
     });
   });
 
-  /**
-   * Test authentication check.
-   * Test de vérification d'authentification.
-   */
   describe('isAuthenticated', () => {
     it('should return true when token exists', () => {
       localStorage.setItem('auth_token', 'jwt.token.here');
@@ -193,10 +169,6 @@ describe('AuthService', () => {
     });
   });
 
-  /**
-   * Test logout.
-   * Test de déconnexion.
-   */
   describe('logout', () => {
     it('should clear localStorage and navigate to login', () => {
       localStorage.setItem('auth_token', 'jwt.token.here');

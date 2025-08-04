@@ -6,6 +6,31 @@ import { environment } from '../../environments/environment';
 describe('UserTrainingProgramService', () => {
   let service: UserTrainingProgramService;
   let httpMock: HttpTestingController;
+  const apiUrl = `${environment.apiUrl}/user-training-programs`;
+
+  const mockUserTrainingProgram: UserTrainingProgram = {
+    id: 1,
+    user: { id: 1, email: 'test@test.com' },
+    trainingProgram: { id: 1, name: 'Program 1' },
+    startedAt: '2024-01-01',
+    status: 'IN_PROGRESS',
+    currentWeek: 1,
+    currentSession: 1,
+    isFavorite: true,
+    createdAt: '2024-01-01'
+  };
+
+  const mockNewSubscription: UserTrainingProgram = {
+    id: 1,
+    user: { id: 1, email: 'test@test.com' },
+    trainingProgram: { id: 1, name: 'Program 1' },
+    startedAt: '2024-01-01',
+    status: 'NOT_STARTED',
+    currentWeek: 1,
+    currentSession: 1,
+    isFavorite: false,
+    createdAt: '2024-01-01'
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -24,87 +49,83 @@ describe('UserTrainingProgramService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should get user programs', () => {
-    const userId = 1;
-    const mockPrograms: UserTrainingProgram[] = [
-      {
-        id: 1,
-        user: { id: 1, email: 'test@test.com' },
-        trainingProgram: { id: 1, name: 'Program 1' },
-        startedAt: '2024-01-01',
-        status: 'IN_PROGRESS',
-        currentWeek: 1,
-        currentSession: 1,
-        isFavorite: true,
-        createdAt: '2024-01-01'
-      }
-    ];
+  describe('getUserPrograms', () => {
+    it('should get user programs successfully', () => {
+      const userId = 1;
+      const mockPrograms: UserTrainingProgram[] = [mockUserTrainingProgram];
 
-    service.getUserPrograms(userId).subscribe(programs => {
-      expect(programs).toEqual(mockPrograms);
+      service.getUserPrograms(userId).subscribe(programs => {
+        expect(programs).toEqual(mockPrograms);
+        expect(programs.length).toBe(1);
+        expect(programs[0].id).toBe(1);
+        expect(programs[0].status).toBe('IN_PROGRESS');
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/user/${userId}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockPrograms);
     });
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/user-training-programs/user/${userId}`);
-    expect(req.request.method).toBe('GET');
-    req.flush(mockPrograms);
   });
 
-  it('should subscribe user to program', () => {
-    const userId = 1;
-    const trainingProgramId = 1;
-    const mockResponse: UserTrainingProgram = {
-      id: 1,
-      user: { id: 1, email: 'test@test.com' },
-      trainingProgram: { id: 1, name: 'Program 1' },
-      startedAt: '2024-01-01',
-      status: 'NOT_STARTED',
-      currentWeek: 1,
-      currentSession: 1,
-      isFavorite: false,
-      createdAt: '2024-01-01'
-    };
+  describe('subscribeUserToProgram', () => {
+    it('should subscribe user to program successfully', () => {
+      const userId = 1;
+      const trainingProgramId = 1;
 
-    service.subscribeUserToProgram(userId, trainingProgramId).subscribe(response => {
-      expect(response).toEqual(mockResponse);
+      service.subscribeUserToProgram(userId, trainingProgramId).subscribe(response => {
+        expect(response).toEqual(mockNewSubscription);
+        expect(response.status).toBe('NOT_STARTED');
+        expect(response.isFavorite).toBe(false);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/subscribe?userId=${userId}&trainingProgramId=${trainingProgramId}`);
+      expect(req.request.method).toBe('POST');
+      req.flush(mockNewSubscription);
     });
-
-    const req = httpMock.expectOne(`${environment.apiUrl}/user-training-programs/subscribe?userId=${userId}&trainingProgramId=${trainingProgramId}`);
-    expect(req.request.method).toBe('POST');
-    req.flush(mockResponse);
   });
 
-  it('should unsubscribe user from program', () => {
-    const userId = 1;
-    const trainingProgramId = 1;
+  describe('unsubscribeUserFromProgram', () => {
+    it('should unsubscribe user from program successfully', () => {
+      const userId = 1;
+      const trainingProgramId = 1;
 
-    service.unsubscribeUserFromProgram(userId, trainingProgramId).subscribe();
+      service.unsubscribeUserFromProgram(userId, trainingProgramId).subscribe(response => {
+        expect(response).toBeNull();
+      });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/user-training-programs/unsubscribe?userId=${userId}&trainingProgramId=${trainingProgramId}`);
-    expect(req.request.method).toBe('DELETE');
-    req.flush(null);
+      const req = httpMock.expectOne(`${apiUrl}/unsubscribe?userId=${userId}&trainingProgramId=${trainingProgramId}`);
+      expect(req.request.method).toBe('DELETE');
+      req.flush(null);
+    });
   });
 
-  it('should get user program', () => {
-    const userId = 1;
-    const trainingProgramId = 1;
-    const mockResponse: UserTrainingProgram = {
-      id: 1,
-      user: { id: 1, email: 'test@test.com' },
-      trainingProgram: { id: 1, name: 'Program 1' },
-      startedAt: '2024-01-01',
-      status: 'IN_PROGRESS',
-      currentWeek: 1,
-      currentSession: 1,
-      isFavorite: true,
-      createdAt: '2024-01-01'
-    };
+  describe('getUserProgram', () => {
+    it('should get user program successfully', () => {
+      const userId = 1;
+      const trainingProgramId = 1;
 
-    service.getUserProgram(userId, trainingProgramId).subscribe(response => {
-      expect(response).toEqual(mockResponse);
+      service.getUserProgram(userId, trainingProgramId).subscribe(response => {
+        expect(response).toEqual(mockUserTrainingProgram);
+        expect(response?.status).toBe('IN_PROGRESS');
+        expect(response?.isFavorite).toBe(true);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/user/${userId}/program/${trainingProgramId}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(mockUserTrainingProgram);
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/user-training-programs/user/${userId}/program/${trainingProgramId}`);
-    expect(req.request.method).toBe('GET');
-    req.flush(mockResponse);
+    it('should return null when user is not subscribed to program', () => {
+      const userId = 1;
+      const trainingProgramId = 999;
+
+      service.getUserProgram(userId, trainingProgramId).subscribe(response => {
+        expect(response).toBeNull();
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/user/${userId}/program/${trainingProgramId}`);
+      expect(req.request.method).toBe('GET');
+      req.flush(null);
+    });
   });
 }); 

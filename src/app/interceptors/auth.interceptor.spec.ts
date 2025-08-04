@@ -1,7 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpRequest, HttpEvent, HttpResponse } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { HttpRequest, HttpEvent, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
 import { authInterceptor } from './auth.interceptor';
+import { STORAGE_KEYS, HTTP_STATUS } from '../constants/storage.constants';
+
+/**
+ * Test constants.
+ * Constantes de test.
+ */
+const TEST_TOKEN = 'jwt.token.here';
 
 /**
  * Tests for authentication interceptor.
@@ -9,7 +16,6 @@ import { authInterceptor } from './auth.interceptor';
  */
 describe('authInterceptor', () => {
   beforeEach(() => {
-    // Clear localStorage before each test
     localStorage.clear();
   });
 
@@ -22,13 +28,12 @@ describe('authInterceptor', () => {
    * Test d'ajout du header d'autorisation quand le token existe.
    */
   it('should add Authorization header when token exists', () => {
-    const token = 'jwt.token.here';
-    localStorage.setItem('auth_token', token);
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, TEST_TOKEN);
 
     const request = new HttpRequest('GET', '/api/test');
     const next = (req: HttpRequest<any>): Observable<HttpEvent<any>> => {
       expect(req.headers.has('Authorization')).toBe(true);
-      expect(req.headers.get('Authorization')).toBe(`Bearer ${token}`);
+      expect(req.headers.get('Authorization')).toBe(`Bearer ${TEST_TOKEN}`);
       return of(new HttpResponse({ status: 200 }));
     };
 
@@ -50,63 +55,48 @@ describe('authInterceptor', () => {
   });
 
   /**
-   * Test handling GET method with authorization header.
-   * Test de gestion de la méthode GET avec header d'autorisation.
+   * Test clearing localStorage on authentication errors (401/403).
+   * Test de nettoyage du localStorage sur les erreurs d'authentification (401/403).
    */
-  it('should handle GET method with authorization header', () => {
-    const token = 'jwt.token.here';
-    localStorage.setItem('auth_token', token);
+  it('should clear localStorage on authentication errors', () => {
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, TEST_TOKEN);
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, '{"id": 1, "email": "test@test.com"}');
 
-    const request = new HttpRequest('GET', '/api/test');
-    const next = (req: HttpRequest<any>): Observable<HttpEvent<any>> => {
-      expect(req.headers.has('Authorization')).toBe(true);
-      expect(req.headers.get('Authorization')).toBe(`Bearer ${token}`);
-      return of(new HttpResponse({ status: 200 }));
-    };
-    
-    authInterceptor(request, next).subscribe();
-  });
+    const errorStatuses = [HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN];
 
-  /**
-   * Test handling requests to different URLs.
-   * Test de gestion des requêtes vers différentes URLs.
-   */
-  it('should handle requests to different URLs', () => {
-    const token = 'jwt.token.here';
-    localStorage.setItem('auth_token', token);
-
-    const urls = [
-      '/api/auth/login',
-      '/api/auth/register',
-      '/api/user/profile',
-      '/api/training-info'
-    ];
-
-    urls.forEach(url => {
-      const request = new HttpRequest('GET', url);
+    errorStatuses.forEach(status => {
+      const request = new HttpRequest('GET', '/api/test');
       const next = (req: HttpRequest<any>): Observable<HttpEvent<any>> => {
-        expect(req.headers.has('Authorization')).toBe(true);
-        return of(new HttpResponse({ status: 200 }));
+        return throwError(() => new HttpErrorResponse({ status }));
       };
-      
-      authInterceptor(request, next).subscribe();
+
+      authInterceptor(request, next).subscribe({
+        error: () => {
+          expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
+          expect(localStorage.getItem(STORAGE_KEYS.CURRENT_USER)).toBeNull();
+        }
+      });
     });
   });
 
   /**
-   * Test token format in Authorization header.
-   * Test du format du token dans le header d'autorisation.
+   * Test not clearing localStorage on other errors.
+   * Test de non-nettoyage du localStorage sur d'autres erreurs.
    */
-  it('should format token correctly in Authorization header', () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
-    localStorage.setItem('auth_token', token);
+  it('should not clear localStorage on other errors', () => {
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, TEST_TOKEN);
+    localStorage.setItem(STORAGE_KEYS.CURRENT_USER, '{"id": 1, "email": "test@test.com"}');
 
     const request = new HttpRequest('GET', '/api/test');
     const next = (req: HttpRequest<any>): Observable<HttpEvent<any>> => {
-      expect(req.headers.get('Authorization')).toBe(`Bearer ${token}`);
-      return of(new HttpResponse({ status: 200 }));
+      return throwError(() => new HttpErrorResponse({ status: HTTP_STATUS.INTERNAL_SERVER_ERROR }));
     };
 
-    authInterceptor(request, next).subscribe();
+    authInterceptor(request, next).subscribe({
+      error: () => {
+        expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBe(TEST_TOKEN);
+        expect(localStorage.getItem(STORAGE_KEYS.CURRENT_USER)).toBe('{"id": 1, "email": "test@test.com"}');
+      }
+    });
   });
 }); 

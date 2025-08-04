@@ -3,6 +3,10 @@ import { HttpClient } from "@angular/common/http";
 import { Observable, tap, catchError } from "rxjs";
 import { environment } from "../../environments/environment";
 
+/**
+ * Interface representing a training exercise.
+ * Interface représentant un exercice d'entraînement.
+ */
 export interface TrainingExercise {
   id: number;
   exerciseName: string;
@@ -18,6 +22,10 @@ export interface TrainingExercise {
   completedSets: boolean[];
 }
 
+/**
+ * Interface representing a training session.
+ * Interface représentant une session d'entraînement.
+ */
 export interface TrainingSession {
   id?: number;
   userId: number;
@@ -31,7 +39,10 @@ export interface TrainingSession {
   title?: string;
 }
 
-// Interface pour correspondre au DTO CreateTrainingSessionRequest du backend
+/**
+ * Interface for creating a training session request.
+ * Interface pour la requête de création d'une session d'entraînement.
+ */
 export interface CreateTrainingSessionRequest {
   name: string;
   description?: string;
@@ -41,7 +52,10 @@ export interface CreateTrainingSessionRequest {
   trainingProgramId?: number;
 }
 
-// Interface pour la réponse du backend
+/**
+ * Interface for training session DTO from backend.
+ * Interface pour le DTO de session d'entraînement du backend.
+ */
 export interface TrainingSessionDto {
   id: number;
   userId: number;
@@ -55,227 +69,192 @@ export interface TrainingSessionDto {
   updatedAt: string;
 }
 
+/**
+ * Service for managing training sessions.
+ * Service pour la gestion des sessions d'entraînement.
+ */
 @Injectable({
   providedIn: "root"
 })
 export class TrainingSessionService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.apiUrl}/training-sessions`;
+  private readonly apiUrl = `${environment.apiUrl}/training-sessions`;
 
   /**
-   * Create a new training session
+   * Create a new training session.
+   * Créer une nouvelle session d'entraînement.
    */
   createTrainingSession(request: CreateTrainingSessionRequest): Observable<TrainingSessionDto> {
-    console.log('=== TRAINING SESSION SERVICE: CREATE ===');
-    console.log('Request data:', request);
-    console.log('API URL:', this.apiUrl);
-    
     return this.http.post<TrainingSessionDto>(this.apiUrl, request).pipe(
       tap(response => {
-        console.log('Training session created successfully:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error creating training session:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Get training session by ID
+   * Get training session by ID.
+   * Obtenir une session d'entraînement par ID.
    */
   getTrainingSession(sessionId: number): Observable<TrainingSessionDto> {
-    console.log('=== TRAINING SESSION SERVICE: GET BY ID ===');
-    console.log('Session ID:', sessionId);
-    
     return this.http.get<TrainingSessionDto>(`${this.apiUrl}/${sessionId}`).pipe(
       tap(response => {
-        console.log('Training session retrieved:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error getting training session:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Update training session
+   * Update training session.
+   * Mettre à jour une session d'entraînement.
    */
   updateTrainingSession(sessionId: number, request: CreateTrainingSessionRequest): Observable<TrainingSessionDto> {
-    console.log('=== TRAINING SESSION SERVICE: UPDATE ===');
-    console.log('Session ID:', sessionId);
-    console.log('Request data:', request);
-    
     return this.http.put<TrainingSessionDto>(`${this.apiUrl}/${sessionId}`, request).pipe(
       tap(response => {
-        console.log('Training session updated successfully:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error updating training session:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Get all training sessions for the current user
+   * Get all training sessions for the current user.
+   * Obtenir toutes les sessions d'entraînement de l'utilisateur actuel.
    */
   getUserTrainingSessions(): Observable<TrainingSessionDto[]> {
-    console.log('=== TRAINING SESSION SERVICE: GET USER SESSIONS ===');
-    console.log('API URL:', this.apiUrl);
-    
     return this.http.get<TrainingSessionDto[]>(this.apiUrl).pipe(
       tap(response => {
-        console.log('User training sessions retrieved:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error getting user training sessions:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Get training sessions for a specific user with pagination
+   * Get training sessions for a specific user with pagination.
+   * Obtenir les sessions d'entraînement d'un utilisateur spécifique avec pagination.
    */
   getUserTrainingSessionsWithPagination(userId: number, page: number = 0, size: number = 10): Observable<any> {
-    console.log('=== TRAINING SESSION SERVICE: GET USER SESSIONS WITH PAGINATION ===');
-    console.log('User ID:', userId);
-    console.log('Page:', page);
-    console.log('Size:', size);
-    
     return this.http.get<any>(`${this.apiUrl}/user/${userId}?page=${page}&size=${size}`).pipe(
       tap(response => {
-        console.log('User training sessions with pagination retrieved:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error getting user training sessions with pagination:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Get training sessions by date range
+   * Get training sessions by date range.
+   * Obtenir les sessions d'entraînement par plage de dates.
    */
   getTrainingSessionsByDateRange(startDate: string, endDate: string): Observable<TrainingSessionDto[]> {
-    console.log('=== TRAINING SESSION SERVICE: GET BY DATE RANGE ===');
-    console.log('Start date:', startDate);
-    console.log('End date:', endDate);
-    
     return this.http.get<TrainingSessionDto[]>(`${this.apiUrl}/date-range?startDate=${startDate}&endDate=${endDate}`).pipe(
       tap(response => {
-        console.log('Training sessions by date range retrieved:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error getting training sessions by date range:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Get training sessions by type
+   * Get training sessions by type.
+   * Obtenir les sessions d'entraînement par type.
    */
   getTrainingSessionsByType(sessionType: string): Observable<TrainingSessionDto[]> {
-    console.log('=== TRAINING SESSION SERVICE: GET BY TYPE ===');
-    console.log('Session type:', sessionType);
-    
     return this.http.get<TrainingSessionDto[]>(`${this.apiUrl}/type/${sessionType}`).pipe(
       tap(response => {
-        console.log('Training sessions by type retrieved:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error getting training sessions by type:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Get training sessions by program
+   * Get training sessions by program.
+   * Obtenir les sessions d'entraînement par programme.
    */
   getTrainingSessionsByProgram(trainingProgramId: number): Observable<TrainingSessionDto[]> {
-    console.log('=== TRAINING SESSION SERVICE: GET BY PROGRAM ===');
-    console.log('Training program ID:', trainingProgramId);
-    
     return this.http.get<TrainingSessionDto[]>(`${this.apiUrl}/program/${trainingProgramId}`).pipe(
       tap(response => {
-        console.log('Training sessions by program retrieved:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error getting training sessions by program:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Search training sessions by name
+   * Search training sessions by name.
+   * Rechercher des sessions d'entraînement par nom.
    */
   searchTrainingSessionsByName(name: string): Observable<TrainingSessionDto[]> {
-    console.log('=== TRAINING SESSION SERVICE: SEARCH BY NAME ===');
-    console.log('Search name:', name);
-    
     return this.http.get<TrainingSessionDto[]>(`${this.apiUrl}/search?name=${name}`).pipe(
       tap(response => {
-        console.log('Training sessions search results:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error searching training sessions:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Get most recent training session
+   * Get most recent training session.
+   * Obtenir la session d'entraînement la plus récente.
    */
   getMostRecentTrainingSession(): Observable<TrainingSessionDto> {
-    console.log('=== TRAINING SESSION SERVICE: GET MOST RECENT ===');
-    
     return this.http.get<TrainingSessionDto>(`${this.apiUrl}/recent`).pipe(
       tap(response => {
-        console.log('Most recent training session retrieved:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error getting most recent training session:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Get training sessions count
+   * Get training sessions count.
+   * Obtenir le nombre total de sessions d'entraînement.
    */
   getTrainingSessionsCount(): Observable<number> {
-    console.log('=== TRAINING SESSION SERVICE: GET COUNT ===');
-    
     return this.http.get<number>(`${this.apiUrl}/count`).pipe(
       tap(response => {
-        console.log('Training sessions count retrieved:', response);
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error getting training sessions count:', error);
         throw error;
       })
     );
   }
 
   /**
-   * Delete training session
+   * Delete training session.
+   * Supprimer une session d'entraînement.
    */
   deleteTrainingSession(sessionId: number): Observable<void> {
-    console.log('=== TRAINING SESSION SERVICE: DELETE ===');
-    console.log('Session ID to delete:', sessionId);
-    
     return this.http.delete<void>(`${this.apiUrl}/${sessionId}`).pipe(
       tap(() => {
-        console.log('Training session deleted successfully');
+        // Success callback
       }),
       catchError(error => {
-        console.error('Error deleting training session:', error);
         throw error;
       })
     );

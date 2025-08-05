@@ -123,7 +123,7 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
       const matchesAudience = !this.selectedAudience || 
         program.targetAudience === this.selectedAudience;
       
-      const matchesVisibility = !this.showOnlyPublic || program.isPublic;
+      const matchesVisibility = true; // Tous les programmes sont visibles maintenant
 
       return matchesSearch && matchesDifficulty && matchesAudience && matchesVisibility;
     });

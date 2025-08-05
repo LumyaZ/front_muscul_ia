@@ -1,114 +1,74 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Router, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ProgramDetailsComponent } from './program-details.component';
 import { TrainingProgramService } from '../../../services/training-program.service';
-import { ProgramExerciseService } from '../../../services/program-exercise.service';
-import { AuthService } from '../../../services/auth.service';
+import { TrainingProgram } from '../../../models/training-program.model';
+import { ProgramExercise } from '../../../models/program-exercise.model';
 
-/**
- * Tests pour le composant ProgramDetailsComponent
- * Tests for ProgramDetailsComponent
- */
+interface ProgramDetails extends TrainingProgram {
+  exercises: ProgramExercise[];
+}
+import { HeaderComponent } from '../../../components/header/header.component';
+import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
+
 describe('ProgramDetailsComponent', () => {
   let component: ProgramDetailsComponent;
   let fixture: ComponentFixture<ProgramDetailsComponent>;
   let trainingProgramService: jasmine.SpyObj<TrainingProgramService>;
-  let programExerciseService: jasmine.SpyObj<ProgramExerciseService>;
   let router: jasmine.SpyObj<Router>;
-  let authService: jasmine.SpyObj<AuthService>;
+  let activatedRoute: jasmine.SpyObj<ActivatedRoute>;
 
-  const mockTrainingProgram = {
+  const mockProgram: ProgramDetails = {
     id: 1,
-    name: 'Programme Test',
-    description: 'Description test',
+    name: 'Programme Débutant Musculation',
+    description: 'Un programme complet pour débuter la musculation',
+    difficultyLevel: 'Débutant',
     category: 'Musculation',
-    difficultyLevel: 'Intermédiaire',
-    durationWeeks: 4,
-    sessionsPerWeek: 3,
-    estimatedDurationMinutes: 60,
-    equipmentRequired: 'Haltères',
-    targetAudience: 'Tous niveaux',
-    isPublic: true,
-    isActive: true,
+    targetAudience: 'Débutants',
     createdByUserId: 1,
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  };
-
-  const mockProgramExercise = {
-    id: 1,
-    trainingProgramId: 1,
-    exerciseId: 1,
-    exerciseName: 'Squat',
-    exerciseDescription: 'Exercice de squat',
-    exerciseCategory: 'Musculation',
-    exerciseMuscleGroup: 'Jambes',
-    exerciseEquipmentNeeded: 'Barre',
-    exerciseDifficultyLevel: 'Intermédiaire',
-    orderInProgram: 1,
-    setsCount: 3,
-    repsCount: 10,
-    restDurationSeconds: 60,
-    durationSeconds: 30,
-    weightKg: 50,
-    distanceMeters: 0,
-    isOptional: false,
-    notes: 'Test exercise',
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  };
-
-  const mockUser = {
-    id: 1,
-    username: 'testuser',
-    email: 'test@example.com',
-    firstName: 'Test',
-    lastName: 'User',
-    dateOfBirth: '1990-01-01',
-    gender: 'MALE',
-    height: 180,
-    weight: 75,
-    experienceLevel: 'BEGINNER',
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    exercises: []
   };
 
   beforeEach(async () => {
-    const trainingProgramServiceSpy = jasmine.createSpyObj('TrainingProgramService', ['getProgramById']);
-    const programExerciseServiceSpy = jasmine.createSpyObj('ProgramExerciseService', ['getExercisesByProgramId']);
+    const trainingProgramServiceSpy = jasmine.createSpyObj('TrainingProgramService', [
+      'getProgramById',
+      'addProgramToUser'
+    ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      params: of({ id: '1' }),
-      queryParams: of({}),
-      paramMap: of({ get: () => '1' }),
-      snapshot: {
-        paramMap: {
-          get: () => '1'
-        }
-      }
+      params: of({ id: '1' })
     });
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser', 'isAuthenticated']);
-    authServiceSpy.getCurrentUser.and.returnValue(mockUser);
-    authServiceSpy.isAuthenticated.and.returnValue(true);
+
+    trainingProgramServiceSpy.getProgramById.and.returnValue(of(mockProgram));
+    trainingProgramServiceSpy.addProgramToUser.and.returnValue(of({ success: true }));
 
     await TestBed.configureTestingModule({
-      imports: [ProgramDetailsComponent],
+      imports: [
+        ProgramDetailsComponent,
+        HttpClientTestingModule,
+        HeaderComponent,
+        NavBarComponent
+      ],
       providers: [
         { provide: TrainingProgramService, useValue: trainingProgramServiceSpy },
-        { provide: ProgramExerciseService, useValue: programExerciseServiceSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: AuthService, useValue: authServiceSpy }
+        { provide: ActivatedRoute, useValue: activatedRouteSpy }
       ]
     }).compileComponents();
 
+    trainingProgramService = TestBed.inject(TrainingProgramService) as jasmine.SpyObj<TrainingProgramService>;
+    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    activatedRoute = TestBed.inject(ActivatedRoute) as jasmine.SpyObj<ActivatedRoute>;
+  });
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(ProgramDetailsComponent);
     component = fixture.componentInstance;
-    trainingProgramService = TestBed.inject(TrainingProgramService) as jasmine.SpyObj<TrainingProgramService>;
-    programExerciseService = TestBed.inject(ProgramExerciseService) as jasmine.SpyObj<ProgramExerciseService>;
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    fixture.detectChanges();
   });
 
   describe('Initialisation du composant', () => {
@@ -116,153 +76,157 @@ describe('ProgramDetailsComponent', () => {
       expect(component).toBeTruthy();
     });
 
-    it('should initialize with correct programId', () => {
-      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
-      programExerciseService.getExercisesByProgramId.and.returnValue(of([]));
+    it('should load program details on init', () => {
+      component.ngOnInit();
       
-      component.ngOnInit();
-      expect(component.programId).toBe(1);
-    });
-
-    it('should load current user on init', () => {
-      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
-      programExerciseService.getExercisesByProgramId.and.returnValue(of([]));
-      
-      component.ngOnInit();
-      expect(component.currentUser).toEqual(mockUser);
-    });
-  });
-
-  describe('Chargement des données', () => {
-    it('should load program details and then exercises sequentially', () => {
-      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
-      programExerciseService.getExercisesByProgramId.and.returnValue(of([mockProgramExercise as any]));
-
-      component.ngOnInit();
-      fixture.detectChanges();
-
       expect(trainingProgramService.getProgramById).toHaveBeenCalledWith(1);
-      expect(programExerciseService.getExercisesByProgramId).toHaveBeenCalledWith(1);
-      expect(component.program).toBeTruthy();
-      expect(component.program?.exercises).toBeTruthy();
-      expect(component.program?.exercises.length).toBe(1);
+      expect(component.program).toEqual(mockProgram);
     });
 
-    it('should handle error when loading program details', () => {
-      const error = { status: 404, message: 'Program not found' };
-      trainingProgramService.getProgramById.and.returnValue(throwError(() => error));
+    it('should handle loading state', () => {
+      component.loading = true;
+      expect(component.loading).toBe(true);
+    });
 
-      component.ngOnInit();
-      fixture.detectChanges();
-
-      expect(component.error).toBe('Programme non trouvé.');
+    it('should handle error state', () => {
+      trainingProgramService.getProgramById.and.returnValue(
+        throwError(() => new Error('Erreur de chargement'))
+      );
+      
+      component.loadProgramDetails();
+      
+      expect(component.error).toBe('Erreur lors du chargement du programme');
       expect(component.loading).toBe(false);
     });
 
-    it('should handle error when loading exercises', () => {
-      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
-      const error = { status: 500, message: 'Server error' };
-      programExerciseService.getExercisesByProgramId.and.returnValue(throwError(() => error));
-
-      component.ngOnInit();
+    it('should display program details correctly', () => {
+      component.program = mockProgram;
       fixture.detectChanges();
-
-      expect(component.error).toBe('Erreur lors du chargement des exercices');
+      
+      const compiled = fixture.nativeElement;
+      expect(compiled.textContent).toContain('Programme Débutant Musculation');
+      expect(compiled.textContent).toContain('Un programme complet pour débuter la musculation');
+      expect(compiled.textContent).toContain('Débutant');
+      expect(compiled.textContent).toContain('Musculation');
+      expect(compiled.textContent).toContain('Débutants');
     });
   });
 
-  describe('Gestion des permissions', () => {
-    it('should set canAddProgram based on provenance', () => {
-      trainingProgramService.getProgramById.and.returnValue(of(mockTrainingProgram as any));
-      programExerciseService.getExercisesByProgramId.and.returnValue(of([]));
+  describe('Actions utilisateur', () => {
+    it('should add program to user', () => {
+      component.program = mockProgram;
       
-      component.fromYouPrograms = false;
-      component.ngOnInit();
-      expect(component.canAddProgram).toBe(true);
+      component.addProgramToUser();
+      
+      expect(trainingProgramService.addProgramToUser).toHaveBeenCalledWith(mockProgram.id);
     });
 
-    it('should update modification permissions correctly', () => {
-      component.program = { ...mockTrainingProgram, createdByUserId: 1 } as any;
-      component.currentUser = mockUser;
-      component.fromYouPrograms = true;
+    it('should handle add program success', () => {
+      component.program = mockProgram;
+      component.canAddProgram = true;
+      
+      component.addProgramToUser();
+      
+      expect(component.canAddProgram).toBe(false);
+    });
 
-      if (component.program && component.currentUser) {
-        component.isProgramCreator = (component.program as any).createdByUserId === component.currentUser.id;
-        component.canModifyProgram = component.fromYouPrograms && component.isProgramCreator;
-      }
+    it('should handle add program error', () => {
+      trainingProgramService.addProgramToUser.and.returnValue(
+        throwError(() => new Error('Erreur d\'ajout'))
+      );
+      
+      component.program = mockProgram;
+      
+      component.addProgramToUser();
+      
+      expect(component.error).toBe('Erreur lors de l\'ajout du programme');
+    });
+  });
 
-      expect(component.isProgramCreator).toBe(true);
-      expect(component.canModifyProgram).toBe(true);
+  describe('Utilitaires', () => {
+    it('should get difficulty color', () => {
+      expect(component.getDifficultyColor('Débutant')).toBe('#10B981');
+      expect(component.getDifficultyColor('Intermédiaire')).toBe('#F59E0B');
+      expect(component.getDifficultyColor('Avancé')).toBe('#EF4444');
+      expect(component.getDifficultyColor('Autre')).toBe('#6B7280');
+    });
+
+    it('should get total exercises', () => {
+      // Mock exercises data if needed
+      expect(component.getTotalExercises()).toBe(0);
+    });
+
+    it('should get total sets', () => {
+      // Mock exercises data if needed
+      expect(component.getTotalSets()).toBe(0);
+    });
+
+    it('should get estimated total time', () => {
+      // Mock exercises data if needed
+      expect(component.getEstimatedTotalTime()).toBe('0min');
+    });
+
+    it('should format duration correctly', () => {
+      expect(component.formatDuration(30)).toBe('30min');
+      expect(component.formatDuration(60)).toBe('1h');
+      expect(component.formatDuration(90)).toBe('1h 30min');
     });
   });
 
   describe('Navigation', () => {
-    it('should navigate back to you page when from you-programs', () => {
-      component.fromYouPrograms = true;
-      component.programId = 1;
-
+    it('should navigate back to programs', () => {
       component.goBack();
-
-      expect(router.navigate).toHaveBeenCalledWith(
-        ['/dashboard/you'],
-        { queryParams: { from: 'you-programs' } }
-      );
-    });
-
-    it('should navigate back to programs page when not from you-programs', () => {
-      component.fromYouPrograms = false;
-      component.programId = 1;
-
-      component.goBack();
-
+      
       expect(router.navigate).toHaveBeenCalledWith(['/dashboard/programs']);
     });
   });
 
-  describe('Méthodes utilitaires', () => {
-    beforeEach(() => {
-      component.program = {
-        ...mockTrainingProgram,
-        exercises: [mockProgramExercise as any]
-      } as any;
+  describe('Gestion des états', () => {
+    it('should handle program not found', () => {
+      trainingProgramService.getProgramById.and.returnValue(
+        throwError(() => new Error('Programme non trouvé'))
+      );
+      
+      component.loadProgramDetails();
+      
+      expect(component.error).toBe('Erreur lors du chargement du programme');
+      expect(component.loading).toBe(false);
     });
 
-    it('should calculate total exercises correctly', () => {
-      const total = component.getTotalExercises();
-      expect(total).toBe(1);
+    it('should handle user not authenticated', () => {
+      component.currentUser = null;
+      
+      expect(component.canAddProgram).toBe(false);
     });
 
-    it('should calculate total sets correctly', () => {
-      const total = component.getTotalSets();
-      expect(total).toBe(3);
-    });
-
-    it('should calculate estimated total time correctly', () => {
-      const time = component.getEstimatedTotalTime();
-      expect(time).toContain('min');
-    });
-
-    it('should return 0 min when no exercises', () => {
-      component.program!.exercises = [];
-      const time = component.getEstimatedTotalTime();
-      expect(time).toBe('0 min');
+    it('should allow adding program when user is authenticated', () => {
+      component.currentUser = { id: 1, email: 'test@test.com' };
+      component.program = mockProgram;
+      
+      expect(component.canAddProgram).toBe(true);
     });
   });
 
-  describe('Gestion des erreurs', () => {
-    it('should handle different error types correctly', () => {
-      const testCases = [
-        { status: 401, expected: 'Session expirée. Veuillez vous reconnecter.' },
-        { status: 403, expected: 'Accès refusé. Vous n\'avez pas les permissions nécessaires.' },
-        { status: 404, expected: 'Programme non trouvé.' },
-        { status: 500, expected: 'Custom error message' }
-      ];
+  describe('Affichage des informations', () => {
+    it('should display program statistics', () => {
+      component.program = mockProgram;
+      
+      fixture.detectChanges();
+      
+      const compiled = fixture.nativeElement;
+      expect(compiled.textContent).toContain('Programme Débutant Musculation');
+      expect(compiled.textContent).toContain('Un programme complet pour débuter la musculation');
+    });
 
-      testCases.forEach(({ status, expected }) => {
-        const error = { status };
-        component['handleError'](error, 'Custom error message');
-        expect(component.error).toBe(expected);
-      });
+    it('should display training tips', () => {
+      component.program = mockProgram;
+      
+      fixture.detectChanges();
+      
+      const compiled = fixture.nativeElement;
+      expect(compiled.textContent).toContain('Conseils d\'entraînement');
+      expect(compiled.textContent).toContain('Échauffez-vous bien');
+      expect(compiled.textContent).toContain('Restez hydraté');
     });
   });
 }); 

@@ -79,6 +79,7 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
   loadUserPrograms(): void {
     this.isLoading = true;
     this.error = null;
+    this.success = null;
     
     if (!this.currentUser || !this.currentUser.id) {
       this.error = 'Erreur: Utilisateur non connecté';
@@ -92,6 +93,10 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
         next: (programs: UserTrainingProgram[]) => {
           this.userPrograms = programs;
           this.isLoading = false;
+          if (programs.length > 0) {
+            this.success = `${programs.length} programme(s) chargé(s) avec succès`;
+            setTimeout(() => this.success = '', 3000);
+          }
         },
         error: (err: any) => {
           this.handleError(err, 'Erreur lors du chargement des programmes');
@@ -199,7 +204,7 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
       case 'NOT_STARTED':
         return '#9E9E9E';
       default:
-        return '#9E9E9E';
+        return '#4CAF50'; // Par défaut, en cours
     }
   }
 
@@ -208,7 +213,7 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
    * Get status text
    */
   getStatusText(status: string): string {
-    return this.STATUS_CONFIG[status as keyof ProgramStatus] || 'Inconnu';
+    return this.STATUS_CONFIG[status as keyof ProgramStatus] || 'En cours';
   }
 
   /**

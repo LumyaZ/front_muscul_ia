@@ -62,8 +62,8 @@
               >
                 <div class="program-header">
                   <h3 class="program-name">{{ program.trainingProgramName || 'Programme sans nom' }}</h3>
-                  <div class="program-status" [class]="(program.isCompleted ? 'completed' : 'in-progress').toLowerCase()">
-                    {{ program.isCompleted ? 'Terminé' : 'En cours' }}
+                  <div class="program-status in-progress">
+                    En cours
                   </div>
                 </div>
                 
@@ -71,22 +71,22 @@
                   <p class="program-description">{{ program.trainingProgramDescription || 'Aucune description' }}</p>
                   <div class="program-info">
                     <span class="info-item">
-                      <i class="fas fa-calendar"></i>
-                      {{ program.trainingProgramDurationWeeks || 0 }} semaines
+                      <i class="fas fa-dumbbell"></i>
+                      {{ program.trainingProgramDifficultyLevel || 'Niveau non défini' }}
                     </span>
                     <span class="info-item">
-                      <i class="fas fa-clock"></i>
-                      {{ program.trainingProgramSessionsPerWeek || 0 }} sessions/semaine
+                      <i class="fas fa-tag"></i>
+                      {{ program.trainingProgramCategory || 'Catégorie non définie' }}
                     </span>
                   </div>
                 </div>
                 
-                <div class="program-progress" *ngIf="!program.isCompleted">
+                <div class="program-progress">
                   <div class="progress-container">
                     <div class="progress-bar">
                       <div class="progress-fill" [style.width.%]="getProgressPercentage(program)"></div>
                     </div>
-                    <span class="progress-text">Semaine {{ program.currentWeek || 0 }}/{{ program.trainingProgramDurationWeeks || 0 }}</span>
+                    <span class="progress-text">Progression non disponible</span>
                   </div>
                 </div>
 

@@ -168,12 +168,9 @@ export class SelectProgramComponent implements OnInit, OnDestroy {
    * Calculate progress percentage
    */
   getProgressPercentage(program: UserTrainingProgram): number {
-    if (program.isCompleted) return 100;
-    
-    const totalWeeks = program.trainingProgramDurationWeeks || 1;
-    const currentWeek = program.currentWeek || 0;
-    const percentage = Math.round((currentWeek / totalWeeks) * 100);
-    return Math.min(percentage, 100);
+    // Par défaut, on considère que le programme est en cours
+    // Default: consider program as in progress
+    return 0; // Pas de progression disponible dans le backend actuel
   }
 
   /**

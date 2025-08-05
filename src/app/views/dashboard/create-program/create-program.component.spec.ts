@@ -1,19 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Router, ActivatedRoute } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { CreateProgramComponent } from './create-program.component';
 import { TrainingProgramService } from '../../../services/training-program.service';
 import { AuthService } from '../../../services/auth.service';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
-import { ActivatedRoute } from '@angular/router';
 
-/**
- * Tests pour le composant CreateProgramComponent
- * Tests for CreateProgramComponent
- */
 describe('CreateProgramComponent', () => {
   let component: CreateProgramComponent;
   let fixture: ComponentFixture<CreateProgramComponent>;
@@ -26,14 +21,8 @@ describe('CreateProgramComponent', () => {
     name: 'Test Program',
     description: 'Test Description',
     difficultyLevel: 'Débutant',
-    durationWeeks: 4,
-    sessionsPerWeek: 3,
-    estimatedDurationMinutes: 60,
     category: 'Musculation',
     targetAudience: 'Tous niveaux',
-    equipmentRequired: 'Haltères',
-    isPublic: true,
-    isActive: true,
     createdByUserId: 1,
     createdAt: '2024-01-01',
     updatedAt: '2024-01-01'
@@ -99,10 +88,6 @@ describe('CreateProgramComponent', () => {
       expect(component.createProgramForm.get('category')?.value).toBe('Musculation');
       expect(component.createProgramForm.get('difficultyLevel')?.value).toBe('Débutant');
       expect(component.createProgramForm.get('targetAudience')?.value).toBe('Tous niveaux');
-      expect(component.createProgramForm.get('durationWeeks')?.value).toBe(4);
-      expect(component.createProgramForm.get('sessionsPerWeek')?.value).toBe(3);
-      expect(component.createProgramForm.get('estimatedDurationMinutes')?.value).toBe(60);
-      expect(component.createProgramForm.get('isPublic')?.value).toBe(true);
     });
 
     it('should create form with required controls', () => {
@@ -111,11 +96,6 @@ describe('CreateProgramComponent', () => {
       expect(component.createProgramForm.get('category')).toBeTruthy();
       expect(component.createProgramForm.get('difficultyLevel')).toBeTruthy();
       expect(component.createProgramForm.get('targetAudience')).toBeTruthy();
-      expect(component.createProgramForm.get('durationWeeks')).toBeTruthy();
-      expect(component.createProgramForm.get('sessionsPerWeek')).toBeTruthy();
-      expect(component.createProgramForm.get('estimatedDurationMinutes')).toBeTruthy();
-      expect(component.createProgramForm.get('equipmentRequired')).toBeTruthy();
-      expect(component.createProgramForm.get('isPublic')).toBeTruthy();
     });
 
     it('should validate required fields', () => {
@@ -128,12 +108,7 @@ describe('CreateProgramComponent', () => {
         description: 'Test Description',
         category: 'Musculation',
         difficultyLevel: 'Débutant',
-        targetAudience: 'Tous niveaux',
-        durationWeeks: 4,
-        sessionsPerWeek: 3,
-        estimatedDurationMinutes: 60,
-        equipmentRequired: 'Haltères',
-        isPublic: true
+        targetAudience: 'Tous niveaux'
       });
       
       expect(form.valid).toBeTruthy();
@@ -158,22 +133,17 @@ describe('CreateProgramComponent', () => {
         description: 'Test Description',
         category: 'Musculation',
         difficultyLevel: 'Débutant',
-        targetAudience: 'Tous niveaux',
-        durationWeeks: 4,
-        sessionsPerWeek: 3,
-        estimatedDurationMinutes: 60,
-        equipmentRequired: 'Haltères',
-        isPublic: true
+        targetAudience: 'Tous niveaux'
       });
 
       component.onSubmit();
 
-      expect(mockTrainingProgramService.createTrainingProgram).toHaveBeenCalled();
+      expect(mockTrainingProgramService.createProgram).toHaveBeenCalled();
       expect(component.loading).toBe(false);
     });
 
     it('should handle form submission error', () => {
-      mockTrainingProgramService.createTrainingProgram.and.returnValue(
+      mockTrainingProgramService.createProgram.and.returnValue(
         throwError(() => new Error('Erreur de création'))
       );
 
@@ -183,12 +153,7 @@ describe('CreateProgramComponent', () => {
         description: 'Test Description',
         category: 'Musculation',
         difficultyLevel: 'Débutant',
-        targetAudience: 'Tous niveaux',
-        durationWeeks: 4,
-        sessionsPerWeek: 3,
-        estimatedDurationMinutes: 60,
-        equipmentRequired: 'Haltères',
-        isPublic: true
+        targetAudience: 'Tous niveaux'
       });
 
       component.onSubmit();
@@ -235,68 +200,115 @@ describe('CreateProgramComponent', () => {
       expect(errorMessage).toBe('Le nom du programme est requis');
     });
 
-    it('should get error message for invalid duration', () => {
-      const durationControl = component.createProgramForm.get('durationWeeks');
-      durationControl?.markAsTouched();
-      durationControl?.setErrors({ min: { min: 1 } });
+    it('should get error message for minlength field', () => {
+      const nameControl = component.createProgramForm.get('name');
+      nameControl?.markAsTouched();
+      nameControl?.setErrors({ minlength: { requiredLength: 3 } });
       
-      const errorMessage = component.getErrorMessage('durationWeeks');
-      expect(errorMessage).toBe('La durée doit être d\'au moins 1 semaine(s)');
+      const errorMessage = component.getErrorMessage('name');
+      expect(errorMessage).toBe('Le nom doit contenir au moins 3 caractères');
     });
 
-    it('should format duration correctly', () => {
-      expect(component.formatDuration(60)).toBe('1h');
-      expect(component.formatDuration(90)).toBe('1h 30min');
-      expect(component.formatDuration(30)).toBe('30min');
-    });
-
-    it('should validate form when user is not authenticated', () => {
-      component.currentUser = null;
-      mockAuthService.getCurrentUser.and.returnValue(null);
-
-      const form = component.createProgramForm;
-      form.patchValue({
-        name: 'Test Program',
-        description: 'Test Description',
-        category: 'Musculation',
-        difficultyLevel: 'Débutant',
-        targetAudience: 'Tous niveaux',
-        durationWeeks: 4,
-        sessionsPerWeek: 3,
-        estimatedDurationMinutes: 60,
-        equipmentRequired: 'Haltères',
-        isPublic: true
-      });
-
-      component.onSubmit();
-
-      expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
-      expect(mockTrainingProgramService.createTrainingProgram).not.toHaveBeenCalled();
-    });
-
-    it('should display form sections correctly', () => {
-      fixture.detectChanges();
-      const compiled = fixture.nativeElement;
+    it('should get error message for maxlength field', () => {
+      const nameControl = component.createProgramForm.get('name');
+      nameControl?.markAsTouched();
+      nameControl?.setErrors({ maxlength: { requiredLength: 100 } });
       
-      expect(compiled.textContent).toContain('Informations de base');
-      expect(compiled.textContent).toContain('Niveau et public cible');
-      expect(compiled.textContent).toContain('Durée et fréquence');
-      expect(compiled.textContent).toContain('Équipement et visibilité');
+      const errorMessage = component.getErrorMessage('name');
+      expect(errorMessage).toBe('Le nom ne peut pas dépasser 100 caractères');
     });
 
-    it('should display all form fields', () => {
-      fixture.detectChanges();
-      const compiled = fixture.nativeElement;
+    it('should return empty string for untouched field', () => {
+      const nameControl = component.createProgramForm.get('name');
+      nameControl?.setErrors({ required: true });
       
-      expect(compiled.textContent).toContain('Nom du programme');
-      expect(compiled.textContent).toContain('Catégorie');
-      expect(compiled.textContent).toContain('Description');
-      expect(compiled.textContent).toContain('Niveau de difficulté');
-      expect(compiled.textContent).toContain('Public cible');
-      expect(compiled.textContent).toContain('Durée (semaines)');
-      expect(compiled.textContent).toContain('Sessions par semaine');
-      expect(compiled.textContent).toContain('Durée estimée par session (minutes)');
-      expect(compiled.textContent).toContain('Équipement requis');
+      const errorMessage = component.getErrorMessage('name');
+      expect(errorMessage).toBe('');
+    });
+
+    it('should return default error message for unknown error', () => {
+      const nameControl = component.createProgramForm.get('name');
+      nameControl?.markAsTouched();
+      nameControl?.setErrors({ unknown: true });
+      
+      const errorMessage = component.getErrorMessage('name');
+      expect(errorMessage).toBe('Valeur invalide');
+    });
+  });
+
+  describe('Navigation', () => {
+    it('should navigate to you/programs when fromYouPrograms is true', () => {
+      component.fromYouPrograms = true;
+      
+      component.goBackToPrograms();
+      
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/you'], { queryParams: { from: 'you-programs' } });
+    });
+
+    it('should navigate to programs when fromYouPrograms is false', () => {
+      component.fromYouPrograms = false;
+      
+      component.goBackToPrograms();
+      
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs']);
+    });
+  });
+
+  describe('Form validation', () => {
+    it('should validate name field', () => {
+      const nameControl = component.createProgramForm.get('name');
+      
+      nameControl?.setValue('');
+      expect(nameControl?.invalid).toBeTruthy();
+      
+      nameControl?.setValue('ab');
+      expect(nameControl?.invalid).toBeTruthy();
+      
+      nameControl?.setValue('Valid Name');
+      expect(nameControl?.valid).toBeTruthy();
+    });
+
+    it('should validate description field', () => {
+      const descriptionControl = component.createProgramForm.get('description');
+      
+      descriptionControl?.setValue('');
+      expect(descriptionControl?.invalid).toBeTruthy();
+      
+      descriptionControl?.setValue('Short');
+      expect(descriptionControl?.invalid).toBeTruthy();
+      
+      descriptionControl?.setValue('This is a valid description with enough characters');
+      expect(descriptionControl?.valid).toBeTruthy();
+    });
+
+    it('should validate category field', () => {
+      const categoryControl = component.createProgramForm.get('category');
+      
+      categoryControl?.setValue('');
+      expect(categoryControl?.invalid).toBeTruthy();
+      
+      categoryControl?.setValue('Musculation');
+      expect(categoryControl?.valid).toBeTruthy();
+    });
+
+    it('should validate difficultyLevel field', () => {
+      const difficultyControl = component.createProgramForm.get('difficultyLevel');
+      
+      difficultyControl?.setValue('');
+      expect(difficultyControl?.invalid).toBeTruthy();
+      
+      difficultyControl?.setValue('Débutant');
+      expect(difficultyControl?.valid).toBeTruthy();
+    });
+
+    it('should validate targetAudience field', () => {
+      const audienceControl = component.createProgramForm.get('targetAudience');
+      
+      audienceControl?.setValue('');
+      expect(audienceControl?.invalid).toBeTruthy();
+      
+      audienceControl?.setValue('Tous niveaux');
+      expect(audienceControl?.valid).toBeTruthy();
     });
   });
 }); 

@@ -75,6 +75,31 @@
     }
   }
 
+  .success-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #4CAF50;
+    text-align: center;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+
+    i {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1rem;
+      margin: 0;
+      font-weight: 600;
+    }
+  }
+
   .error-state {
     display: flex;
     flex-direction: column;

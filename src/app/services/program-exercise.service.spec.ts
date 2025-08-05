@@ -22,9 +22,7 @@ describe('ProgramExerciseService', () => {
     restDurationSeconds: 90,
     weightKg: 0,
     notes: 'Exercice de base',
-    isOptional: false,
-    createdAt: '2024-01-01T00:00:00',
-    updatedAt: '2024-01-01T00:00:00'
+    isOptional: false
   };
 
   beforeEach(() => {
@@ -97,14 +95,15 @@ describe('ProgramExerciseService', () => {
     it('should add exercise to program successfully', () => {
       const programId = 1;
       const exerciseData = {
+        trainingProgramId: 1,
         exerciseId: 1,
-        orderInProgram: 1,
         setsCount: 3,
         repsCount: 12,
-        durationSeconds: 60,
         restDurationSeconds: 90,
         weightKg: 0,
-        notes: 'Test exercise'
+        notes: 'Test exercise',
+        createdAt: '2024-01-01',
+        updatedAt: '2024-01-01'
       };
 
       service.addExerciseToProgram(programId, exerciseData).subscribe(exercise => {

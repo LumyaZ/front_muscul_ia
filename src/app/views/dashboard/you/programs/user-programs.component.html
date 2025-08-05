@@ -10,6 +10,11 @@
   </header>
 
   <div class="programs-content">
+    <div *ngIf="success" class="success-state" role="status" aria-live="polite">
+      <i class="fas fa-check-circle" aria-hidden="true"></i>
+      <p>{{ success }}</p>
+    </div>
+
     <div *ngIf="isLoading" class="loading-state" role="status" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
       <p>Chargement de vos programmes...</p>
@@ -43,35 +48,27 @@
       <article *ngFor="let userProgram of userPrograms; trackBy: trackByProgramId" 
                class="program-item" 
                role="listitem"
-               [attr.aria-label]="'Programme: ' + userProgram.trainingProgramName">
+               [attr.aria-label]="'Programme: ' + (userProgram.trainingProgramName || 'Programme sans nom')">
         <header class="program-header">
-          <h3>{{ userProgram.trainingProgramName }}</h3>
+          <h3>{{ userProgram.trainingProgramName || 'Programme sans nom' }}</h3>
           <div class="program-status" 
-               [style.background-color]="getStatusColor(userProgram.isCompleted ? 'COMPLETED' : 'IN_PROGRESS')"
-               [attr.aria-label]="'Statut: ' + (userProgram.isCompleted ? 'Terminé' : 'En cours')">
-            {{ userProgram.isCompleted ? 'Terminé' : 'En cours' }}
+               [style.background-color]="getStatusColor('IN_PROGRESS')"
+               [attr.aria-label]="'Statut: En cours'">
+            {{ getStatusText('IN_PROGRESS') }}
           </div>
         </header>
         
         <div class="program-details">
-          <p class="program-description">{{ userProgram.trainingProgramDescription }}</p>
+          <p class="program-description">{{ userProgram.trainingProgramDescription || 'Aucune description disponible' }}</p>
           
           <div class="program-info" role="group" aria-label="Informations du programme">
-            <div class="info-item">
+            <div class="info-item" *ngIf="userProgram.trainingProgramDifficultyLevel">
               <span class="label">Difficulté:</span>
               <span class="value">{{ userProgram.trainingProgramDifficultyLevel }}</span>
             </div>
-            <div class="info-item">
-              <span class="label">Durée:</span>
-              <span class="value">{{ userProgram.trainingProgramDurationWeeks }} semaines</span>
-            </div>
-            <div class="info-item">
-              <span class="label">Sessions/semaine:</span>
-              <span class="value">{{ userProgram.trainingProgramSessionsPerWeek }}</span>
-            </div>
-            <div class="info-item" *ngIf="!userProgram.isCompleted">
-              <span class="label">Progression:</span>
-              <span class="value">Semaine {{ userProgram.currentWeek }}, Jour {{ userProgram.currentDay }}</span>
+            <div class="info-item" *ngIf="userProgram.trainingProgramCategory">
+              <span class="label">Catégorie:</span>
+              <span class="value">{{ userProgram.trainingProgramCategory }}</span>
             </div>
           </div>
         </div>
@@ -79,12 +76,12 @@
         <div class="program-actions" role="group" aria-label="Actions pour le programme">
           <button class="action-btn view-btn" 
                   (click)="viewProgramDetails(userProgram.trainingProgramId)"
-                  [attr.aria-label]="'Voir les détails de ' + userProgram.trainingProgramName">
+                  [attr.aria-label]="'Voir les détails de ' + (userProgram.trainingProgramName || 'ce programme')">
             Voir les détails
           </button>
           <button class="action-btn unsubscribe-btn" 
                   (click)="unsubscribeFromProgram(userProgram.trainingProgramId)"
-                  [attr.aria-label]="'Se désabonner de ' + userProgram.trainingProgramName">
+                  [attr.aria-label]="'Se désabonner de ' + (userProgram.trainingProgramName || 'ce programme')">
             Se désabonner
           </button>
         </div>

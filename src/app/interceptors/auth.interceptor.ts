@@ -20,8 +20,17 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === HTTP_STATUS.UNAUTHORIZED || error.status === HTTP_STATUS.FORBIDDEN) {
-        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-        localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        if (error.error && typeof error.error === 'object' && error.error.message) {
+          console.warn(`Auth interceptor: Clearing localStorage due to ${error.status} error for URL: ${req.url}`, error.error.message);
+          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        } else if (error.status === HTTP_STATUS.UNAUTHORIZED) {
+          console.warn(`Auth interceptor: Clearing localStorage due to 401 UNAUTHORIZED for URL: ${req.url}`);
+          localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+          localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+        } else {
+          console.warn(`Auth interceptor: 403 FORBIDDEN error for URL: ${req.url} - not clearing localStorage yet`);
+        }
       }
       
       return throwError(() => error);

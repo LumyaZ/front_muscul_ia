@@ -19,29 +19,11 @@ interface CreateProgramForm {
   category: string;
   difficultyLevel: string;
   targetAudience: string;
-  durationWeeks: number;
-  sessionsPerWeek: number;
-  estimatedDurationMinutes: number;
-  equipmentRequired: string;
-  isPublic: boolean;
 }
 
 /**
  * Component for creating a new training program.
  * Composant pour créer un nouveau programme d'entraînement.
- * 
- * This component provides a comprehensive form interface for users to create
- * new training programs with all necessary parameters including name,
- * description, category, difficulty, target audience, and scheduling details.
- * 
- * Ce composant fournit une interface de formulaire complète pour que les utilisateurs
- * puissent créer de nouveaux programmes d'entraînement avec tous les paramètres
- * nécessaires incluant le nom, la description, la catégorie, la difficulté,
- * le public cible et les détails de planification.
- * 
- * @author Muscul IA Team
- * @version 1.0
- * @since 2024-01-01
  */
 @Component({
   selector: 'app-create-program',
@@ -58,65 +40,25 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
   private trainingProgramService = inject(TrainingProgramService);
   private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
-  
-  /**
-   * Form group for creating a new training program.
-   * Groupe de formulaire pour créer un nouveau programme d'entraînement.
-   */
+
   createProgramForm: FormGroup;
   
-  /**
-   * Current authenticated user.
-   * Utilisateur actuellement authentifié.
-   */
   currentUser: User | null = null;
   
-  /**
-   * Loading state indicator.
-   * Indicateur d'état de chargement.
-   */
   loading = false;
   
-  /**
-   * Error message to display if operation fails.
-   * Message d'erreur à afficher si l'opération échoue.
-   */
   error = '';
   
-  /**
-   * Success message to display after successful creation.
-   * Message de succès à afficher après création réussie.
-   */
   success = '';
 
-  /**
-   * Indicates if the user came from you/programs page.
-   * Indique si l'utilisateur vient de la page you/programs.
-   */
   fromYouPrograms = false;
 
-  /**
-   * User ID from query parameters.
-   * ID de l'utilisateur depuis les paramètres de requête.
-   */
   userIdFromParams: string | null = null;
 
-  /**
-   * Available categories for training programs.
-   * Catégories disponibles pour les programmes d'entraînement.
-   */
   categories = ['Musculation', 'Cardio', 'Flexibilité', 'Mixte'];
 
-  /**
-   * Available difficulty levels.
-   * Niveaux de difficulté disponibles.
-   */
   difficultyLevels = ['Débutant', 'Intermédiaire', 'Avancé'];
 
-  /**
-   * Available target audiences.
-   * Publics cibles disponibles.
-   */
   targetAudiences = [
     'Débutants',
     'Sportifs confirmés',
@@ -125,22 +67,13 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
     'Tous niveaux'
   ];
 
-  /**
-   * Constructor initializes the form with default values and validators.
-   * Le constructeur initialise le formulaire avec des valeurs par défaut et des validateurs.
-   */
   constructor() {
     this.createProgramForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
       category: ['Musculation', Validators.required],
       difficultyLevel: ['Débutant', Validators.required],
-      targetAudience: ['Tous niveaux', Validators.required],
-      durationWeeks: [4, [Validators.required, Validators.min(1), Validators.max(52)]],
-      sessionsPerWeek: [3, [Validators.required, Validators.min(1), Validators.max(7)]],
-      estimatedDurationMinutes: [60, [Validators.required, Validators.min(15), Validators.max(180)]],
-      equipmentRequired: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(200)]],
-      isPublic: [true]
+      targetAudience: ['Tous niveaux', Validators.required]
     });
   }
 
@@ -290,7 +223,6 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
         case 'category': return 'La catégorie est requise';
         case 'difficultyLevel': return 'Le niveau de difficulté est requis';
         case 'targetAudience': return 'Le public cible est requis';
-        case 'equipmentRequired': return 'L\'équipement requis est obligatoire';
         default: return 'Ce champ est requis';
       }
     }
@@ -300,7 +232,6 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
       switch (controlName) {
         case 'name': return `Le nom doit contenir au moins ${requiredLength} caractères`;
         case 'description': return `La description doit contenir au moins ${requiredLength} caractères`;
-        case 'equipmentRequired': return `L'équipement doit contenir au moins ${requiredLength} caractères`;
         default: return `Minimum ${requiredLength} caractères`;
       }
     }
@@ -310,7 +241,6 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
       switch (controlName) {
         case 'name': return `Le nom ne peut pas dépasser ${requiredLength} caractères`;
         case 'description': return `La description ne peut pas dépasser ${requiredLength} caractères`;
-        case 'equipmentRequired': return `L'équipement ne peut pas dépasser ${requiredLength} caractères`;
         default: return `Maximum ${requiredLength} caractères`;
       }
     }
@@ -318,9 +248,6 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
     if (errors['min']) {
       const minValue = errors['min'].min;
       switch (controlName) {
-        case 'durationWeeks': return `La durée doit être d'au moins ${minValue} semaine(s)`;
-        case 'sessionsPerWeek': return `Le nombre de sessions doit être d'au moins ${minValue}`;
-        case 'estimatedDurationMinutes': return `La durée estimée doit être d'au moins ${minValue} minutes`;
         default: return `La valeur minimale est ${minValue}`;
       }
     }
@@ -328,9 +255,6 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
     if (errors['max']) {
       const maxValue = errors['max'].max;
       switch (controlName) {
-        case 'durationWeeks': return `La durée ne peut pas dépasser ${maxValue} semaines`;
-        case 'sessionsPerWeek': return `Le nombre de sessions ne peut pas dépasser ${maxValue}`;
-        case 'estimatedDurationMinutes': return `La durée estimée ne peut pas dépasser ${maxValue} minutes`;
         default: return `La valeur maximale est ${maxValue}`;
       }
     }
@@ -338,25 +262,5 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
     return 'Valeur invalide';
   }
 
-  /**
-   * Format duration in minutes to a readable string.
-   * Formate la durée en minutes en une chaîne lisible.
-   * 
-   * @param minutes - Duration in minutes
-   * @returns Formatted duration string
-   */
-  formatDuration(minutes: number): string {
-    if (minutes < 60) {
-      return `${minutes}min`;
-    }
-    
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    
-    if (remainingMinutes === 0) {
-      return `${hours}h`;
-    }
-    
-    return `${hours}h ${remainingMinutes}min`;
-  }
+
 } 

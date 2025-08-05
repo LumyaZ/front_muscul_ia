@@ -29,7 +29,7 @@ describe('TrainingComponent', () => {
       trainingSessionId: 1,
       exerciseId: 1,
       exerciseName: 'Développé couché',
-      exerciseDescription: 'Exercice pour les pectoraux',
+      exerciseDescription: 'Exercice de base',
       exerciseMuscleGroup: 'CHEST',
       setsCount: 3,
       repsCount: 10,
@@ -37,7 +37,6 @@ describe('TrainingComponent', () => {
       weightKg: 50,
       notes: 'Exercice de base',
       isCompleted: false,
-      orderIndex: 1,
       createdAt: '2024-01-01T10:00:00Z',
       updatedAt: '2024-01-01T10:00:00Z'
     },
@@ -54,7 +53,6 @@ describe('TrainingComponent', () => {
       weightKg: 20,
       notes: 'Isolation pectoraux',
       isCompleted: false,
-      orderIndex: 2,
       createdAt: '2024-01-01T10:00:00Z',
       updatedAt: '2024-01-01T10:00:00Z'
     }
@@ -252,11 +250,16 @@ describe('TrainingComponent', () => {
 
   it('should finish training successfully', () => {
     component.session = {
+      id: 1,
       userId: 1,
       trainingProgramId: 1,
       name: 'Test Session',
-      startTime: new Date().toISOString(),
+      description: 'Test session description',
+      sessionDate: new Date().toISOString(),
+      sessionType: 'Strength',
       durationMinutes: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       isCompleted: false,
       exercises: []
     };
@@ -273,11 +276,16 @@ describe('TrainingComponent', () => {
 
   it('should not finish training when no token', () => {
     component.session = {
+      id: 1,
       userId: 1,
       trainingProgramId: 1,
       name: 'Test Session',
-      startTime: new Date().toISOString(),
+      description: 'Test session description',
+      sessionDate: new Date().toISOString(),
+      sessionType: 'Strength',
       durationMinutes: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       isCompleted: false,
       exercises: []
     };
@@ -291,11 +299,16 @@ describe('TrainingComponent', () => {
 
   it('should handle 403 error when saving session', () => {
     component.session = {
+      id: 1,
       userId: 1,
       trainingProgramId: 1,
       name: 'Test Session',
-      startTime: new Date().toISOString(),
+      description: 'Test session description',
+      sessionDate: new Date().toISOString(),
+      sessionType: 'Strength',
       durationMinutes: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       isCompleted: false,
       exercises: []
     };
@@ -312,11 +325,16 @@ describe('TrainingComponent', () => {
 
   it('should handle 401 error when saving session', () => {
     component.session = {
+      id: 1,
       userId: 1,
       trainingProgramId: 1,
       name: 'Test Session',
-      startTime: new Date().toISOString(),
+      description: 'Test session description',
+      sessionDate: new Date().toISOString(),
+      sessionType: 'Strength',
       durationMinutes: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       isCompleted: false,
       exercises: []
     };
@@ -333,11 +351,16 @@ describe('TrainingComponent', () => {
 
   it('should stop training', () => {
     component.session = {
+      id: 1,
       userId: 1,
       trainingProgramId: 1,
       name: 'Test Session',
-      startTime: new Date().toISOString(),
+      description: 'Test session description',
+      sessionDate: new Date().toISOString(),
+      sessionType: 'Strength',
       durationMinutes: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       isCompleted: false,
       exercises: []
     };

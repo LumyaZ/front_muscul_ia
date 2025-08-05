@@ -107,15 +107,16 @@ export class TrainingComponent implements OnInit, OnDestroy {
       this.programExerciseService.getExercisesByProgramId(this.programId!)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (exercises: any) => {
-            this.exercises = exercises
-              .sort((a: any, b: any) => a.orderInProgram - b.orderInProgram)
-              .map((exercise: any) => ({
-                ...exercise,
-                completedSets: new Array(exercise.setsCount).fill(false)
-              }));
+          next: (exercises: any[]) => {
+            // Trier les exercices par ordre d'ajout (pas d'ordre spécifique dans le backend)
+            // Sort exercises by addition order (no specific order in backend)
+            this.exercises = exercises.map(exercise => ({
+              ...exercise,
+              completedSets: new Array(exercise.setsCount).fill(false),
+              currentSet: 0,
+              isCompleted: false
+            }));
             this.loading = false;
-            this.initializeSession();
           },
           error: (error: any) => {
             console.error('Erreur lors du chargement des exercices:', error);

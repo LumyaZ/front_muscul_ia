@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { UserProfileService, CreateUserProfileWithEmailRequest } from './user-profile.service';
-import { UserProfile, CreateUserProfileRequest, UpdateUserProfileRequest } from '../models/user-profile.model';
+import { UserProfileService } from './user-profile.service';
+import { UserProfile, CreateUserProfileRequest, UpdateUserProfileRequest, CreateUserProfileWithEmailRequest } from '../models/user-profile.model';
 import { environment } from '../../environments/environment';
 
 describe('UserProfileService', () => {
@@ -32,6 +32,7 @@ describe('UserProfileService', () => {
     firstName: 'John',
     lastName: 'Doe',
     dateOfBirth: '1990-01-01',
+    age: 34,
     phoneNumber: '+33123456789'
   };
 

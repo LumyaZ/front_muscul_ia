@@ -110,7 +110,8 @@ describe('AuthService', () => {
 
       const mockResponse = {
         user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
-        profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' }
+        profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' },
+        token: 'jwt.token.here'
       };
 
       service.createUserWithProfile(request).subscribe(response => {

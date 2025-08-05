@@ -33,12 +33,6 @@ export interface ProgramExercise {
   distanceMeters?: number;
 
   notes?: string;
-
-  durationSeconds?: number;
-
-  isOptional?: boolean;
-
-  orderIndex?: number;
 }
 
 /**
@@ -74,15 +68,9 @@ export interface UpdateProgramExerciseRequest {
   
   repsCount?: number;
   
-  durationSeconds?: number;
-  
   restDurationSeconds?: number;
   
   weightKg?: number;
   
   notes?: string;
-  
-  isOptional?: boolean;
-  
-  orderIndex?: number;
 } 

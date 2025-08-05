@@ -25,41 +25,19 @@ export interface UserTrainingProgram {
     updatedAt: string;
   };
 
-  startDate: string;
-
-  completionDate?: string;
-
-  progressPercentage: number;
-
-  notes?: string;
-
-  isActive: boolean;
-
-  createdAt: string;
-
-  updatedAt: string;
-
-  userId?: number;
-
-  trainingProgramId?: number;
-
+  // Propriétés calculées pour faciliter l'affichage
+  // Computed properties for easier display
   trainingProgramName?: string;
 
   trainingProgramDescription?: string;
 
   trainingProgramDifficultyLevel?: string;
 
-  trainingProgramDurationWeeks?: number;
-
-  trainingProgramSessionsPerWeek?: number;
-
   trainingProgramCategory?: string;
 
-  isCompleted?: boolean;
+  userId?: number;
 
-  currentWeek?: number;
-
-  currentDay?: number;
+  trainingProgramId?: number;
 }
 
 /**
@@ -78,31 +56,16 @@ export interface CreateUserTrainingProgramRequest {
 
   userId: number;
   
-
   trainingProgramId: number;
   
-
   notes?: string;
 }
 
 /**
  * Interface for updating an existing user training program.
  * Interface pour mettre à jour un programme d'entraînement utilisateur existant.
-
  */
 export interface UpdateUserTrainingProgramRequest {
 
-  currentWeek?: number;
-  
-  currentDay?: number;
-  
-  isCompleted?: boolean;
-  
-  completionDate?: string;
-  
-  progressPercentage?: number;
-
   notes?: string;
-  
-  isActive?: boolean;
 } 

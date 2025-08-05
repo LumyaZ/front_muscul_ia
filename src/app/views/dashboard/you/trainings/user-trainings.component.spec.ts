@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { UserTrainingsComponent } from './user-trainings.component';
-import { TrainingSessionService, TrainingSessionDto } from '../../../../services/training-session.service';
+import { TrainingSessionService } from '../../../../services/training-session.service';
+import { TrainingSession } from '../../../../models/training-session.model';
 import { AuthService } from '../../../../services/auth.service';
 import { of, throwError } from 'rxjs';
 
@@ -17,26 +18,26 @@ describe('UserTrainingsComponent', () => {
     email: 'test@example.com'
   };
 
-  const mockTrainingSessions: TrainingSessionDto[] = [
+  const mockTrainingSessions: TrainingSession[] = [
     {
       id: 1,
-      userId: 1,
       name: 'Entraînement Force',
-      sessionDate: '2024-01-15T10:00:00Z',
-      durationMinutes: 90,
-      sessionType: 'Force',
       description: 'Entraînement de force complet',
+      sessionDate: '2024-01-15T10:00:00Z',
+      sessionType: 'Force',
+      durationMinutes: 90,
+      userId: 1,
       createdAt: '2024-01-15T10:00:00Z',
       updatedAt: '2024-01-15T10:00:00Z'
     },
     {
       id: 2,
-      userId: 1,
       name: 'Cardio HIIT',
-      sessionDate: '2024-01-14T08:00:00Z',
-      durationMinutes: 45,
-      sessionType: 'Cardio',
       description: 'Entraînement cardio intensif',
+      sessionDate: '2024-01-14T08:00:00Z',
+      sessionType: 'Cardio',
+      durationMinutes: 45,
+      userId: 1,
       createdAt: '2024-01-14T08:00:00Z',
       updatedAt: '2024-01-14T08:00:00Z'
     }
@@ -182,7 +183,7 @@ describe('UserTrainingsComponent', () => {
       const session = mockTrainingSessions[0];
       const result = component.trackBySessionId(0, session);
       
-      expect(result).toBe(session.id);
+      expect(result).toBe(session.id!);
     });
   });
 

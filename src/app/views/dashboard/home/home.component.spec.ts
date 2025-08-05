@@ -2,7 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { HomeComponent } from './home.component';
 import { AuthService } from '../../../services/auth.service';
-import { TrainingSessionService, TrainingSessionDto } from '../../../services/training-session.service';
+import { TrainingSessionService } from '../../../services/training-session.service';
+import { TrainingSession } from '../../../models/training-session.model';
 import { User } from '../../../models/user.model';
 import { of, throwError } from 'rxjs';
 
@@ -19,26 +20,26 @@ describe('HomeComponent', () => {
     creationDate: '2023-01-01T00:00:00Z'
   };
 
-  const mockTrainings: TrainingSessionDto[] = [
+  const mockTrainings: TrainingSession[] = [
     {
       id: 1,
-      userId: 1,
       name: 'Entraînement 1',
-      sessionDate: '2024-01-01T10:00:00Z',
-      durationMinutes: 60,
-      sessionType: 'Cardio',
       description: 'Entraînement cardio',
+      sessionDate: '2024-01-01T10:00:00Z',
+      sessionType: 'Cardio',
+      durationMinutes: 60,
+      userId: 1,
       createdAt: '2024-01-01T10:00:00Z',
       updatedAt: '2024-01-01T10:00:00Z'
     },
     {
       id: 2,
-      userId: 1,
       name: 'Entraînement 2',
-      sessionDate: '2024-01-02T10:00:00Z',
-      durationMinutes: 45,
-      sessionType: 'Musculation',
       description: 'Entraînement musculation',
+      sessionDate: '2024-01-02T10:00:00Z',
+      sessionType: 'Musculation',
+      durationMinutes: 45,
+      userId: 1,
       createdAt: '2024-01-02T10:00:00Z',
       updatedAt: '2024-01-02T10:00:00Z'
     }

@@ -36,7 +36,7 @@ export class ProgramExerciseService {
    * Créer un nouvel exercice de programme.
    */
   createProgramExercise(request: CreateProgramExerciseRequest): Observable<ProgramExercise> {
-    return this.http.post<ProgramExercise>(this.apiUrl, request);
+    return this.http.post<ProgramExercise>(`${this.apiUrl}/program/${request.trainingProgramId}`, request);
   }
 
   /**

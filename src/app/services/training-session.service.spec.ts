@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TrainingSessionService, TrainingSessionDto } from './training-session.service';
-import { CreateTrainingSessionRequest } from '../models/training-session.model';
+import { TrainingSessionService } from './training-session.service';
+import { CreateTrainingSessionRequest, TrainingSession } from '../models/training-session.model';
 import { environment } from '../../environments/environment';
 
 describe('TrainingSessionService', () => {
@@ -9,27 +9,26 @@ describe('TrainingSessionService', () => {
   let httpMock: HttpTestingController;
   const apiUrl = `${environment.apiUrl}/training-sessions`;
 
-  const mockTrainingSession: TrainingSessionDto = {
+  const mockTrainingSession: TrainingSession = {
     id: 1,
-    userId: 1,
     name: 'Test Training Session',
     description: 'Test description',
     sessionDate: '2024-01-01T10:00:00Z',
-    durationMinutes: 60,
     sessionType: 'Cardio',
     trainingProgramId: 1,
+    durationMinutes: 60,
+    userId: 1,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
   };
 
   const mockCreateRequest: CreateTrainingSessionRequest = {
-    userId: 1,
     name: 'Test Training Session',
     description: 'Test description',
-    startTime: '2024-01-01T10:00:00Z',
+    sessionDate: '2024-01-01T10:00:00Z',
     durationMinutes: 60,
-    isCompleted: true,
-    exercises: []
+    sessionType: 'Cardio',
+    trainingProgramId: 1
   };
 
   beforeEach(() => {

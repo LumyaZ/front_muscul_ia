@@ -1,6 +1,6 @@
 /**
- * Interface representing a training exercise.
- * Interface représentant un exercice d'entraînement.
+ * Interface for training exercise.
+ * Interface pour un exercice d'entraînement.
  */
 export interface TrainingExercise {
 
@@ -27,8 +27,6 @@ export interface TrainingExercise {
   notes?: string;
   
   isCompleted: boolean;
-  
-  orderIndex: number;
   
   createdAt?: string;
   
@@ -114,8 +112,6 @@ export interface CreateTrainingExerciseRequest {
   notes?: string;
   
   isCompleted: boolean;
-  
-  orderIndex: number;
 }
 
 /**

@@ -102,7 +102,7 @@ export class ProfileComponent implements OnInit {
   private loadUserData(): void {
     this.isLoading = true;
     this.error = null;
-
+    
     this.loadUserProfile();
     this.loadTrainingInfo();
   }

@@ -15,11 +15,8 @@ describe('ExerciseService', () => {
     description: 'Classic bodyweight exercise for chest and triceps',
     category: 'Bodyweight',
     muscleGroup: 'Chest',
-    equipment: 'None',
+    equipmentNeeded: 'None',
     difficultyLevel: 'Beginner',
-    instructions: 'Perform push-ups with proper form',
-    tips: 'Keep your body straight',
-    mediaUrl: 'https://example.com/pushups',
     isActive: true,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'

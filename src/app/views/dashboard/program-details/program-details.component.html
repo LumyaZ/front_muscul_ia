@@ -38,12 +38,12 @@
                 </span>
               </div>
               <div class="meta-item">
-                <span class="meta-label">Durée</span>
-                <span class="meta-value">{{ program.durationWeeks }} semaines</span>
+                <span class="meta-label">Catégorie</span>
+                <span class="meta-value">{{ program.category }}</span>
               </div>
               <div class="meta-item">
-                <span class="meta-label">Fréquence</span>
-                <span class="meta-value">{{ program.sessionsPerWeek }}x/semaine</span>
+                <span class="meta-label">Public cible</span>
+                <span class="meta-value">{{ program.targetAudience }}</span>
               </div>
               <div class="meta-item">
                 <span class="meta-label">Temps estimé</span>
@@ -155,11 +155,10 @@
           <div 
             *ngFor="let programExercise of program.exercises; let i = index" 
             class="exercise-card"
-            [class.optional]="programExercise.isOptional"
           >
             <div class="exercise-header">
               <div class="exercise-order">
-                <span class="order-number">{{ programExercise.orderIndex }}</span>
+                <span class="order-number">{{ i + 1 }}</span>
               </div>
               <div class="exercise-info">
                 <h3 class="exercise-name">{{ programExercise.exerciseName }}</h3>
@@ -168,9 +167,6 @@
                   <span class="muscle-group">{{ programExercise.exerciseMuscleGroup }}</span>
                   <span class="equipment">Équipement de base</span>
                 </div>
-              </div>
-              <div *ngIf="programExercise.isOptional" class="optional-badge">
-                Optionnel
               </div>
             </div>
 
@@ -183,10 +179,6 @@
                 <div class="detail-col" *ngIf="programExercise.repsCount">
                   <span class="detail-label">Répétitions</span>
                   <span class="detail-value">{{ programExercise.repsCount }}</span>
-                </div>
-                <div class="detail-col" *ngIf="programExercise.durationSeconds">
-                  <span class="detail-label">Durée</span>
-                  <span class="detail-value">{{ formatExerciseDuration(programExercise.durationSeconds) }}</span>
                 </div>
                 <div class="detail-col" *ngIf="programExercise.weightKg">
                   <span class="detail-label">Poids</span>

@@ -62,8 +62,11 @@ describe('LoginComponent', () => {
    * Test that auth service is called with correct data
    */
   it('should call authService.login when form is valid', () => {
-    const mockUser = { id: 1, email: 'test@example.com' };
-    mockAuthService.login.and.returnValue(of(mockUser));
+    const mockResponse = { 
+      user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
+      token: 'jwt.token.here'
+    };
+    mockAuthService.login.and.returnValue(of(mockResponse));
 
     component.loginForm.patchValue({
       email: 'test@example.com',

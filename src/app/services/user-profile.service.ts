@@ -18,7 +18,7 @@ import {
 })
 export class UserProfileService {
   private http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/user-profiles`;
+  private readonly apiUrl = `${environment.apiUrl}/profiles`;
 
   /**
    * Create a new user profile (requires authentication).

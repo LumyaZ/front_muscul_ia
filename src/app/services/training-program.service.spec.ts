@@ -17,13 +17,9 @@ describe('TrainingProgramService', () => {
     name: 'Beginner Strength Program',
     description: 'A comprehensive strength training program for beginners',
     difficultyLevel: 'BEGINNER',
-    durationWeeks: 8,
-    sessionsPerWeek: 3,
     category: 'STRENGTH',
     targetAudience: 'BEGINNERS',
-    isPublic: true,
-    isActive: true,
-    userId: 1,
+    createdByUserId: 1,
     createdAt: '2024-01-01T10:00:00Z',
     updatedAt: '2024-01-01T10:00:00Z'
   };
@@ -32,11 +28,8 @@ describe('TrainingProgramService', () => {
     name: 'Beginner Strength Program',
     description: 'A comprehensive strength training program for beginners',
     difficultyLevel: 'BEGINNER',
-    durationWeeks: 8,
-    sessionsPerWeek: 3,
     category: 'STRENGTH',
-    targetAudience: 'BEGINNERS',
-    isPublic: true
+    targetAudience: 'BEGINNERS'
   };
 
   const mockUpdateRequest: UpdateTrainingProgramRequest = {
@@ -126,12 +119,12 @@ describe('TrainingProgramService', () => {
     });
   });
 
-  describe('createTrainingProgram', () => {
+  describe('createProgram', () => {
     it('should create training program successfully', () => {
-      const programData = { name: 'Test Program' };
+      const programData = mockCreateRequest;
       const userId = 1;
       
-      service.createTrainingProgram(programData, userId).subscribe(response => {
+      service.createProgram(programData, userId).subscribe(response => {
         expect(response).toEqual(mockTrainingProgram);
       });
 
@@ -146,13 +139,13 @@ describe('TrainingProgramService', () => {
     it('should update program successfully', () => {
       const programId = 1;
       
-      service.updateProgram(programId, mockUpdateRequest).subscribe(response => {
+      service.updateProgram(programId, mockCreateRequest).subscribe(response => {
         expect(response).toEqual(mockTrainingProgram);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/${programId}`);
       expect(req.request.method).toBe('PUT');
-      expect(req.request.body).toEqual(mockUpdateRequest);
+      expect(req.request.body).toEqual(mockCreateRequest);
       req.flush(mockTrainingProgram);
     });
   });
@@ -177,8 +170,7 @@ describe('TrainingProgramService', () => {
         name: 'Strength',
         difficultyLevel: 'BEGINNER',
         category: 'STRENGTH',
-        targetAudience: 'BEGINNERS',
-        isPublic: true
+        targetAudience: 'BEGINNERS'
       };
       const mockPrograms = [mockTrainingProgram];
       
@@ -186,13 +178,12 @@ describe('TrainingProgramService', () => {
         searchParams.name,
         searchParams.difficultyLevel,
         searchParams.category,
-        searchParams.targetAudience,
-        searchParams.isPublic
+        searchParams.targetAudience
       ).subscribe(response => {
         expect(response).toEqual(mockPrograms);
       });
 
-      const req = httpMock.expectOne(`${apiUrl}/search?name=${searchParams.name}&difficultyLevel=${searchParams.difficultyLevel}&category=${searchParams.category}&targetAudience=${searchParams.targetAudience}&isPublic=${searchParams.isPublic}`);
+      const req = httpMock.expectOne(`${apiUrl}/search?name=${searchParams.name}&difficultyLevel=${searchParams.difficultyLevel}&category=${searchParams.category}&targetAudience=${searchParams.targetAudience}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockPrograms);
     });

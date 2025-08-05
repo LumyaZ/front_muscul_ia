@@ -117,13 +117,11 @@ export class ProgramDetailsComponent implements OnInit {
             exerciseName: exercise.exerciseName,
             exerciseDescription: exercise.exerciseDescription,
             exerciseMuscleGroup: exercise.exerciseMuscleGroup,
-            orderIndex: exercise.orderIndex || 0,
             setsCount: exercise.setsCount || 0,
             repsCount: exercise.repsCount,
             restDurationSeconds: exercise.restDurationSeconds,
             weightKg: exercise.weightKg,
-            notes: exercise.notes,
-            isOptional: exercise.isOptional || false
+            notes: exercise.notes
           }));
           this.loading = false;
         }
@@ -243,19 +241,6 @@ export class ProgramDetailsComponent implements OnInit {
   }
 
   /**
-   * Formate une durée d'exercice en secondes en une chaîne de caractères
-   * Format exercise duration in seconds to a string
-   */
-  formatExerciseDuration(seconds: number): string {
-    if (seconds < 60) {
-      return `${seconds}s`;
-    }
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return remainingSeconds > 0 ? `${minutes}m${remainingSeconds}s` : `${minutes}m`;
-  }
-
-  /**
    * Navigue vers la page appropriée selon la provenance
    * Navigate back to the appropriate page based on provenance
    */
@@ -312,9 +297,10 @@ export class ProgramDetailsComponent implements OnInit {
 
     let totalMinutes = 0;
     this.program.exercises.forEach(exercise => {
-      const exerciseTime = exercise.durationSeconds ? exercise.durationSeconds / 60 : 0;
+      // Estimation basée sur les séries et le repos uniquement
+      // Estimation based on sets and rest only
       const restTime = exercise.restDurationSeconds ? exercise.restDurationSeconds / 60 : 0;
-      const setsTime = (exercise.setsCount || 0) * (exerciseTime + restTime);
+      const setsTime = (exercise.setsCount || 0) * restTime;
       totalMinutes += setsTime;
     });
 

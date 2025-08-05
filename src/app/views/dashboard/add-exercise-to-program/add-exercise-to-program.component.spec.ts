@@ -119,9 +119,10 @@ describe('AddExerciseToProgramComponent', () => {
       weightKg: 0,
       distanceMeters: 0,
       isOptional: false,
-      notes: 'Test exercise',
-      createdAt: '2024-01-01',
-      updatedAt: '2024-01-01'
+      notes: 'Exercice de base',
+      isCompleted: false,
+      createdAt: '2024-01-01T10:00:00Z',
+      updatedAt: '2024-01-01T10:00:00Z'
     }));
   });
 
@@ -164,23 +165,40 @@ describe('AddExerciseToProgramComponent', () => {
   });
 
   describe('Gestion du formulaire', () => {
-    it('should initialize form with correct structure', () => {
+    it('should have required form controls', () => {
       expect(component.addExerciseForm.get('exerciseId')).toBeTruthy();
-      expect(component.addExerciseForm.get('orderInProgram')).toBeTruthy();
       expect(component.addExerciseForm.get('setsCount')).toBeTruthy();
+      expect(component.addExerciseForm.get('repsCount')).toBeTruthy();
       expect(component.addExerciseForm.get('restDurationSeconds')).toBeTruthy();
+      expect(component.addExerciseForm.get('weightKg')).toBeTruthy();
+      expect(component.addExerciseForm.get('distanceMeters')).toBeTruthy();
+      expect(component.addExerciseForm.get('notes')).toBeTruthy();
     });
 
-    it('should submit form successfully', () => {
+    it('should create program exercise with valid data', () => {
+      const formData = {
+        trainingProgramId: 1,
+        exerciseId: 1,
+        setsCount: 3,
+        repsCount: 10,
+        restDurationSeconds: 60,
+        weightKg: 50,
+        distanceMeters: 0,
+        notes: 'Test exercise'
+      };
+
       component.addExerciseForm.patchValue({
         exerciseId: 1,
-        orderInProgram: 1,
         setsCount: 3,
-        restDurationSeconds: 60
+        repsCount: 10,
+        restDurationSeconds: 60,
+        weightKg: 50,
+        distanceMeters: 0,
+        notes: 'Test exercise'
       });
-      
+
       component.onSubmit();
-      
+
       expect(mockProgramExerciseService.addExerciseToProgram).toHaveBeenCalledWith(123, jasmine.any(Object));
       expect(component.success).toBe('Exercice ajouté au programme avec succès !');
     });
@@ -256,6 +274,15 @@ describe('AddExerciseToProgramComponent', () => {
       const errorMessage = component.getErrorMessage('orderInProgram');
       
       expect(errorMessage).toBe('La valeur minimale est 1');
+    });
+
+    it('should return error message for invalid control', () => {
+      const control = component.addExerciseForm.get('setsCount');
+      control?.setErrors({ required: true });
+      control?.markAsTouched();
+      
+      const errorMessage = component.getErrorMessage('setsCount');
+      expect(errorMessage).toBe('Ce champ est requis.');
     });
   });
 

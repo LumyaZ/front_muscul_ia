@@ -7,7 +7,6 @@
         <h1>Programmes d'entraînement</h1>
         <p>Découvrez et choisissez parmi nos programmes d'entraînement personnalisés</p>
       </div>
-      <!-- Suppression du bouton de création - uniquement disponible dans you/programs -->
     </div>
 
     <div class="filters-section">
@@ -91,7 +90,7 @@
               <div 
                 *ngFor="let program of categoryGroup.programs; let j = index" 
                 class="program-card"
-                [class.private]="!program.isPublic"
+
                 [style.animation-delay]="(j * 0.1) + 's'"
                 [style.background]="getCardColor(categoryGroup.category)"
               >
@@ -99,9 +98,7 @@
                   <div class="difficulty-badge" [style.background-color]="getDifficultyColor(program.difficultyLevel)">
                     {{ program.difficultyLevel }}
                   </div>
-                  <div *ngIf="!program.isPublic" class="private-badge">
-                    Privé
-                  </div>
+
                 </div>
 
                 <div class="card-content">
@@ -110,16 +107,8 @@
                   
                   <div class="program-details">
                     <div class="detail-item">
-                      <span class="detail-label">📅</span>
-                      <span>{{ program.durationWeeks }} semaines</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">🔄</span>
-                      <span>{{ program.sessionsPerWeek }}x/semaine</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">⏱️</span>
-                      <span>{{ formatDuration(60) }}</span>
+                      <span class="detail-label">📂</span>
+                      <span>{{ program.category }}</span>
                     </div>
                     <div class="detail-item">
                       <span class="detail-label">👥</span>

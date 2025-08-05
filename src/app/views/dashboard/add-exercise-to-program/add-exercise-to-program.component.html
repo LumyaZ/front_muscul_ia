@@ -56,24 +56,6 @@
         </div>
 
         <div class="form-group">
-          <label for="orderInProgram">Ordre dans le programme *</label>
-          <div class="input-container">
-            <input 
-              type="number" 
-              id="orderInProgram" 
-              formControlName="orderInProgram" 
-              class="form-control"
-              placeholder="1, 2, 3..."
-              min="1"
-              [class.error]="addExerciseForm.get('orderInProgram')?.invalid && addExerciseForm.get('orderInProgram')?.touched"
-            >
-          </div>
-          <div *ngIf="getErrorMessage('orderInProgram')" class="error-text">
-            {{ getErrorMessage('orderInProgram') }}
-          </div>
-        </div>
-
-        <div class="form-group">
           <label for="setsCount">Nombre de séries *</label>
           <div class="input-container">
             <input 
@@ -108,25 +90,6 @@
             {{ getErrorMessage('repsCount') }}
           </div>
           <small class="form-help">Laissez vide si l'exercice est basé sur la durée</small>
-        </div>
-
-        <div class="form-group">
-          <label for="durationSeconds">Durée (secondes)</label>
-          <div class="input-container">
-            <input 
-              type="number" 
-              id="durationSeconds" 
-              formControlName="durationSeconds" 
-              class="form-control"
-              placeholder="30, 45, 60..."
-              min="1"
-              [class.error]="addExerciseForm.get('durationSeconds')?.invalid && addExerciseForm.get('durationSeconds')?.touched"
-            >
-          </div>
-          <div *ngIf="getErrorMessage('durationSeconds')" class="error-text">
-            {{ getErrorMessage('durationSeconds') }}
-          </div>
-          <small class="form-help">Laissez vide si l'exercice est basé sur les répétitions</small>
         </div>
 
         <div class="form-group">
@@ -195,19 +158,6 @@
               rows="3"
             ></textarea>
           </div>
-        </div>
-
-        <div class="form-group checkbox-group">
-          <label class="checkbox-label">
-            <input 
-              type="checkbox" 
-              formControlName="isOptional"
-              class="checkbox-input"
-            >
-            <span class="checkbox-custom"></span>
-            Exercice optionnel
-          </label>
-          <small class="form-help">Cochez si cet exercice est optionnel dans le programme</small>
         </div>
 
         <div class="form-actions">

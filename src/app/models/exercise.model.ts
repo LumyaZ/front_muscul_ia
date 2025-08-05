@@ -59,17 +59,9 @@ export interface UpdateExerciseRequest {
   
   muscleGroup?: string;
   
-  secondaryMuscleGroups?: string[];
-  
   difficultyLevel?: string;
   
-  equipment?: string;
-  
-  instructions?: string;
-  
-  tips?: string;
-  
-  mediaUrl?: string;
+  equipmentNeeded?: string;
   
   isActive?: boolean;
 } 

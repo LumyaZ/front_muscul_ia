@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, map, catchError } from 'rxjs';
 import { User, LoginRequest, RegisterRequest } from '../models/user.model';
 import { environment } from '../../environments/environment';
 import { CreateUserWithProfileRequest, CreateUserWithProfileResponse } from '../models/user-profile.model';
@@ -86,6 +86,34 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  /**
+   * Check if token is valid by making a test request.
+   * Vérifier si le token est valide en faisant une requête de test.
+   */
+  validateToken(): Observable<boolean> {
+    const token = this.getToken();
+    if (!token) {
+      return new Observable<boolean>(observer => {
+        observer.next(false);
+        observer.complete();
+      });
+    }
+
+    return this.http.get(`${environment.apiUrl}/profiles/me`, { 
+      observe: 'response'
+    }).pipe(
+      tap(() => console.log('Token is valid')),
+      map(() => true),
+      catchError((error: any) => {
+        console.warn('Token validation failed:', error);
+        return new Observable<boolean>(observer => {
+          observer.next(false);
+          observer.complete();
+        });
+      })
+    );
   }
 
   /**

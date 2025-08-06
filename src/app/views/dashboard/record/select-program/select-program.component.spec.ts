@@ -7,67 +7,56 @@ import { UserTrainingProgramService } from '../../../../services/user-training-p
 import { UserTrainingProgram } from '../../../../models/user-training-program.model';
 import { HeaderComponent } from '../../../../components/header/header.component';
 import { NavBarComponent } from '../../../../components/nav-bar/nav-bar.component';
+import { AuthService } from '../../../../services/auth.service';
 
 describe('SelectProgramComponent', () => {
   let component: SelectProgramComponent;
   let fixture: ComponentFixture<SelectProgramComponent>;
   let userTrainingProgramService: jasmine.SpyObj<UserTrainingProgramService>;
   let router: jasmine.SpyObj<Router>;
+  let authService: jasmine.SpyObj<AuthService>;
 
-  const mockPrograms: UserTrainingProgram[] = [
-    { 
+  const mockUser = {
+    id: 1,
+    email: 'test@test.com',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  };
+
+  const mockTrainingProgram = {
+    id: 1,
+    name: 'Programme Débutant',
+    description: 'Description du programme débutant',
+    difficultyLevel: 'Débutant',
+    category: 'Musculation',
+    targetAudience: 'Débutants',
+    createdByUserId: 1,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  };
+
+  const mockUserTrainingPrograms: UserTrainingProgram[] = [
+    {
       id: 1,
-      user: {
-        id: 1,
-        email: 'test@test.com',
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      trainingProgram: {
-        id: 1,
-        name: 'Programme Débutant',
-        description: 'Description du programme débutant',
-        difficultyLevel: 'Débutant',
-        category: 'Musculation',
-        targetAudience: 'Débutants',
-        createdByUserId: 1,
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      startDate: '2024-01-01T00:00:00Z',
-      progressPercentage: 0,
-      isActive: true,
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z',
+      user: mockUser,
+      trainingProgram: mockTrainingProgram,
       userId: 1,
-      trainingProgramId: 1
+      trainingProgramId: 1,
+      trainingProgramName: 'Programme Débutant',
+      trainingProgramDescription: 'Programme pour débutants',
+      trainingProgramDifficultyLevel: 'BEGINNER',
+      trainingProgramCategory: 'STRENGTH'
     },
-    { 
+    {
       id: 2,
-      user: {
-        id: 1,
-        email: 'test@test.com',
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      trainingProgram: {
-        id: 2,
-        name: 'Programme Intermédiaire',
-        description: 'Description du programme intermédiaire',
-        difficultyLevel: 'Intermédiaire',
-        category: 'Cardio',
-        targetAudience: 'Sportifs confirmés',
-        createdByUserId: 1,
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      startDate: '2024-01-01T00:00:00Z',
-      progressPercentage: 0,
-      isActive: true,
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z',
+      user: mockUser,
+      trainingProgram: mockTrainingProgram,
       userId: 1,
-      trainingProgramId: 2
+      trainingProgramId: 2,
+      trainingProgramName: 'Programme Intermédiaire',
+      trainingProgramDescription: 'Programme pour intermédiaires',
+      trainingProgramDifficultyLevel: 'INTERMEDIATE',
+      trainingProgramCategory: 'STRENGTH'
     }
   ];
 
@@ -76,8 +65,11 @@ describe('SelectProgramComponent', () => {
       'getUserPrograms'
     ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser', 'isAuthenticated']);
 
-    userTrainingProgramServiceSpy.getUserPrograms.and.returnValue(of(mockPrograms));
+    userTrainingProgramServiceSpy.getUserPrograms.and.returnValue(of(mockUserTrainingPrograms));
+    authServiceSpy.getCurrentUser.and.returnValue(mockUser);
+    authServiceSpy.isAuthenticated.and.returnValue(true);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -88,12 +80,14 @@ describe('SelectProgramComponent', () => {
       ],
       providers: [
         { provide: UserTrainingProgramService, useValue: userTrainingProgramServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: AuthService, useValue: authServiceSpy }
       ]
     }).compileComponents();
 
     userTrainingProgramService = TestBed.inject(UserTrainingProgramService) as jasmine.SpyObj<UserTrainingProgramService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
   });
 
   beforeEach(() => {
@@ -110,8 +104,8 @@ describe('SelectProgramComponent', () => {
     it('should load user programs on init', () => {
       component.ngOnInit();
       
-      expect(userTrainingProgramService.getUserPrograms).toHaveBeenCalled();
-      expect(component.userPrograms).toEqual(mockPrograms);
+      expect(userTrainingProgramService.getUserPrograms).toHaveBeenCalledWith(mockUser.id);
+      expect(component.userPrograms).toEqual(mockUserTrainingPrograms);
     });
 
     it('should handle loading state', () => {
@@ -131,7 +125,9 @@ describe('SelectProgramComponent', () => {
     });
 
     it('should display program cards with correct data', () => {
-      component.userPrograms = mockPrograms;
+      component.userPrograms = mockUserTrainingPrograms;
+      component.loading = false;
+      component.error = null;
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement;
@@ -142,7 +138,7 @@ describe('SelectProgramComponent', () => {
 
   describe('Sélection de programme', () => {
     it('should select a program', () => {
-      const program = mockPrograms[0];
+      const program = mockUserTrainingPrograms[0];
       
       component.selectProgram(program);
       
@@ -150,14 +146,12 @@ describe('SelectProgramComponent', () => {
     });
 
     it('should navigate to training with selected program', () => {
-      const program = mockPrograms[0];
+      const program = mockUserTrainingPrograms[0];
       component.selectedProgram = program;
       
       component.onNext();
       
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/record/training'], {
-        queryParams: { programId: program.trainingProgramId }
-      });
+      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/record/training', program.trainingProgramId]);
     });
 
     it('should not navigate if no program selected', () => {
@@ -180,6 +174,8 @@ describe('SelectProgramComponent', () => {
   describe('Gestion des états', () => {
     it('should handle empty programs list', () => {
       component.userPrograms = [];
+      component.loading = false;
+      component.error = null;
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement;
@@ -200,23 +196,26 @@ describe('SelectProgramComponent', () => {
 
   describe('Affichage des informations', () => {
     it('should display program information correctly', () => {
-      component.userPrograms = mockPrograms;
+      component.userPrograms = mockUserTrainingPrograms;
+      component.loading = false;
+      component.error = null;
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('Débutant');
-      expect(compiled.textContent).toContain('Intermédiaire');
-      expect(compiled.textContent).toContain('Musculation');
-      expect(compiled.textContent).toContain('Cardio');
+      expect(compiled.textContent).toContain('BEGINNER');
+      expect(compiled.textContent).toContain('INTERMEDIATE');
+      expect(compiled.textContent).toContain('STRENGTH');
     });
 
     it('should display difficulty badges with correct colors', () => {
-      component.userPrograms = mockPrograms;
+      component.userPrograms = mockUserTrainingPrograms;
+      component.loading = false;
+      component.error = null;
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('Débutant');
-      expect(compiled.textContent).toContain('Intermédiaire');
+      expect(compiled.textContent).toContain('BEGINNER');
+      expect(compiled.textContent).toContain('INTERMEDIATE');
     });
   });
 
@@ -224,14 +223,15 @@ describe('SelectProgramComponent', () => {
     it('should validate program selection', () => {
       expect(component.canProceed()).toBe(false);
       
-      component.selectedProgram = mockPrograms[0];
+      component.selectedProgram = mockUserTrainingPrograms[0];
+      component.loading = false;
       
       expect(component.canProceed()).toBe(true);
     });
 
     it('should handle program selection change', () => {
-      const program1 = mockPrograms[0];
-      const program2 = mockPrograms[1];
+      const program1 = mockUserTrainingPrograms[0];
+      const program2 = mockUserTrainingPrograms[1];
       
       component.selectProgram(program1);
       expect(component.selectedProgram).toEqual(program1);

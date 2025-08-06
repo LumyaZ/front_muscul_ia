@@ -135,7 +135,7 @@
       <!-- Action Bar -->
       <div class="action-bar">
         <button 
-          *ngIf="!isTrainingFinished()"
+          *ngIf="!isTrainingComplete"
           class="btn-stop" 
           (click)="stopTraining()"
         >
@@ -144,12 +144,22 @@
         </button>
         
         <button 
-          *ngIf="isTrainingFinished()"
+          *ngIf="!isTrainingComplete"
           class="btn-finish" 
           (click)="finishTraining()"
         >
           <i class="fas fa-flag-checkered"></i>
           Terminer l'entraînement
+        </button>
+        
+        <button 
+          *ngIf="isTrainingComplete"
+          class="btn-finish" 
+          (click)="finishTraining()"
+          disabled
+        >
+          <i class="fas fa-flag-checkered"></i>
+          Entraînement terminé
         </button>
       </div>
     </div>

@@ -22,7 +22,6 @@
   }
 }
 
-// Loading and Error States
 .loading-container {
   @include flex-center;
   padding: 40px 20px;
@@ -112,7 +111,6 @@
   flex-direction: column;
   gap: 30px;
 
-  // Header
   .header {
     margin-bottom: 30px;
     position: relative;
@@ -164,7 +162,6 @@
     }
   }
 
-  // Completion Status
   .completion-status {
     @include glass-effect;
     padding: 30px;
@@ -206,7 +203,6 @@
     }
   }
 
-  // Form Section
   .form-section {
     @include glass-effect;
     padding: 30px;
@@ -309,7 +305,6 @@
     }
   }
 
-  // Stats Section
   .stats-section {
     @include glass-effect;
     padding: 30px;
@@ -382,7 +377,6 @@
   100% { transform: rotate(360deg); }
 }
 
-// Responsive Design
 @media (max-width: $breakpoint-sm) {
   .training-recap-content {
     padding: 100px 15px 80px 15px;

@@ -75,7 +75,7 @@ describe('TrainingRecapComponent', () => {
   });
 
   it('should get completion data based on status', () => {
-    // Test completed training
+    
     component.recap = {
       sessionId: 123,
       duration: 1800,
@@ -87,7 +87,6 @@ describe('TrainingRecapComponent', () => {
     expect(component.getCompletionIcon()).toBe('fas fa-trophy');
     expect(component.getCompletionColor()).toBe('#4CAF50');
 
-    // Test interrupted training
     component.recap.completed = false;
 
     expect(component.getCompletionMessage()).toBe('Vous avez arrêté votre entraînement. Votre progression a été sauvegardée.');

@@ -37,7 +37,6 @@ export class TrainingRecapComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
   
-  // Form data
   title: string = '';
   rating: number = 5;
   notes: string = '';

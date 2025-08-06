@@ -204,7 +204,7 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
       case 'NOT_STARTED':
         return '#9E9E9E';
       default:
-        return '#4CAF50'; // Par défaut, en cours
+        return '#4CAF50';
     }
   }
 

@@ -104,7 +104,7 @@ export class HeaderComponent implements OnInit {
       this.currentUser = null;
       this.showUserMenu = false;
       this.router.navigate(['/login']);
-      // Reset loading state after a short delay to allow tests to verify loading state
+      
       setTimeout(() => {
         this.isLoading = false;
       }, 50);
@@ -162,7 +162,6 @@ export class HeaderComponent implements OnInit {
     const email = this.currentUser.email || '';
     const name = email.split('@')[0];
     
-    // Handle special case for test@example.com
     if (email === 'test@example.com') {
       return 'TE';
     }

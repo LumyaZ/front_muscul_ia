@@ -22,7 +22,7 @@ export class TrainingSessionService {
   createTrainingSession(request: CreateTrainingSessionRequest): Observable<TrainingSession> {
     return this.http.post<TrainingSession>(this.apiUrl, request).pipe(
       tap(response => {
-        // Success callback
+          
       }),
       catchError(error => {
         throw error;
@@ -37,7 +37,7 @@ export class TrainingSessionService {
   getTrainingSession(sessionId: number): Observable<TrainingSession> {
     return this.http.get<TrainingSession>(`${this.apiUrl}/${sessionId}`).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -52,7 +52,7 @@ export class TrainingSessionService {
   updateTrainingSession(sessionId: number, request: CreateTrainingSessionRequest): Observable<TrainingSession> {
     return this.http.put<TrainingSession>(`${this.apiUrl}/${sessionId}`, request).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -67,7 +67,7 @@ export class TrainingSessionService {
   getUserTrainingSessions(): Observable<TrainingSession[]> {
     return this.http.get<TrainingSession[]>(this.apiUrl).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -82,7 +82,7 @@ export class TrainingSessionService {
   getUserTrainingSessionsWithPagination(userId: number, page: number = 0, size: number = 10): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/user/${userId}?page=${page}&size=${size}`).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -97,7 +97,7 @@ export class TrainingSessionService {
   getTrainingSessionsByDateRange(startDate: string, endDate: string): Observable<TrainingSession[]> {
     return this.http.get<TrainingSession[]>(`${this.apiUrl}/date-range?startDate=${startDate}&endDate=${endDate}`).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -112,7 +112,7 @@ export class TrainingSessionService {
   getTrainingSessionsByType(sessionType: string): Observable<TrainingSession[]> {
     return this.http.get<TrainingSession[]>(`${this.apiUrl}/type/${sessionType}`).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -127,7 +127,7 @@ export class TrainingSessionService {
   getTrainingSessionsByProgram(trainingProgramId: number): Observable<TrainingSession[]> {
     return this.http.get<TrainingSession[]>(`${this.apiUrl}/program/${trainingProgramId}`).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -142,7 +142,7 @@ export class TrainingSessionService {
   searchTrainingSessionsByName(name: string): Observable<TrainingSession[]> {
     return this.http.get<TrainingSession[]>(`${this.apiUrl}/search?name=${name}`).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -157,7 +157,7 @@ export class TrainingSessionService {
   getMostRecentTrainingSession(): Observable<TrainingSession> {
     return this.http.get<TrainingSession>(`${this.apiUrl}/recent`).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -172,7 +172,7 @@ export class TrainingSessionService {
   getTrainingSessionsCount(): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/count`).pipe(
       tap(response => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;
@@ -187,7 +187,7 @@ export class TrainingSessionService {
   deleteTrainingSession(sessionId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${sessionId}`).pipe(
       tap(() => {
-        // Success callback
+        
       }),
       catchError(error => {
         throw error;

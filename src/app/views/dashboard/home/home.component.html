@@ -107,30 +107,41 @@
               </div>
               <div class="training-info">
                 <h3>{{ training.name || 'Entraînement' }}</h3>
-                <p class="training-date">{{ formatDate(training.sessionDate) }}</p>
+                <p class="training-date">
+                  <i class="fas fa-calendar"></i>
+                  {{ formatDate(training.sessionDate) }}
+                </p>
               </div>
             </div>
             
             <div class="training-details">
               <div class="detail-item">
                 <i class="fas fa-clock"></i>
-                <span>{{ formatDuration(training.durationMinutes) }}</span>
+                <span>Durée: {{ formatDuration(training.durationMinutes) }}</span>
               </div>
               <div *ngIf="training.sessionType" class="detail-item">
                 <i class="fas fa-tag"></i>
-                <span>{{ training.sessionType }}</span>
+                <span>Type: {{ training.sessionType }}</span>
+              </div>
+              <div *ngIf="training.trainingProgramName" class="detail-item">
+                <i class="fas fa-list-check"></i>
+                <span>Programme: {{ training.trainingProgramName }}</span>
               </div>
             </div>
 
             <div *ngIf="training.description" class="training-description">
+              <i class="fas fa-info-circle"></i>
               <p>{{ training.description }}</p>
             </div>
 
-            <div class="training-actions">
-              <button class="btn-view-training">
-                <i class="fas fa-eye"></i>
-                Voir détails
-              </button>
+            <div *ngIf="training.exercises && training.exercises.length > 0" class="training-exercises">
+              <i class="fas fa-dumbbell"></i>
+              <span>{{ training.exercises.length }} exercice(s) effectué(s)</span>
+            </div>
+
+            <div *ngIf="training.notes" class="training-notes">
+              <i class="fas fa-sticky-note"></i>
+              <span>Notes: {{ training.notes }}</span>
             </div>
           </div>
         </div>

@@ -104,13 +104,13 @@ describe('HeaderComponent', () => {
    * Test de navigation profil pour différents états utilisateur
    */
   it('should navigate correctly based on authentication state', () => {
-    // Test authenticated user
+      
     mockAuthService.isAuthenticated.and.returnValue(true);
     component.onProfileClick();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/profile']);
     expect(component.showUserMenu).toBeFalse();
 
-    // Test non-authenticated user
+    
     mockAuthService.isAuthenticated.and.returnValue(false);
     component.onProfileClick();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
@@ -147,12 +147,12 @@ describe('HeaderComponent', () => {
    * Test de navigation logo pour différents états utilisateur
    */
   it('should navigate logo correctly based on authentication state', () => {
-    // Test authenticated user
+    
     mockAuthService.isAuthenticated.and.returnValue(true);
     component.onLogoClick();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/home']);
 
-    // Test non-authenticated user
+    
     mockAuthService.isAuthenticated.and.returnValue(false);
     component.onLogoClick();
     expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
@@ -187,11 +187,11 @@ describe('HeaderComponent', () => {
    * Test de fonctionnalité du nom d'affichage utilisateur
    */
   it('should get user display name correctly', () => {
-    // Test with user
+    
     component.currentUser = mockUser;
     expect(component.getUserDisplayName()).toBe('test@example.com');
 
-    // Test without user
+    
     component.currentUser = null;
     expect(component.getUserDisplayName()).toBe('Utilisateur');
   });
@@ -201,15 +201,15 @@ describe('HeaderComponent', () => {
    * Test de fonctionnalité des initiales utilisateur
    */
   it('should get user initials correctly', () => {
-    // Test with user
+    
     component.currentUser = mockUser;
     expect(component.getUserInitials()).toBe('TE');
 
-    // Test with complex email
+    
     component.currentUser = { ...mockUser, email: 'john.doe@example.com' };
     expect(component.getUserInitials()).toBe('JD');
 
-    // Test without user
+    
     component.currentUser = null;
     expect(component.getUserInitials()).toBe('');
   });

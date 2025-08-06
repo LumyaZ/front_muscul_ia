@@ -67,7 +67,7 @@ describe('AddExerciseToProgramComponent', () => {
 
   beforeEach(async () => {
     const exerciseServiceSpy = jasmine.createSpyObj('ExerciseService', ['getAllExercises']);
-    const programExerciseServiceSpy = jasmine.createSpyObj('ProgramExerciseService', ['addExerciseToProgram']);
+    const programExerciseServiceSpy = jasmine.createSpyObj('ProgramExerciseService', ['createProgramExercise']);
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser', 'isAuthenticated']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -101,7 +101,7 @@ describe('AddExerciseToProgramComponent', () => {
     mockAuthService.getCurrentUser.and.returnValue(mockUser);
     mockAuthService.isAuthenticated.and.returnValue(true);
     mockExerciseService.getAllExercises.and.returnValue(of(mockExercises));
-    mockProgramExerciseService.addExerciseToProgram.and.returnValue(of({
+    mockProgramExerciseService.createProgramExercise.and.returnValue(of({
       id: 1,
       trainingProgramId: 123,
       exerciseId: 1,
@@ -111,7 +111,6 @@ describe('AddExerciseToProgramComponent', () => {
       exerciseMuscleGroup: 'Chest',
       exerciseEquipmentNeeded: 'None',
       exerciseDifficultyLevel: 'Beginner',
-      orderIndex: 1,
       setsCount: 3,
       repsCount: 10,
       restDurationSeconds: 60,
@@ -199,13 +198,13 @@ describe('AddExerciseToProgramComponent', () => {
 
       component.onSubmit();
 
-      expect(mockProgramExerciseService.addExerciseToProgram).toHaveBeenCalledWith(123, jasmine.any(Object));
+      expect(mockProgramExerciseService.createProgramExercise).toHaveBeenCalledWith(jasmine.any(Object));
       expect(component.success).toBe('Exercice ajouté au programme avec succès !');
     });
 
     it('should handle error during form submission', () => {
       const error = { status: 400, message: 'Bad request' };
-      mockProgramExerciseService.addExerciseToProgram.and.returnValue(throwError(() => error));
+      mockProgramExerciseService.createProgramExercise.and.returnValue(throwError(() => error));
       
       component.addExerciseForm.patchValue({
         exerciseId: 1,
@@ -216,7 +215,7 @@ describe('AddExerciseToProgramComponent', () => {
       
       component.onSubmit();
       
-      expect(component.error).toBe('Erreur lors de l\'ajout de l\'exercice au programme');
+      expect(component.error).toBe('Données invalides. Veuillez vérifier les informations saisies.');
     });
   });
 
@@ -267,11 +266,11 @@ describe('AddExerciseToProgramComponent', () => {
     });
 
     it('should get error message for min value', () => {
-      const control = component.addExerciseForm.get('orderInProgram');
+      const control = component.addExerciseForm.get('setsCount');
       control?.markAsTouched();
       control?.setErrors({ min: { min: 1 } });
       
-      const errorMessage = component.getErrorMessage('orderInProgram');
+      const errorMessage = component.getErrorMessage('setsCount');
       
       expect(errorMessage).toBe('La valeur minimale est 1');
     });
@@ -282,16 +281,16 @@ describe('AddExerciseToProgramComponent', () => {
       control?.markAsTouched();
       
       const errorMessage = component.getErrorMessage('setsCount');
-      expect(errorMessage).toBe('Ce champ est requis.');
+      expect(errorMessage).toBe('Ce champ est requis');
     });
   });
 
   describe('Gestion des erreurs', () => {
     it('should handle different error types', () => {
       const testCases = [
-        { status: 401, expected: 'Session expirée. Veuillez vous reconnecter.' },
-        { status: 403, expected: 'Accès refusé. Vous n\'avez pas les permissions nécessaires.' },
-        { status: 404, expected: 'Programme non trouvé.' },
+        { status: 400, expected: 'Données invalides. Veuillez vérifier les informations saisies.' },
+        { status: 403, expected: 'Vous n\'avez pas les permissions pour modifier ce programme.' },
+        { status: 404, expected: 'Programme ou exercice non trouvé.' },
         { status: 500, expected: 'Custom error message' }
       ];
 

@@ -77,13 +77,11 @@ describe('RecordComponent', () => {
   });
 
   it('should clear error', () => {
-    // Initialize component first
     const mockUser = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
     mockAuthService.getCurrentUser.and.returnValue(mockUser);
     mockAuthService.isAuthenticated.and.returnValue(true);
     component.ngOnInit();
     
-    // Set error manually
     component.error = 'Test error';
 
     component.clearError();

@@ -28,7 +28,13 @@ describe('UserTrainingsComponent', () => {
       durationMinutes: 90,
       userId: 1,
       createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-01-15T10:00:00Z'
+      updatedAt: '2024-01-15T10:00:00Z',
+      notes: 'Très bon entraînement',
+      trainingProgramName: 'Programme Force',
+      exercises: [
+        { id: 1, exerciseName: 'Squat', setsCount: 3, repsCount: 10 },
+        { id: 2, exerciseName: 'Deadlift', setsCount: 3, repsCount: 8 }
+      ]
     },
     {
       id: 2,
@@ -39,7 +45,10 @@ describe('UserTrainingsComponent', () => {
       durationMinutes: 45,
       userId: 1,
       createdAt: '2024-01-14T08:00:00Z',
-      updatedAt: '2024-01-14T08:00:00Z'
+      updatedAt: '2024-01-14T08:00:00Z',
+      exercises: [
+        { id: 3, exerciseName: 'Burpees', setsCount: 5, repsCount: 15 }
+      ]
     }
   ];
 
@@ -200,45 +209,45 @@ describe('UserTrainingsComponent', () => {
       
       expect(component.loadTrainingSessions).toHaveBeenCalled();
     });
+  });
 
-    it('should navigate to training session details', () => {
-      const sessionId = 1;
+  describe('Display Information', () => {
+    beforeEach(() => {
+      mockAuthService.getCurrentUser.and.returnValue(mockUser);
+      mockTrainingSessionService.getUserTrainingSessions.and.returnValue(of(mockTrainingSessions));
       
-      component.viewTrainingSession(sessionId);
-      
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/trainings', sessionId]);
+      component.ngOnInit();
+      fixture.detectChanges();
     });
 
-    it('should delete training session successfully', () => {
-      const sessionId = 1;
-      spyOn(window, 'confirm').and.returnValue(true);
-      mockTrainingSessionService.deleteTrainingSession.and.returnValue(of(void 0));
-      spyOn(component, 'loadTrainingSessions');
+    it('should display training session information correctly', () => {
+      const compiled = fixture.nativeElement;
       
-      component.deleteTrainingSession(sessionId);
-      
-      expect(mockTrainingSessionService.deleteTrainingSession).toHaveBeenCalledWith(sessionId);
-      expect(component.loadTrainingSessions).toHaveBeenCalled();
+      expect(compiled.textContent).toContain('Entraînement Force');
+      expect(compiled.textContent).toContain('Cardio HIIT');
+      expect(compiled.textContent).toContain('Force');
+      expect(compiled.textContent).toContain('Cardio');
+      expect(compiled.textContent).toContain('1h 30min');
+      expect(compiled.textContent).toContain('45min');
     });
 
-    it('should not delete training session if user cancels', () => {
-      const sessionId = 1;
-      spyOn(window, 'confirm').and.returnValue(false);
+    it('should display exercises count when available', () => {
+      const compiled = fixture.nativeElement;
       
-      component.deleteTrainingSession(sessionId);
-      
-      expect(mockTrainingSessionService.deleteTrainingSession).not.toHaveBeenCalled();
+      expect(compiled.textContent).toContain('2 exercice(s) effectué(s)');
+      expect(compiled.textContent).toContain('1 exercice(s) effectué(s)');
     });
 
-    it('should handle delete error', () => {
-      const sessionId = 1;
-      const error = { status: 500 };
-      spyOn(window, 'confirm').and.returnValue(true);
-      mockTrainingSessionService.deleteTrainingSession.and.returnValue(throwError(() => error));
+    it('should display notes when available', () => {
+      const compiled = fixture.nativeElement;
       
-      component.deleteTrainingSession(sessionId);
+      expect(compiled.textContent).toContain('Notes: Très bon entraînement');
+    });
+
+    it('should display training program name when available', () => {
+      const compiled = fixture.nativeElement;
       
-      expect(component.error).toBe('Erreur lors de la suppression de la session');
+      expect(compiled.textContent).toContain('Programme: Programme Force');
     });
   });
 

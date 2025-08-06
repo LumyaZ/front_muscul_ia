@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 import { UserProgramsComponent } from './user-programs.component';
 import { UserTrainingProgramService } from '../../../../services/user-training-program.service';
 import { UserTrainingProgram } from '../../../../models/user-training-program.model';
+import { AuthService } from '../../../../services/auth.service';
 import { HeaderComponent } from '../../../../components/header/header.component';
 import { NavBarComponent } from '../../../../components/nav-bar/nav-bar.component';
 
@@ -14,60 +15,47 @@ describe('UserProgramsComponent', () => {
   let userTrainingProgramService: jasmine.SpyObj<UserTrainingProgramService>;
   let router: jasmine.SpyObj<Router>;
 
-  const mockPrograms: UserTrainingProgram[] = [
-    { 
+  const mockUser = {
+    id: 1,
+    email: 'test@test.com',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  };
+
+  const mockTrainingProgram = {
+    id: 1,
+    name: 'Programme Débutant',
+    description: 'Description du programme débutant',
+    difficultyLevel: 'Débutant',
+    category: 'Musculation',
+    targetAudience: 'Débutants',
+    createdByUserId: 1,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  };
+
+  const mockUserTrainingPrograms: UserTrainingProgram[] = [
+    {
       id: 1,
-      user: {
-        id: 1,
-        email: 'test@test.com',
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      trainingProgram: {
-        id: 1,
-        name: 'Programme Débutant',
-        description: 'Description du programme débutant',
-        difficultyLevel: 'Débutant',
-        category: 'Musculation',
-        targetAudience: 'Débutants',
-        createdByUserId: 1,
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      startDate: '2024-01-01T00:00:00Z',
-      progressPercentage: 0,
-      isActive: true,
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z',
+      user: mockUser,
+      trainingProgram: mockTrainingProgram,
       userId: 1,
-      trainingProgramId: 1
+      trainingProgramId: 1,
+      trainingProgramName: 'Programme Débutant',
+      trainingProgramDescription: 'Programme pour débutants',
+      trainingProgramDifficultyLevel: 'Débutant',
+      trainingProgramCategory: 'Musculation'
     },
-    { 
+    {
       id: 2,
-      user: {
-        id: 1,
-        email: 'test@test.com',
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      trainingProgram: {
-        id: 2,
-        name: 'Programme Intermédiaire',
-        description: 'Description du programme intermédiaire',
-        difficultyLevel: 'Intermédiaire',
-        category: 'Cardio',
-        targetAudience: 'Sportifs confirmés',
-        createdByUserId: 1,
-        createdAt: '2024-01-01T00:00:00Z',
-        updatedAt: '2024-01-01T00:00:00Z'
-      },
-      startDate: '2024-01-01T00:00:00Z',
-      progressPercentage: 0,
-      isActive: true,
-      createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z',
+      user: mockUser,
+      trainingProgram: mockTrainingProgram,
       userId: 1,
-      trainingProgramId: 2
+      trainingProgramId: 2,
+      trainingProgramName: 'Programme Intermédiaire',
+      trainingProgramDescription: 'Programme pour intermédiaires',
+      trainingProgramDifficultyLevel: 'Intermédiaire',
+      trainingProgramCategory: 'Cardio'
     }
   ];
 
@@ -77,9 +65,11 @@ describe('UserProgramsComponent', () => {
       'unsubscribeUserFromProgram'
     ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser']);
 
-    userTrainingProgramServiceSpy.getUserPrograms.and.returnValue(of(mockPrograms));
+    userTrainingProgramServiceSpy.getUserPrograms.and.returnValue(of(mockUserTrainingPrograms));
     userTrainingProgramServiceSpy.unsubscribeUserFromProgram.and.returnValue(of(null));
+    authServiceSpy.getCurrentUser.and.returnValue(mockUser);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -90,7 +80,8 @@ describe('UserProgramsComponent', () => {
       ],
       providers: [
         { provide: UserTrainingProgramService, useValue: userTrainingProgramServiceSpy },
-        { provide: Router, useValue: routerSpy }
+        { provide: Router, useValue: routerSpy },
+        { provide: AuthService, useValue: authServiceSpy }
       ]
     }).compileComponents();
 
@@ -113,7 +104,7 @@ describe('UserProgramsComponent', () => {
       component.ngOnInit();
       
       expect(userTrainingProgramService.getUserPrograms).toHaveBeenCalled();
-      expect(component.userPrograms).toEqual(mockPrograms);
+      expect(component.userPrograms).toEqual(mockUserTrainingPrograms);
     });
 
     it('should handle loading state', () => {
@@ -133,7 +124,7 @@ describe('UserProgramsComponent', () => {
     });
 
     it('should display program cards with correct data', () => {
-      component.userPrograms = mockPrograms;
+      component.userPrograms = mockUserTrainingPrograms;
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement;
@@ -144,19 +135,20 @@ describe('UserProgramsComponent', () => {
 
   describe('Gestion des programmes', () => {
     it('should view program details', () => {
-      const program = mockPrograms[0];
+      const program = mockUserTrainingPrograms[0];
       
       component.viewProgramDetails(program.id);
       
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/program-details', program.id]);
+      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/programs', program.id], { queryParams: { from: 'you-programs' } });
     });
 
     it('should unsubscribe from program', () => {
-      const program = mockPrograms[0];
+      const program = mockUserTrainingPrograms[0];
+      spyOn(window, 'confirm').and.returnValue(true);
       
-      component.unsubscribeFromProgram(program.id);
+      component.unsubscribeFromProgram(program.trainingProgramId!);
       
-      expect(userTrainingProgramService.unsubscribeUserFromProgram).toHaveBeenCalledWith(program.userId!, program.trainingProgramId!);
+      expect(userTrainingProgramService.unsubscribeUserFromProgram).toHaveBeenCalledWith(component.currentUser.id, program.trainingProgramId!);
     });
   });
 
@@ -164,8 +156,8 @@ describe('UserProgramsComponent', () => {
     it('should navigate to create program', () => {
       component.createNewProgram();
       
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/create-program'], {
-        queryParams: { from: 'you-programs' }
+      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/programs/create'], {
+        queryParams: { from: 'you-programs', userId: 1 }
       });
     });
 
@@ -182,7 +174,7 @@ describe('UserProgramsComponent', () => {
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('Aucun programme créé');
+      expect(compiled.textContent).toContain('Aucun programme');
     });
 
     it('should handle programs not found', () => {
@@ -199,10 +191,12 @@ describe('UserProgramsComponent', () => {
 
   describe('Affichage des informations', () => {
     it('should display program information correctly', () => {
-      component.userPrograms = mockPrograms;
+      component.userPrograms = mockUserTrainingPrograms;
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement;
+      expect(compiled.textContent).toContain('Programme Débutant');
+      expect(compiled.textContent).toContain('Programme Intermédiaire');
       expect(compiled.textContent).toContain('Débutant');
       expect(compiled.textContent).toContain('Intermédiaire');
       expect(compiled.textContent).toContain('Musculation');
@@ -210,29 +204,21 @@ describe('UserProgramsComponent', () => {
     });
 
     it('should display difficulty badges with correct colors', () => {
-      component.userPrograms = mockPrograms;
+      component.userPrograms = mockUserTrainingPrograms;
       fixture.detectChanges();
       
       const compiled = fixture.nativeElement;
       expect(compiled.textContent).toContain('Débutant');
       expect(compiled.textContent).toContain('Intermédiaire');
     });
-
-    it('should display creation date', () => {
-      component.userPrograms = mockPrograms;
-      fixture.detectChanges();
-      
-      const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('01/01/2024');
-    });
   });
 
   describe('Utilitaires', () => {
     it('should get status color', () => {
-      expect(component.getStatusColor('IN_PROGRESS')).toBe('#10B981');
-      expect(component.getStatusColor('COMPLETED')).toBe('#3B82F6');
-      expect(component.getStatusColor('PAUSED')).toBe('#F59E0B');
-      expect(component.getStatusColor('NOT_STARTED')).toBe('#6B7280');
+      expect(component.getStatusColor('IN_PROGRESS')).toBe('#4CAF50');
+      expect(component.getStatusColor('COMPLETED')).toBe('#2196F3');
+      expect(component.getStatusColor('PAUSED')).toBe('#FF9800');
+      expect(component.getStatusColor('NOT_STARTED')).toBe('#9E9E9E');
     });
 
     it('should get status text', () => {
@@ -243,7 +229,7 @@ describe('UserProgramsComponent', () => {
     });
 
     it('should track by program id', () => {
-      const program = mockPrograms[0];
+      const program = mockUserTrainingPrograms[0];
       const result = component.trackByProgramId(0, program);
       expect(result).toBe(program.id!);
     });

@@ -7,7 +7,6 @@ import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { User } from '../../../models/user.model';
 
-// Mock components
 @Component({
   selector: 'app-user-trainings',
   template: '<div>Mock User Trainings</div>',

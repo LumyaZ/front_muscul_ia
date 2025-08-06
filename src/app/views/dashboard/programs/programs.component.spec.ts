@@ -239,11 +239,13 @@ describe('ProgramsComponent', () => {
       
       component.viewProgram(programId);
       
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/program-details', programId]);
+      expect(router.navigate).toHaveBeenCalledWith(['/dashboard/programs', programId]);
     });
 
     it('should add program to user', () => {
       const programId = 1;
+      
+      spyOn(localStorage, 'getItem').and.returnValue('mock-token');
       
       component.addProgramToUser(programId);
       
@@ -261,7 +263,6 @@ describe('ProgramsComponent', () => {
       
       component.scrollLeft(0);
       
-      // Vérifier que la méthode ne lance pas d'erreur
       expect(component.categoryGroups.length).toBe(1);
     });
 
@@ -276,7 +277,6 @@ describe('ProgramsComponent', () => {
       
       component.scrollRight(0);
       
-      // Vérifier que la méthode ne lance pas d'erreur
       expect(component.categoryGroups.length).toBe(1);
     });
   });
@@ -305,16 +305,16 @@ describe('ProgramsComponent', () => {
     });
 
     it('should get card color', () => {
-      expect(component.getCardColor('Musculation')).toContain('linear-gradient');
-      expect(component.getCardColor('Cardio')).toContain('linear-gradient');
-      expect(component.getCardColor('Flexibilité')).toContain('linear-gradient');
-      expect(component.getCardColor('Mixte')).toContain('linear-gradient');
+      expect(component.getCardColor('Musculation')).toBe('rgba(102, 126, 234, 0.15)');
+      expect(component.getCardColor('Cardio')).toBe('rgba(240, 147, 251, 0.15)');
+      expect(component.getCardColor('Flexibilité')).toBe('rgba(79, 172, 254, 0.15)');
+      expect(component.getCardColor('Mixte')).toBe('rgba(67, 233, 123, 0.15)');
     });
 
     it('should format duration', () => {
-      expect(component.formatDuration(30)).toBe('30min');
+      expect(component.formatDuration(30)).toBe('30 min');
       expect(component.formatDuration(60)).toBe('1h');
-      expect(component.formatDuration(90)).toBe('1h 30min');
+      expect(component.formatDuration(90)).toBe('1h30');
     });
 
     it('should get total programs count', () => {

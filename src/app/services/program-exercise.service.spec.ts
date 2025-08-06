@@ -8,21 +8,24 @@ describe('ProgramExerciseService', () => {
   let service: ProgramExerciseService;
   let httpMock: HttpTestingController;
 
-  const mockProgramExercise: ProgramExercise = {
+  const mockProgramExercise = {
     id: 1,
     trainingProgramId: 1,
     exerciseId: 1,
-    exerciseName: 'Pompes',
-    exerciseDescription: 'Exercice de musculation pour les pectoraux',
-    exerciseMuscleGroup: 'Pectoraux',
-    orderIndex: 1,
+    exerciseName: 'Push-ups',
+    exerciseDescription: 'Classic push-ups',
+    exerciseCategory: 'Strength',
+    exerciseMuscleGroup: 'Chest',
+    exerciseEquipmentNeeded: 'None',
+    exerciseDifficultyLevel: 'Beginner',
     setsCount: 3,
-    repsCount: 12,
-    durationSeconds: 60,
-    restDurationSeconds: 90,
+    repsCount: 10,
+    restDurationSeconds: 60,
     weightKg: 0,
-    notes: 'Exercice de base',
-    isOptional: false
+    distanceMeters: 0,
+    notes: 'Test exercise',
+    createdAt: '2024-01-01T10:00:00Z',
+    updatedAt: '2024-01-01T10:00:00Z'
   };
 
   beforeEach(() => {
@@ -52,7 +55,7 @@ describe('ProgramExerciseService', () => {
         expect(exercises).toEqual(mockExercises);
         expect(exercises.length).toBe(1);
         expect(exercises[0].id).toBe(1);
-        expect(exercises[0].exerciseName).toBe('Pompes');
+        expect(exercises[0].exerciseName).toBe('Push-ups');
         expect(exercises[0].trainingProgramId).toBe(programId);
       });
 
@@ -82,7 +85,7 @@ describe('ProgramExerciseService', () => {
       service.getProgramExerciseById(exerciseId).subscribe(exercise => {
         expect(exercise).toEqual(mockProgramExercise);
         expect(exercise.id).toBe(exerciseId);
-        expect(exercise.exerciseName).toBe('Pompes');
+        expect(exercise.exerciseName).toBe('Push-ups');
       });
 
       const req = httpMock.expectOne(`${environment.apiUrl}/program-exercises/${exerciseId}`);

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { TrainingComponent } from './training.component';
@@ -248,7 +248,7 @@ describe('TrainingComponent', () => {
     expect(component.isPaused).toBe(false);
   });
 
-  it('should finish training successfully', () => {
+  it('should finish training successfully with session', () => {
     component.session = {
       id: 1,
       userId: 1,
@@ -267,87 +267,102 @@ describe('TrainingComponent', () => {
     mockAuthService.getToken.and.returnValue('mock-token');
     mockTrainingSessionService.createTrainingSession.and.returnValue(of({ id: 1 } as any));
 
+    spyOn(component as any, 'saveTrainingSession');
     component.finishTraining();
 
     expect(component.isTrainingComplete).toBe(true);
     expect(component.session?.endTime).toBeDefined();
-    expect(mockTrainingSessionService.createTrainingSession).toHaveBeenCalled();
+    expect((component as any).saveTrainingSession).toHaveBeenCalled();
   });
 
-  it('should not finish training when no token', () => {
-    component.session = {
-      id: 1,
-      userId: 1,
-      trainingProgramId: 1,
-      name: 'Test Session',
-      description: 'Test session description',
-      sessionDate: new Date().toISOString(),
-      sessionType: 'Strength',
-      durationMinutes: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isCompleted: false,
-      exercises: []
-    };
+  it('should finish training successfully without session', () => {
+    component.session = null;
+    component.programId = 1;
     component.currentUser = mockUser;
-    mockAuthService.getToken.and.returnValue(null);
+    mockAuthService.isAuthenticated.and.returnValue(true);
+    mockAuthService.getToken.and.returnValue('mock-token');
+    mockTrainingSessionService.createTrainingSession.and.returnValue(of({ id: 1 } as any));
 
+    spyOn(component as any, 'createNewSession');
     component.finishTraining();
 
-    expect(component.error).toBe('Erreur d\'authentification. Veuillez vous reconnecter.');
+    expect((component as any).createNewSession).toHaveBeenCalled();
   });
 
-  it('should handle 403 error when saving session', () => {
-    component.session = {
-      id: 1,
-      userId: 1,
-      trainingProgramId: 1,
-      name: 'Test Session',
-      description: 'Test session description',
-      sessionDate: new Date().toISOString(),
-      sessionType: 'Strength',
-      durationMinutes: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isCompleted: false,
-      exercises: []
-    };
+  it('should handle token expiration during finish training', () => {
+    component.session = null;
+    component.programId = 1;
     component.currentUser = mockUser;
+    mockAuthService.isAuthenticated.and.returnValue(false);
+
+    spyOn(component as any, 'handleTokenExpiration');
+    component.finishTraining();
+
+    expect((component as any).handleTokenExpiration).toHaveBeenCalled();
+  });
+
+  it('should handle 403 error when creating session', () => {
+    component.session = null;
+    component.programId = 1;
+    component.currentUser = mockUser;
+    mockAuthService.isAuthenticated.and.returnValue(true);
     mockAuthService.getToken.and.returnValue('mock-token');
     
     const error403 = { status: 403, error: 'Forbidden' };
     mockTrainingSessionService.createTrainingSession.and.returnValue(throwError(() => error403));
 
+    spyOn(component as any, 'handleTokenExpiration');
     component.finishTraining();
 
-    expect(component.error).toBe('Erreur d\'autorisation. Veuillez vous reconnecter.');
+    expect((component as any).handleTokenExpiration).toHaveBeenCalled();
   });
 
-  it('should handle 401 error when saving session', () => {
-    component.session = {
-      id: 1,
-      userId: 1,
-      trainingProgramId: 1,
-      name: 'Test Session',
-      description: 'Test session description',
-      sessionDate: new Date().toISOString(),
-      sessionType: 'Strength',
-      durationMinutes: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isCompleted: false,
-      exercises: []
-    };
+  it('should handle 401 error when creating session', () => {
+    component.session = null;
+    component.programId = 1;
     component.currentUser = mockUser;
+    mockAuthService.isAuthenticated.and.returnValue(true);
     mockAuthService.getToken.and.returnValue('mock-token');
     
     const error401 = { status: 401, error: 'Unauthorized' };
     mockTrainingSessionService.createTrainingSession.and.returnValue(throwError(() => error401));
 
+    spyOn(component as any, 'handleTokenExpiration');
     component.finishTraining();
 
-    expect(component.error).toBe('Session expirée. Veuillez vous reconnecter.');
+    expect((component as any).handleTokenExpiration).toHaveBeenCalled();
   });
+
+  it('should handle other errors when creating session', () => {
+    component.session = null;
+    component.programId = 1;
+    component.currentUser = mockUser;
+    mockAuthService.isAuthenticated.and.returnValue(true);
+    mockAuthService.getToken.and.returnValue('mock-token');
+    
+    const error500 = { status: 500, error: 'Internal Server Error' };
+    mockTrainingSessionService.createTrainingSession.and.returnValue(throwError(() => error500));
+
+    component.finishTraining();
+
+    expect(component.error).toBe('Erreur lors de la création de la session d\'entraînement');
+    expect(component.loading).toBe(false);
+  });
+
+  it('should handle token expiration', fakeAsync(() => {
+    spyOn(localStorage, 'removeItem');
+
+    (component as any).handleTokenExpiration();
+
+    expect(component.error).toBe('Session expirée. Veuillez vous reconnecter.');
+    expect(component.loading).toBe(false);
+    expect(localStorage.removeItem).toHaveBeenCalledWith('auth_token');
+    expect(localStorage.removeItem).toHaveBeenCalledWith('current_user');
+    
+    tick(2000);
+    
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+  }));
 
   it('should stop training', () => {
     component.session = {

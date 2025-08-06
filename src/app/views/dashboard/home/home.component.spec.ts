@@ -30,7 +30,13 @@ describe('HomeComponent', () => {
       durationMinutes: 60,
       userId: 1,
       createdAt: '2024-01-01T10:00:00Z',
-      updatedAt: '2024-01-01T10:00:00Z'
+      updatedAt: '2024-01-01T10:00:00Z',
+      notes: 'Très bon cardio',
+      trainingProgramName: 'Programme Cardio',
+      exercises: [
+        { id: 1, exerciseName: 'Course', setsCount: 1, repsCount: 30 },
+        { id: 2, exerciseName: 'Burpees', setsCount: 3, repsCount: 10 }
+      ]
     },
     {
       id: 2,
@@ -41,7 +47,10 @@ describe('HomeComponent', () => {
       durationMinutes: 45,
       userId: 1,
       createdAt: '2024-01-02T10:00:00Z',
-      updatedAt: '2024-01-02T10:00:00Z'
+      updatedAt: '2024-01-02T10:00:00Z',
+      exercises: [
+        { id: 3, exerciseName: 'Squat', setsCount: 3, repsCount: 12 }
+      ]
     }
   ];
 

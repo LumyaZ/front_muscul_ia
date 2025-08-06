@@ -36,7 +36,7 @@ describe('CreateProgramComponent', () => {
   };
 
   beforeEach(async () => {
-    const trainingProgramServiceSpy = jasmine.createSpyObj('TrainingProgramService', ['createTrainingProgram']);
+    const trainingProgramServiceSpy = jasmine.createSpyObj('TrainingProgramService', ['createProgram']);
     const authServiceSpy = jasmine.createSpyObj('AuthService', [
       'getCurrentUser',
       'isAuthenticated',
@@ -47,7 +47,7 @@ describe('CreateProgramComponent', () => {
       queryParams: of({})
     });
 
-    trainingProgramServiceSpy.createTrainingProgram.and.returnValue(of(mockCreatedProgram));
+    trainingProgramServiceSpy.createProgram.and.returnValue(of(mockCreatedProgram));
     authServiceSpy.getCurrentUser.and.returnValue(mockUser);
     authServiceSpy.isAuthenticated.and.returnValue(true);
     authServiceSpy.getToken.and.returnValue('mock-token');

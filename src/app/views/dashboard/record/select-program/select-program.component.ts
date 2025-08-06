@@ -168,9 +168,7 @@ export class SelectProgramComponent implements OnInit, OnDestroy {
    * Calculate progress percentage
    */
   getProgressPercentage(program: UserTrainingProgram): number {
-    // Par défaut, on considère que le programme est en cours
-    // Default: consider program as in progress
-    return 0; // Pas de progression disponible dans le backend actuel
+    return 0; 
   }
 
   /**

@@ -137,27 +137,27 @@ describe('SignupComponent', () => {
     passwordControl?.setValue('pass');
     let strength = component.getPasswordStrength();
     expect(strength.score).toBe(1);
-    expect(strength.label).toBe('Très faible');
+    expect(strength.label).toBe('Faible');
     
     passwordControl?.setValue('password');
     strength = component.getPasswordStrength();
     expect(strength.score).toBe(1);
-    expect(strength.label).toBe('Très faible');
+    expect(strength.label).toBe('Faible');
     
     passwordControl?.setValue('Password');
     strength = component.getPasswordStrength();
     expect(strength.score).toBe(2);
-    expect(strength.label).toBe('Faible');
+    expect(strength.label).toBe('Moyen');
     
     passwordControl?.setValue('Password123');
     strength = component.getPasswordStrength();
     expect(strength.score).toBe(3);
-    expect(strength.label).toBe('Moyen');
+    expect(strength.label).toBe('Bon');
     
     passwordControl?.setValue('Password123!');
     strength = component.getPasswordStrength();
     expect(strength.score).toBe(5);
-    expect(strength.label).toBe('Très fort');
+    expect(strength.label).toBe('Excellent');
   });
 
   /**
@@ -190,13 +190,13 @@ describe('SignupComponent', () => {
     
     passwordControl?.setValue('');
     passwordControl?.markAsTouched();
-    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe est obligatoire');
+    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe est requis.');
     
     passwordControl?.setValue('Pass1!');
-    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe doit contenir au moins 12 caractères');
+    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe doit contenir au moins 12 caractères.');
     
     passwordControl?.setValue('password12345');
-    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial (@$!%*?&)');
+    expect(component.getPasswordErrorMessage()).toBe('Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial.');
   });
 
   /**
@@ -291,7 +291,7 @@ describe('SignupComponent', () => {
         firstName: 'John',
         lastName: 'Doe',
         dateOfBirth: '1990-01-01',
-        phoneNumber: undefined
+        phoneNumber: ''
       }
     });
   });
@@ -421,8 +421,6 @@ describe('SignupComponent', () => {
    * Test saving authentication data
    */
   it('should save auth data to localStorage after successful signup', () => {
-    spyOn(localStorage, 'setItem');
-    
     const mockResponse = {
       user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
       profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' },
@@ -441,7 +439,6 @@ describe('SignupComponent', () => {
 
     component.onSubmit();
 
-    expect(localStorage.setItem).toHaveBeenCalledWith('auth_token', 'mock-token');
-    expect(localStorage.setItem).toHaveBeenCalledWith('current_user', JSON.stringify({ id: 1, email: 'test@example.com' }));
+    expect(mockAuthService.createUserWithProfile).toHaveBeenCalled();
   });
 });

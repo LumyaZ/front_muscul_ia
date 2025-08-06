@@ -50,8 +50,6 @@ export class TrainingInfoFormComponent implements OnInit {
   authToken: string | null = null;
   currentStep = 1;
 
-  // Display names for dropdowns
-  // Noms d'affichage pour les menus déroulants
   genderOptions = Object.values(Gender);
   experienceLevelOptions = Object.values(ExperienceLevel);
   sessionFrequencyOptions = Object.values(SessionFrequency);
@@ -60,8 +58,6 @@ export class TrainingInfoFormComponent implements OnInit {
   trainingPreferenceOptions = Object.values(TrainingPreference);
   equipmentOptions = Object.values(Equipment);
 
-  // Display name mappings
-  // Mappages des noms d'affichage
   genderDisplayNames = GenderDisplayNames;
   experienceLevelDisplayNames = ExperienceLevelDisplayNames;
   sessionFrequencyDisplayNames = SessionFrequencyDisplayNames;

@@ -202,7 +202,6 @@ export class SignupComponent {
       this.authService.createUserWithProfile(request).subscribe({
         next: (response: CreateUserWithProfileResponse) => {
           this.isLoading = false;
-          // Les données d'authentification sont maintenant sauvegardées automatiquement par le service
           this.router.navigate(['/training-info']);
         },
         error: (error: any) => {

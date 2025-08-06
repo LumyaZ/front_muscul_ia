@@ -108,8 +108,7 @@ export class TrainingComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (exercises: any[]) => {
-            // Trier les exercices par ordre d'ajout (pas d'ordre spécifique dans le backend)
-            // Sort exercises by addition order (no specific order in backend)
+
             this.exercises = exercises.map(exercise => ({
               ...exercise,
               completedSets: new Array(exercise.setsCount).fill(false),
@@ -268,6 +267,9 @@ export class TrainingComponent implements OnInit, OnDestroy {
   finishTraining(): void {
     if (this.loading) return;
     
+    this.loading = true;
+    this.error = '';
+    
     try {
       if (this.session) {
         this.session.endTime = new Date().toISOString();
@@ -276,10 +278,13 @@ export class TrainingComponent implements OnInit, OnDestroy {
         this.isTrainingComplete = true;
         
         this.saveTrainingSession();
+      } else {
+        this.createNewSession();
       }
     } catch (error) {
       console.error('Erreur lors de la finalisation de l\'entraînement:', error);
       this.error = 'Erreur lors de la finalisation de l\'entraînement';
+      this.loading = false;
     }
   }
 
@@ -314,6 +319,7 @@ export class TrainingComponent implements OnInit, OnDestroy {
       console.error('Cannot save session - missing data');
       console.error('Session:', this.session);
       console.error('Current user:', this.currentUser);
+      this.loading = false;
       return;
     }
 
@@ -321,6 +327,7 @@ export class TrainingComponent implements OnInit, OnDestroy {
     if (!token) {
       console.error('No authentication token found');
       this.error = 'Erreur d\'authentification. Veuillez vous reconnecter.';
+      this.loading = false;
       setTimeout(() => {
         this.router.navigate(['/login']);
       }, 2000);
@@ -341,7 +348,7 @@ export class TrainingComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
-            
+            this.loading = false;
             this.router.navigate(['/dashboard/record/training-recap'], {
               queryParams: {
                 sessionId: response.id,
@@ -354,26 +361,87 @@ export class TrainingComponent implements OnInit, OnDestroy {
             console.error('Erreur lors de la sauvegarde de la session:', error);
             console.error('Error details:', error.error);
             console.error('Error status:', error.status);
+            this.loading = false;
             
             if (error.status === 403) {
               this.error = 'Erreur d\'autorisation. Veuillez vous reconnecter.';
               setTimeout(() => {
                 this.router.navigate(['/login']);
               }, 2000);
-            } else if (error.status === 401) {
-              this.error = 'Session expirée. Veuillez vous reconnecter.';
-              setTimeout(() => {
-                this.router.navigate(['/login']);
-              }, 2000);
+            } else if (error.status === 400) {
+              this.error = 'Données invalides. Veuillez vérifier les informations.';
             } else {
-              this.error = 'Erreur lors de la sauvegarde de la session';
+              this.error = 'Erreur lors de la sauvegarde de la session d\'entraînement';
             }
           }
         });
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde de la session:', error);
-      this.error = 'Erreur lors de la sauvegarde de la session';
+      console.error('Erreur lors de la création de la requête:', error);
+      this.error = 'Erreur lors de la création de la session d\'entraînement';
+      this.loading = false;
     }
+  }
+
+  /**
+   * Gère l'expiration du token et redirige vers la connexion
+   * Handle token expiration and redirect to login
+   */
+  private handleTokenExpiration(): void {
+    console.warn('Token expiré ou invalide. Redirection vers la page de connexion.');
+    this.error = 'Session expirée. Veuillez vous reconnecter.';
+    this.loading = false;
+    
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('current_user');
+    
+    setTimeout(() => {
+      this.router.navigate(['/login']);
+    }, 2000);
+  }
+
+  /**
+   * Crée une nouvelle session d'entraînement
+   * Create a new training session
+   */
+  private createNewSession(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.handleTokenExpiration();
+      return;
+    }
+
+    const createRequest: CreateTrainingSessionRequest = {
+      name: `Entraînement ${this.programId} - ${new Date().toLocaleDateString()}`,
+      description: this.generateSessionDescription(),
+      sessionDate: this.startTime.toISOString(),
+      sessionType: 'Musculation',
+      durationMinutes: Math.floor(this.elapsedTime / 60),
+      trainingProgramId: this.programId!
+    };
+
+    this.trainingSessionService.createTrainingSession(createRequest)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.loading = false;
+          this.router.navigate(['/dashboard/record/training-recap'], {
+            queryParams: {
+              sessionId: response.id,
+              duration: Math.floor(this.elapsedTime / 60),
+              completed: true
+            }
+          });
+        },
+        error: (error) => {
+          console.error('Erreur lors de la création de la session:', error);
+          
+          if (error.status === 401 || error.status === 403) {
+            this.handleTokenExpiration();
+          } else {
+            this.error = 'Erreur lors de la création de la session d\'entraînement';
+            this.loading = false;
+          }
+        }
+      });
   }
 
   /**

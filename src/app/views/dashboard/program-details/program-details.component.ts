@@ -297,8 +297,7 @@ export class ProgramDetailsComponent implements OnInit {
 
     let totalMinutes = 0;
     this.program.exercises.forEach(exercise => {
-      // Estimation basée sur les séries et le repos uniquement
-      // Estimation based on sets and rest only
+
       const restTime = exercise.restDurationSeconds ? exercise.restDurationSeconds / 60 : 0;
       const setsTime = (exercise.setsCount || 0) * restTime;
       totalMinutes += setsTime;

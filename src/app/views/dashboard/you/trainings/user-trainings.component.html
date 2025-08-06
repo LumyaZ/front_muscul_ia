@@ -23,10 +23,6 @@
   <div *ngIf="!isLoading && !error && trainingSessions.length > 0" class="trainings-section">
     <header class="section-header">
       <h2>Mes Entraînements</h2>
-      <button class="filter-btn" aria-label="Filtrer les entraînements">
-        <i class="fas fa-filter" aria-hidden="true"></i>
-        Filtrer
-      </button>
     </header>
 
     <div class="trainings-list" role="list" aria-label="Liste des sessions d'entraînement">
@@ -37,30 +33,33 @@
         <div class="training-info">
           <h3>{{ session.name }}</h3>
           <p class="training-date">
+            <i class="fas fa-calendar" aria-hidden="true"></i>
             <time [attr.datetime]="session.sessionDate">{{ formatDate(session.sessionDate) }}</time>
           </p>
-          <p class="training-duration">Durée: {{ formatDuration(session.durationMinutes) }}</p>
+          <p class="training-duration">
+            <i class="fas fa-clock" aria-hidden="true"></i>
+            Durée: {{ formatDuration(session.durationMinutes) }}
+          </p>
           <p *ngIf="session.sessionType" class="training-type">
             <i class="fas fa-tag" aria-hidden="true"></i>
-            {{ session.sessionType }}
+            Type: {{ session.sessionType }}
           </p>
           <p *ngIf="session.description" class="training-description">
+            <i class="fas fa-info-circle" aria-hidden="true"></i>
             {{ session.description }}
           </p>
-        </div>
-        <div class="training-actions" role="group" aria-label="Actions pour la session">
-          <button class="view-btn" 
-                  (click)="viewTrainingSession(session.id)"
-                  [attr.aria-label]="'Voir les détails de ' + session.name">
-            <i class="fas fa-eye" aria-hidden="true"></i>
-            Voir
-          </button>
-          <button class="delete-btn" 
-                  (click)="deleteTrainingSession(session.id)"
-                  [attr.aria-label]="'Supprimer ' + session.name">
-            <i class="fas fa-trash" aria-hidden="true"></i>
-            Supprimer
-          </button>
+          <p *ngIf="session.exercises && session.exercises.length > 0" class="training-exercises">
+            <i class="fas fa-dumbbell" aria-hidden="true"></i>
+            {{ session.exercises.length }} exercice(s) effectué(s)
+          </p>
+          <p *ngIf="session.notes" class="training-notes">
+            <i class="fas fa-sticky-note" aria-hidden="true"></i>
+            Notes: {{ session.notes }}
+          </p>
+          <p *ngIf="session.trainingProgramName" class="training-program">
+            <i class="fas fa-list-check" aria-hidden="true"></i>
+            Programme: {{ session.trainingProgramName }}
+          </p>
         </div>
       </article>
     </div>

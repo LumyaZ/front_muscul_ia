@@ -25,6 +25,52 @@
     background-clip: text;
   }
 
+  .header-actions {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .ai-generate-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+    border: none;
+    border-radius: 25px;
+    color: $text-white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+    position: relative;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    span {
+      font-size: 1.2rem;
+    }
+
+    .ai-loading-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid $text-white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+  }
+
   .create-program-btn {
     display: flex;
     align-items: center;
@@ -334,6 +380,20 @@
     h2 {
       font-size: 1.5rem;
     }
+
+    .header-actions {
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .ai-generate-btn,
+    .create-program-btn {
+      width: 100%;
+      justify-content: center;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+    }
   }
 
   .programs-content {
@@ -380,9 +440,14 @@
       font-size: 1.3rem;
     }
 
+    .header-actions {
+      gap: 8px;
+    }
+
+    .ai-generate-btn,
     .create-program-btn {
-      padding: 10px 16px;
-      font-size: 0.9rem;
+      padding: 8px 14px;
+      font-size: 0.85rem;
     }
   }
 

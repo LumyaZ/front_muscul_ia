@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { 
   TrainingInfo, 
@@ -32,7 +32,28 @@ export class TrainingInfoService {
    * Obtenir les informations d'entraînement pour l'utilisateur actuel.
    */
   getTrainingInfo(): Observable<TrainingInfo> {
-    return this.http.get<TrainingInfo>(this.apiUrl);
+    console.log('🔍 === TRAINING-INFO SERVICE CALLED ===');
+    console.log('API URL:', this.apiUrl);
+    console.log('localStorage token:', localStorage.getItem('auth_token'));
+    console.log('localStorage user:', localStorage.getItem('current_user'));
+    
+    return this.http.get<TrainingInfo>(this.apiUrl).pipe(
+      tap({
+        next: (response) => {
+          console.log('✅ TrainingInfo API call successful:', response);
+        },
+        error: (error) => {
+          console.log('❌ TrainingInfo API call failed:', error);
+          console.log('Error status:', error.status);
+          console.log('Error message:', error.message);
+          console.log('Error details:', error.error);
+        }
+      }),
+      catchError((error) => {
+        console.log('❌ TrainingInfo service error caught:', error);
+        throw error;
+      })
+    );
   }
 
   /**

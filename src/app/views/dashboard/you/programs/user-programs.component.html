@@ -1,12 +1,22 @@
 <section class="programs-container" aria-label="Programmes d'entraînement">
   <header class="content-header">
     <h2>Mes Programmes</h2>
-    <button class="create-program-btn" 
-            (click)="createNewProgram()" 
-            aria-label="Créer un nouveau programme d'entraînement">
-      <span aria-hidden="true">➕</span>
-      Créer un programme
-    </button>
+    <div class="header-actions">
+      <button class="ai-generate-btn" 
+              (click)="generateProgramWithAI()" 
+              [disabled]="aiLoading"
+              aria-label="Générer un programme personnalisé avec l'IA">
+        <span aria-hidden="true">🤖</span>
+        {{ aiLoading ? 'Génération IA...' : 'Générer avec IA' }}
+        <div *ngIf="aiLoading" class="ai-loading-spinner"></div>
+      </button>
+      <button class="create-program-btn" 
+              (click)="createNewProgram()" 
+              aria-label="Créer un nouveau programme d'entraînement">
+        <span aria-hidden="true">➕</span>
+        Créer un programme
+      </button>
+    </div>
   </header>
 
   <div class="programs-content">

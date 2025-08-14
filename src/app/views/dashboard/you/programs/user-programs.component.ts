@@ -5,6 +5,8 @@ import { Subject, takeUntil } from 'rxjs';
 import { UserTrainingProgramService } from '../../../../services/user-training-program.service';
 import { UserTrainingProgram } from '../../../../models/user-training-program.model';
 import { AuthService } from '../../../../services/auth.service';
+import { AITrainingService } from '../../../../services/ai-training.service';
+import { TrainingProgram } from '../../../../models/training-program.model';
 
 /**
  * Interface pour les statuts de programme
@@ -33,9 +35,11 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private userTrainingProgramService = inject(UserTrainingProgramService);
   private authService = inject(AuthService);
+  private aiTrainingService = inject(AITrainingService);
   private destroy$ = new Subject<void>();
 
   isLoading = false;
+  aiLoading = false;
   error: string | null = null;
   userPrograms: UserTrainingProgram[] = [];
   currentUser: any = null;
@@ -222,5 +226,58 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
    */
   trackByProgramId(index: number, userProgram: UserTrainingProgram): number {
     return userProgram.trainingProgramId || index;
+  }
+
+  /**
+   * Génère un programme personnalisé avec l'IA
+   * Generate a personalized program with AI
+   */
+  generateProgramWithAI(): void {
+    if (!this.currentUser || !this.currentUser.id) {
+      this.error = 'Erreur: Utilisateur non connecté';
+      return;
+    }
+
+    this.aiLoading = true;
+    this.error = null;
+    this.success = null;
+
+    this.aiTrainingService.generateProgramWithAI(this.currentUser.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (generatedProgram: TrainingProgram) => {
+          this.aiLoading = false;
+          this.success = `Programme "${generatedProgram.name}" généré avec succès par l'IA !`;
+          
+          // Recharger la liste des programmes pour inclure le nouveau
+          this.loadUserPrograms();
+          
+          setTimeout(() => this.success = '', 5000);
+        },
+        error: (err: any) => {
+          this.aiLoading = false;
+          this.handleAIError(err);
+        }
+      });
+  }
+
+  /**
+   * Gère les erreurs spécifiques à l'IA
+   * Handle AI-specific errors
+   */
+  private handleAIError(error: any): void {
+    console.error('Erreur IA:', error);
+    
+    if (error.status === 0) {
+      this.error = 'Impossible de se connecter au service IA. Vérifiez votre connexion.';
+    } else if (error.status === 503) {
+      this.error = 'Service IA temporairement indisponible. Veuillez réessayer plus tard.';
+    } else if (error.status === 500) {
+      this.error = 'Erreur lors de la génération du programme. Veuillez réessayer.';
+    } else {
+      this.error = 'Erreur lors de la génération du programme avec l\'IA.';
+    }
+    
+    setTimeout(() => this.error = '', 5000);
   }
 } 

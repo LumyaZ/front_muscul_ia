@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { TrainingProgram, CreateTrainingProgramRequest } from '../models/training-program.model';
@@ -22,7 +22,27 @@ export class TrainingProgramService {
    * Récupérer tous les programmes d'entraînement publics.
    */
   getPublicPrograms(): Observable<TrainingProgram[]> {
-    return this.http.get<TrainingProgram[]>(`${this.apiUrl}/public`);
+    console.log('🔍 === TRAINING-PROGRAM SERVICE CALLED ===');
+    console.log('API URL:', `${this.apiUrl}/public`);
+    console.log('localStorage token:', localStorage.getItem('auth_token'));
+    console.log('localStorage user:', localStorage.getItem('current_user'));
+    
+    return this.http.get<TrainingProgram[]>(`${this.apiUrl}/public`).pipe(
+      tap({
+        next: (response) => {
+          console.log('✅ TrainingProgram API call successful:', response);
+        },
+        error: (error) => {
+          console.log('❌ TrainingProgram API call failed:', error);
+          console.log('Error status:', error.status);
+          console.log('Error message:', error.message);
+        }
+      }),
+      catchError((error) => {
+        console.log('❌ TrainingProgram service error caught:', error);
+        throw error;
+      })
+    );
   }
 
   /**

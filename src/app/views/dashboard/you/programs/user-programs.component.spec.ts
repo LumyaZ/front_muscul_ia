@@ -6,6 +6,8 @@ import { UserProgramsComponent } from './user-programs.component';
 import { UserTrainingProgramService } from '../../../../services/user-training-program.service';
 import { UserTrainingProgram } from '../../../../models/user-training-program.model';
 import { AuthService } from '../../../../services/auth.service';
+import { AITrainingService } from '../../../../services/ai-training.service';
+import { TrainingProgram } from '../../../../models/training-program.model';
 import { HeaderComponent } from '../../../../components/header/header.component';
 import { NavBarComponent } from '../../../../components/nav-bar/nav-bar.component';
 
@@ -13,11 +15,24 @@ describe('UserProgramsComponent', () => {
   let component: UserProgramsComponent;
   let fixture: ComponentFixture<UserProgramsComponent>;
   let userTrainingProgramService: jasmine.SpyObj<UserTrainingProgramService>;
+  let aiTrainingService: jasmine.SpyObj<AITrainingService>;
   let router: jasmine.SpyObj<Router>;
 
   const mockUser = {
     id: 1,
     email: 'test@test.com',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  };
+
+  const mockGeneratedProgram: TrainingProgram = {
+    id: 3,
+    name: 'Programme IA Généré',
+    description: 'Programme généré par l\'IA',
+    difficultyLevel: 'Intermédiaire',
+    category: 'Mixte',
+    targetAudience: 'Tous niveaux',
+    createdByUserId: 1,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z'
   };
@@ -64,6 +79,7 @@ describe('UserProgramsComponent', () => {
       'getUserPrograms',
       'unsubscribeUserFromProgram'
     ]);
+    const aiTrainingServiceSpy = jasmine.createSpyObj('AITrainingService', ['generateProgram']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser']);
 
@@ -81,11 +97,13 @@ describe('UserProgramsComponent', () => {
       providers: [
         { provide: UserTrainingProgramService, useValue: userTrainingProgramServiceSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: AuthService, useValue: authServiceSpy }
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: AITrainingService, useValue: aiTrainingServiceSpy }
       ]
     }).compileComponents();
 
     userTrainingProgramService = TestBed.inject(UserTrainingProgramService) as jasmine.SpyObj<UserTrainingProgramService>;
+    aiTrainingService = TestBed.inject(AITrainingService) as jasmine.SpyObj<AITrainingService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
   });
 
@@ -232,6 +250,70 @@ describe('UserProgramsComponent', () => {
       const program = mockUserTrainingPrograms[0];
       const result = component.trackByProgramId(0, program);
       expect(result).toBe(program.id!);
+    });
+  });
+
+  describe('Génération IA', () => {
+    beforeEach(() => {
+      aiTrainingService.generateProgramWithAI.and.returnValue(of(mockGeneratedProgram));
+    });
+
+    it('should generate program with AI successfully', () => {
+      component.generateProgramWithAI();
+      
+      expect(aiTrainingService.generateProgramWithAI).toHaveBeenCalledWith(mockUser.id);
+      expect(component.aiLoading).toBe(false);
+      expect(component.success).toContain('Programme "Programme IA Généré" généré avec succès');
+    });
+
+    it('should handle AI generation error', () => {
+      aiTrainingService.generateProgramWithAI.and.returnValue(
+        throwError(() => ({ status: 500, message: 'Erreur serveur' }))
+      );
+      
+      component.generateProgramWithAI();
+      
+      expect(component.aiLoading).toBe(false);
+      expect(component.error).toContain('Erreur lors de la génération du programme avec l\'IA');
+    });
+
+    it('should handle AI service connection error', () => {
+      aiTrainingService.generateProgramWithAI.and.returnValue(
+        throwError(() => ({ status: 0, message: 'Connection failed' }))
+      );
+      
+      component.generateProgramWithAI();
+      
+      expect(component.aiLoading).toBe(false);
+      expect(component.error).toContain('Impossible de se connecter au service IA');
+    });
+
+    it('should handle AI service unavailable error', () => {
+      aiTrainingService.generateProgramWithAI.and.returnValue(
+        throwError(() => ({ status: 503, message: 'Service unavailable' }))
+      );
+      
+      component.generateProgramWithAI();
+      
+      expect(component.aiLoading).toBe(false);
+      expect(component.error).toContain('Service IA temporairement indisponible');
+    });
+
+    it('should not generate program if user not connected', () => {
+      component.currentUser = null;
+      
+      component.generateProgramWithAI();
+      
+      expect(aiTrainingService.generateProgramWithAI).not.toHaveBeenCalled();
+      expect(component.error).toBe('Erreur: Utilisateur non connecté');
+    });
+
+    it('should reload programs after successful AI generation', () => {
+      spyOn(component, 'loadUserPrograms');
+      
+      component.generateProgramWithAI();
+      
+      expect(component.loadUserPrograms).toHaveBeenCalled();
     });
   });
 }); 

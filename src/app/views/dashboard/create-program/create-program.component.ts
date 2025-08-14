@@ -7,6 +7,7 @@ import { HeaderComponent } from '../../../components/header/header.component';
 import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
 import { TrainingProgramService } from '../../../services/training-program.service';
 import { AuthService } from '../../../services/auth.service';
+
 import { User } from '../../../models/user.model';
 
 /**
@@ -39,6 +40,7 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private trainingProgramService = inject(TrainingProgramService);
   private authService = inject(AuthService);
+
   private destroy$ = new Subject<void>();
 
   createProgramForm: FormGroup;
@@ -46,6 +48,7 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   
   loading = false;
+
   
   error = '';
   
@@ -120,6 +123,8 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
       }, 2000);
     }
   }
+
+
 
   /**
    * Soumet le formulaire de création de programme
@@ -198,6 +203,18 @@ export class CreateProgramComponent implements OnInit, OnDestroy {
     } else {
       this.router.navigate(['/dashboard/programs']);
     }
+  }
+
+  /**
+   * Handle token expiration by redirecting to login.
+   * Gère l'expiration du token en redirigeant vers la connexion.
+   */
+  private handleTokenExpiration(): void {
+    this.authService.logout();
+    this.error = 'Session expirée. Redirection vers la page de connexion.';
+    setTimeout(() => {
+      this.router.navigate(['/login']);
+    }, 2000);
   }
 
   /**

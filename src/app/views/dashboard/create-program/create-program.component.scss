@@ -384,6 +384,36 @@
     }
   }
 
+  .btn-ai {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: $text-white;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      padding: 12px 20px;
+      font-size: 0.9rem;
+    }
+  }
+
   .btn-primary {
     background: linear-gradient(135deg, $primary-color, $primary-dark);
     color: $text-white;

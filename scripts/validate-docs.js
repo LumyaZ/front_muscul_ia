@@ -679,7 +679,7 @@ function validateDocumentation() {
   // Create output directory if it doesn't exist
   if (!fs.existsSync(CONFIG.outputDir)) {
     fs.mkdirSync(CONFIG.outputDir, { recursive: true });
-    console.log(`📁 Répertoire de sortie créé: ${CONFIG.outputDir}`);
+    console.log(`Répertoire de sortie créé: ${CONFIG.outputDir}`);
   }
 
   // Find all TypeScript files
@@ -717,7 +717,7 @@ function validateDocumentation() {
   const html = generateHTMLReport(report);
   const htmlPath = path.join(CONFIG.outputDir, 'validation-report.html');
   fs.writeFileSync(htmlPath, html);
-  console.log(`📖 Rapport HTML généré: ${htmlPath}`);
+  console.log(`Rapport HTML généré: ${htmlPath}`);
 
   // Display summary
   console.log('\nRésumé de la Validation:');
@@ -732,7 +732,7 @@ function validateDocumentation() {
   console.log(`   • Suggestions: ${report.suggestions.length}`);
 
   console.log('\n🎉 Validation de documentation terminée!');
-  console.log(`📖 Ouvrez ${htmlPath} dans votre navigateur pour voir le rapport détaillé.`);
+  console.log(`Ouvrez ${htmlPath} dans votre navigateur pour voir le rapport détaillé.`);
 }
 
 // Run the documentation validator

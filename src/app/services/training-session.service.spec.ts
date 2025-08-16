@@ -52,12 +52,39 @@ describe('TrainingSessionService', () => {
     it('should create a training session successfully', () => {
       service.createTrainingSession(mockCreateRequest).subscribe(response => {
         expect(response).toEqual(mockTrainingSession);
+        expect(response.id).toBe(1);
+        expect(response.name).toBe('Test Training Session');
+        expect(response.sessionType).toBe('Cardio');
       });
 
       const req = httpMock.expectOne(apiUrl);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(mockCreateRequest);
       req.flush(mockTrainingSession);
+    });
+
+    it('should handle invalid request data', () => {
+      const invalidRequest = { ...mockCreateRequest, name: '' };
+
+      service.createTrainingSession(invalidRequest).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(400);
+        }
+      });
+
+      const req = httpMock.expectOne(apiUrl);
+      req.flush({ message: 'Invalid request data' }, { status: 400, statusText: 'Bad Request' });
+    });
+
+    it('should handle server error', () => {
+      service.createTrainingSession(mockCreateRequest).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(500);
+        }
+      });
+
+      const req = httpMock.expectOne(apiUrl);
+      req.flush({ message: 'Internal server error' }, { status: 500, statusText: 'Internal Server Error' });
     });
   });
 
@@ -67,11 +94,26 @@ describe('TrainingSessionService', () => {
       
       service.getTrainingSession(sessionId).subscribe(response => {
         expect(response).toEqual(mockTrainingSession);
+        expect(response.id).toBe(sessionId);
+        expect(response.name).toBe('Test Training Session');
       });
 
       const req = httpMock.expectOne(`${apiUrl}/${sessionId}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockTrainingSession);
+    });
+
+    it('should handle session not found', () => {
+      const sessionId = 999;
+
+      service.getTrainingSession(sessionId).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(404);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/${sessionId}`);
+      req.flush({ message: 'Training session not found' }, { status: 404, statusText: 'Not Found' });
     });
   });
 
@@ -81,12 +123,27 @@ describe('TrainingSessionService', () => {
       
       service.updateTrainingSession(sessionId, mockCreateRequest).subscribe(response => {
         expect(response).toEqual(mockTrainingSession);
+        expect(response.id).toBe(sessionId);
+        expect(response.name).toBe('Test Training Session');
       });
 
       const req = httpMock.expectOne(`${apiUrl}/${sessionId}`);
       expect(req.request.method).toBe('PUT');
       expect(req.request.body).toEqual(mockCreateRequest);
       req.flush(mockTrainingSession);
+    });
+
+    it('should handle session not found for update', () => {
+      const sessionId = 999;
+
+      service.updateTrainingSession(sessionId, mockCreateRequest).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(404);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/${sessionId}`);
+      req.flush({ message: 'Training session not found' }, { status: 404, statusText: 'Not Found' });
     });
   });
 
@@ -96,11 +153,34 @@ describe('TrainingSessionService', () => {
       
       service.getUserTrainingSessions().subscribe(response => {
         expect(response).toEqual(mockSessions);
+        expect(response.length).toBe(1);
+        expect(response[0].userId).toBe(1);
       });
 
       const req = httpMock.expectOne(apiUrl);
       expect(req.request.method).toBe('GET');
       req.flush(mockSessions);
+    });
+
+    it('should handle empty response', () => {
+      service.getUserTrainingSessions().subscribe(response => {
+        expect(response).toEqual([]);
+        expect(response.length).toBe(0);
+      });
+
+      const req = httpMock.expectOne(apiUrl);
+      req.flush([]);
+    });
+
+    it('should handle server error', () => {
+      service.getUserTrainingSessions().subscribe({
+        error: (error) => {
+          expect(error.status).toBe(500);
+        }
+      });
+
+      const req = httpMock.expectOne(apiUrl);
+      req.flush({ message: 'Internal server error' }, { status: 500, statusText: 'Internal Server Error' });
     });
   });
 
@@ -118,11 +198,50 @@ describe('TrainingSessionService', () => {
       
       service.getUserTrainingSessionsWithPagination(userId, page, size).subscribe(response => {
         expect(response).toEqual(mockPaginatedResponse);
+        expect(response.content.length).toBe(1);
+        expect(response.totalElements).toBe(1);
+        expect(response.currentPage).toBe(0);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/user/${userId}?page=${page}&size=${size}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockPaginatedResponse);
+    });
+
+    it('should handle empty paginated response', () => {
+      const userId = 1;
+      const page = 0;
+      const size = 10;
+      const mockEmptyResponse = {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        currentPage: 0
+      };
+
+      service.getUserTrainingSessionsWithPagination(userId, page, size).subscribe(response => {
+        expect(response).toEqual(mockEmptyResponse);
+        expect(response.content.length).toBe(0);
+        expect(response.totalElements).toBe(0);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/user/${userId}?page=${page}&size=${size}`);
+      req.flush(mockEmptyResponse);
+    });
+
+    it('should handle user not found', () => {
+      const userId = 999;
+      const page = 0;
+      const size = 10;
+
+      service.getUserTrainingSessionsWithPagination(userId, page, size).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(404);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/user/${userId}?page=${page}&size=${size}`);
+      req.flush({ message: 'User not found' }, { status: 404, statusText: 'Not Found' });
     });
   });
 
@@ -134,11 +253,26 @@ describe('TrainingSessionService', () => {
       
       service.getTrainingSessionsByDateRange(startDate, endDate).subscribe(response => {
         expect(response).toEqual(mockSessions);
+        expect(response.length).toBe(1);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/date-range?startDate=${startDate}&endDate=${endDate}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockSessions);
+    });
+
+    it('should handle invalid date range', () => {
+      const startDate = '2024-01-31';
+      const endDate = '2024-01-01';
+
+      service.getTrainingSessionsByDateRange(startDate, endDate).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(400);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/date-range?startDate=${startDate}&endDate=${endDate}`);
+      req.flush({ message: 'Invalid date range' }, { status: 400, statusText: 'Bad Request' });
     });
   });
 
@@ -149,11 +283,26 @@ describe('TrainingSessionService', () => {
       
       service.getTrainingSessionsByType(sessionType).subscribe(response => {
         expect(response).toEqual(mockSessions);
+        expect(response.length).toBe(1);
+        expect(response[0].sessionType).toBe(sessionType);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/type/${sessionType}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockSessions);
+    });
+
+    it('should handle type not found', () => {
+      const sessionType = 'InvalidType';
+
+      service.getTrainingSessionsByType(sessionType).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(404);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/type/${sessionType}`);
+      req.flush({ message: 'Session type not found' }, { status: 404, statusText: 'Not Found' });
     });
   });
 
@@ -164,11 +313,26 @@ describe('TrainingSessionService', () => {
       
       service.getTrainingSessionsByProgram(trainingProgramId).subscribe(response => {
         expect(response).toEqual(mockSessions);
+        expect(response.length).toBe(1);
+        expect(response[0].trainingProgramId).toBe(trainingProgramId);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/program/${trainingProgramId}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockSessions);
+    });
+
+    it('should handle program not found', () => {
+      const trainingProgramId = 999;
+
+      service.getTrainingSessionsByProgram(trainingProgramId).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(404);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/program/${trainingProgramId}`);
+      req.flush({ message: 'Training program not found' }, { status: 404, statusText: 'Not Found' });
     });
   });
 
@@ -179,11 +343,24 @@ describe('TrainingSessionService', () => {
       
       service.searchTrainingSessionsByName(name).subscribe(response => {
         expect(response).toEqual(mockSessions);
+        expect(response.length).toBe(1);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/search?name=${name}`);
       expect(req.request.method).toBe('GET');
       req.flush(mockSessions);
+    });
+
+    it('should handle empty search results', () => {
+      const name = 'Nonexistent';
+
+      service.searchTrainingSessionsByName(name).subscribe(response => {
+        expect(response).toEqual([]);
+        expect(response.length).toBe(0);
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/search?name=${name}`);
+      req.flush([]);
     });
   });
 
@@ -191,11 +368,23 @@ describe('TrainingSessionService', () => {
     it('should get most recent training session successfully', () => {
       service.getMostRecentTrainingSession().subscribe(response => {
         expect(response).toEqual(mockTrainingSession);
+        expect(response.id).toBe(1);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/recent`);
       expect(req.request.method).toBe('GET');
       req.flush(mockTrainingSession);
+    });
+
+    it('should handle no recent sessions', () => {
+      service.getMostRecentTrainingSession().subscribe({
+        error: (error) => {
+          expect(error.status).toBe(404);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/recent`);
+      req.flush({ message: 'No recent training sessions' }, { status: 404, statusText: 'Not Found' });
     });
   });
 
@@ -205,6 +394,7 @@ describe('TrainingSessionService', () => {
       
       service.getTrainingSessionsCount().subscribe(response => {
         expect(response).toEqual(mockCount);
+        expect(response).toBe(5);
       });
 
       const req = httpMock.expectOne(`${apiUrl}/count`);
@@ -224,6 +414,65 @@ describe('TrainingSessionService', () => {
       const req = httpMock.expectOne(`${apiUrl}/${sessionId}`);
       expect(req.request.method).toBe('DELETE');
       req.flush(null);
+    });
+
+    it('should handle session not found for deletion', () => {
+      const sessionId = 999;
+
+      service.deleteTrainingSession(sessionId).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(404);
+        }
+      });
+
+      const req = httpMock.expectOne(`${apiUrl}/${sessionId}`);
+      req.flush({ message: 'Training session not found' }, { status: 404, statusText: 'Not Found' });
+    });
+  });
+
+  describe('Service Integration', () => {
+    it('should inject required dependencies', () => {
+      expect(service).toBeDefined();
+      expect(httpMock).toBeDefined();
+    });
+
+    it('should use correct API base URL', () => {
+      expect(apiUrl).toBe(`${environment.apiUrl}/training-sessions`);
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should handle network errors', () => {
+      service.getUserTrainingSessions().subscribe({
+        error: (error) => {
+          expect(error.status).toBe(0);
+        }
+      });
+
+      const req = httpMock.expectOne(apiUrl);
+      req.error(new ErrorEvent('Network error'));
+    });
+
+    it('should handle timeout errors', () => {
+      service.createTrainingSession(mockCreateRequest).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(408);
+        }
+      });
+
+      const req = httpMock.expectOne(apiUrl);
+      req.flush({ message: 'Request timeout' }, { status: 408, statusText: 'Request Timeout' });
+    });
+
+    it('should handle unauthorized errors', () => {
+      service.getUserTrainingSessions().subscribe({
+        error: (error) => {
+          expect(error.status).toBe(401);
+        }
+      });
+
+      const req = httpMock.expectOne(apiUrl);
+      req.flush({ message: 'Unauthorized' }, { status: 401, statusText: 'Unauthorized' });
     });
   });
 }); 

@@ -458,7 +458,7 @@ function generateDocumentation() {
         documentationData.push(doc);
       }
     } catch (error) {
-      console.error(`❌ Erreur lors du traitement de ${file}:`, error.message);
+      console.error(`Erreur lors du traitement de ${file}:`, error.message);
     }
   });
 
@@ -469,7 +469,7 @@ function generateDocumentation() {
   const outputPath = path.join(CONFIG.outputDir, 'index.html');
   
   fs.writeFileSync(outputPath, html);
-  console.log(`✅ Documentation générée: ${outputPath}`);
+  console.log(`Documentation générée: ${outputPath}`);
 
   // Generate summary report
   const summary = {

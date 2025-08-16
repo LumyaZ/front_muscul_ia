@@ -23,14 +23,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         Authorization: `Bearer ${token}`
       }
     });
-    console.log('✅ Headers ajoutés:', req.headers);
+    console.log('Headers ajoutés:', req.headers);
   } else {
     console.log('⚠️ Pas de token trouvé dans localStorage');
   }
   
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      console.log('❌ === ERREUR DANS L\'INTERCEPTEUR ===');
+      console.log('=== ERREUR DANS L\'INTERCEPTEUR ===');
       console.log('URL:', req.url);
       console.log('Status:', error.status);
       console.log('Status Text:', error.statusText);

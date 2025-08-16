@@ -210,7 +210,6 @@ open coverage/index.html
 
 ### 1. Karma configuration
 ```javascript
-// karma.conf.js
 module.exports = function (config) {
   config.set({
     basePath: '',
@@ -239,7 +238,6 @@ module.exports = function (config) {
 
 ### 2. Cypress configuration
 ```javascript
-// cypress.config.ts
 import { defineConfig } from 'cypress';
 
 export default defineConfig({
@@ -259,14 +257,14 @@ export default defineConfig({
 
 ### 1. Nommage des tests
 ```typescript
-// ✅ Bon
+//  Bon
 describe('AuthService', () => {
   it('should return user when login is successful', () => {
     // test
   });
 });
 
-// ❌ Éviter
+//  Éviter
 describe('AuthService', () => {
   it('should work', () => {
     // test
@@ -306,20 +304,20 @@ const mockExercises = [
 ## 🚨 Tests critiques
 
 ### 1. Authentification
-- ✅ Connexion réussie
-- ✅ Connexion échouée
-- ✅ Déconnexion
-- ✅ Protection des routes
+- Connexion réussie
+- Connexion échouée
+- Déconnexion
+- Protection des routes
 
 ### 2. Gestion des erreurs
-- ✅ Erreurs réseau
-- ✅ Erreurs de validation
-- ✅ Messages d'erreur appropriés
+- Erreurs réseau
+- Erreurs de validation
+- Messages d'erreur appropriés
 
 ### 3. Responsive design
-- ✅ Adaptation mobile
-- ✅ Adaptation tablette
-- ✅ Adaptation desktop
+- Adaptation mobile
+- Adaptation tablette
+- Adaptation desktop
 
 ## 📈 Monitoring des tests
 

@@ -249,7 +249,6 @@ export class UserProgramsComponent implements OnInit, OnDestroy {
           this.aiLoading = false;
           this.success = `Programme "${generatedProgram.name}" généré avec succès par l'IA !`;
           
-          // Recharger la liste des programmes pour inclure le nouveau
           this.loadUserPrograms();
           
           setTimeout(() => this.success = '', 5000);

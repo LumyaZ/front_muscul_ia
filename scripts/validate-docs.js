@@ -631,7 +631,7 @@ function generateHTMLReport(report) {
 
         ${report.issues.length > 0 ? `
         <div class="section">
-            <h3>❌ Problèmes Identifiés (${report.issues.length})</h3>
+            <h3>Problèmes Identifiés (${report.issues.length})</h3>
             ${report.issues.map(issue => `
                 <div class="issue">
                     <strong>${issue.element}</strong> (${issue.type}): ${issue.issues.join(', ')}
@@ -699,7 +699,7 @@ function validateDocumentation() {
       const validation = validateFileDocumentation(file);
       validationResults.push(validation);
     } catch (error) {
-      console.error(`❌ Erreur lors de la validation de ${file}:`, error.message);
+      console.error(`Erreur lors de la validation de ${file}:`, error.message);
     }
   });
 

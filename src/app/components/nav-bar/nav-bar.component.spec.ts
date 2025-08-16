@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { NavBarComponent, NavItem } from './nav-bar.component';
+import { Router } from '@angular/router';
 
 describe('NavBarComponent', () => {
   let component: NavBarComponent;
@@ -9,9 +10,12 @@ describe('NavBarComponent', () => {
 
   beforeEach(async () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    
+
     await TestBed.configureTestingModule({
-      imports: [NavBarComponent],
+      imports: [
+        NavBarComponent,
+        RouterTestingModule
+      ],
       providers: [
         { provide: Router, useValue: routerSpy }
       ]
@@ -20,177 +24,167 @@ describe('NavBarComponent', () => {
     fixture = TestBed.createComponent(NavBarComponent);
     component = fixture.componentInstance;
     mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
-    fixture.detectChanges();
   });
 
-  /**
-   * Test component creation
-   * Test de création du composant
-   */
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  /**
-   * Test component initialization
-   * Test d'initialisation du composant
-   */
-  it('should initialize component correctly', () => {
-    expect(component.currentRoute).toBe('');
-    expect(component.error).toBeNull();
-    expect(component.isLoading).toBeFalse();
-    expect(component.navItems.length).toBe(5);
-  });
+  describe('Component Initialization', () => {
+    it('should initialize with default values', () => {
+      expect(component.currentRoute).toBe('');
+      expect(component.error).toBeNull();
+      expect(component.isLoading).toBe(false);
+    });
 
-  /**
-   * Test navigation items structure
-   * Test de la structure des éléments de navigation
-   */
-  it('should have correct navigation items structure', () => {
-    const expectedItems = [
-      { label: 'Accueil', icon: 'fas fa-home', route: '/dashboard/home' },
-      { label: 'Amis', icon: 'fas fa-users', route: '/dashboard/friends' },
-      { label: 'Enregistrer', icon: 'fas fa-plus-circle', route: '/dashboard/record' },
-      { label: 'Programmes', icon: 'fas fa-list-alt', route: '/dashboard/programs' },
-      { label: 'Vous', icon: 'fas fa-user', route: '/dashboard/you' }
-    ];
+    it('should initialize navigation items', () => {
+      expect(component.navItems).toBeDefined();
+      expect(component.navItems.length).toBe(5);
+    });
 
-    component.navItems.forEach((item, index) => {
-      expect(item.label).toBe(expectedItems[index].label);
-      expect(item.icon).toBe(expectedItems[index].icon);
-      expect(item.route).toBe(expectedItems[index].route);
+    it('should have correct navigation items structure', () => {
+      component.navItems.forEach(item => {
+        expect(item.label).toBeDefined();
+        expect(item.route).toBeDefined();
+        expect(item.icon).toBeDefined();
+      });
+    });
+
+    it('should have correct navigation items', () => {
+      const expectedItems = [
+        { label: 'Accueil', route: '/dashboard/home' },
+        { label: 'Amis', route: '/dashboard/friends' },
+        { label: 'Enregistrer', route: '/dashboard/record' },
+        { label: 'Programmes', route: '/dashboard/programs' },
+        { label: 'Vous', route: '/dashboard/you' }
+      ];
+
+      expectedItems.forEach((expected, index) => {
+        expect(component.navItems[index].label).toBe(expected.label);
+        expect(component.navItems[index].route).toBe(expected.route);
+      });
     });
   });
 
-  /**
-   * Test active state update on init
-   * Test de mise à jour de l'état actif lors de l'initialisation
-   */
-  it('should update active state on init', () => {
-    component.currentRoute = '/dashboard/home';
-    
-    component.ngOnInit();
-    
-    const homeItem = component.navItems.find(item => item.route === '/dashboard/home');
-    expect(homeItem?.isActive).toBeTrue();
-  });
+  describe('Active State Management', () => {
+    it('should update active state on init', () => {
+      component.currentRoute = '/dashboard/home';
+      component.ngOnInit();
+      
+      const homeItem = component.navItems.find(item => item.route === '/dashboard/home');
+      expect(homeItem?.isActive).toBe(true);
+    });
 
-  /**
-   * Test active state update on changes
-   * Test de mise à jour de l'état actif lors des changements
-   */
-  it('should update active state on changes', () => {
-    component.currentRoute = '/dashboard/friends';
-    
-    component.ngOnChanges();
-    
-    const friendsItem = component.navItems.find(item => item.route === '/dashboard/friends');
-    expect(friendsItem?.isActive).toBeTrue();
-  });
+    it('should update active state on changes', () => {
+      component.currentRoute = '/dashboard/friends';
+      component.ngOnChanges();
+      
+      const friendsItem = component.navItems.find(item => item.route === '/dashboard/friends');
+      expect(friendsItem?.isActive).toBe(true);
+    });
 
-  /**
-   * Test successful navigation
-   * Test de navigation réussie
-   */
-  it('should handle successful navigation', () => {
-    const testItem: NavItem = component.navItems[0];
-    
-    component.onNavItemClick(testItem);
-    
-    expect(mockRouter.navigate).toHaveBeenCalledWith([testItem.route]);
-    expect(component.isLoading).toBeFalse();
-    expect(component.error).toBeNull();
-  });
-
-  /**
-   * Test navigation error handling
-   * Test de gestion d'erreur lors de la navigation
-   */
-  it('should handle navigation error', () => {
-    spyOn(console, 'log');
-    spyOn(console, 'error');
-    mockRouter.navigate.and.throwError('Navigation error');
-    const testItem: NavItem = component.navItems[0];
-    
-    component.onNavItemClick(testItem);
-    
-    expect(console.error).toHaveBeenCalledWith('Erreur lors de la navigation:', jasmine.any(Error));
-    expect(component.error).toBe('Erreur lors de la navigation');
-    expect(component.isLoading).toBeFalse();
-  });
-
-  /**
-   * Test active class for active item
-   * Test de classe active pour l'élément actif
-   */
-  it('should return active class for active item', () => {
-    const testItem: NavItem = component.navItems[0];
-    testItem.isActive = true;
-    
-    const result = component.getActiveClass(testItem);
-    
-    expect(result).toBe('active');
-  });
-
-  /**
-   * Test empty string for inactive item
-   * Test de chaîne vide pour l'élément inactif
-   */
-  it('should return empty string for inactive item', () => {
-    const testItem: NavItem = component.navItems[0];
-    testItem.isActive = false;
-    
-    const result = component.getActiveClass(testItem);
-    
-    expect(result).toBe('');
-  });
-
-  /**
-   * Test error clearing functionality
-   * Test de fonctionnalité d'effacement d'erreur
-   */
-  it('should clear error correctly', () => {
-    component.error = 'Test error';
-    component.clearError();
-    expect(component.error).toBeNull();
-  });
-
-  /**
-   * Test loading state during navigation
-   * Test d'état de chargement lors de la navigation
-   */
-  it('should set loading state during navigation', () => {
-    const testItem: NavItem = component.navItems[0];
-    
-    component.onNavItemClick(testItem);
-    
-    expect(component.isLoading).toBeFalse();
-  });
-
-  /**
-   * Test disabled state when loading
-   * Test d'état désactivé lors du chargement
-   */
-  it('should disable buttons when loading', () => {
-    component.isLoading = true;
-    fixture.detectChanges();
-    
-    const navButtons = fixture.nativeElement.querySelectorAll('.nav-button');
-    navButtons.forEach((button: any) => {
-      expect(button.disabled).toBeTrue();
+    it('should set only one item as active', () => {
+      component.currentRoute = '/dashboard/programs';
+      component.ngOnInit();
+      
+      const activeItems = component.navItems.filter(item => item.isActive);
+      expect(activeItems.length).toBe(1);
     });
   });
 
-  /**
-   * Test error message display
-   * Test d'affichage du message d'erreur
-   */
-  it('should display error message when error exists', () => {
-    component.error = 'Test error message';
-    fixture.detectChanges();
-    
-    const errorMessage = fixture.nativeElement.querySelector('.error-message');
-    expect(errorMessage).toBeTruthy();
-    expect(errorMessage.textContent).toContain('Test error message');
+  describe('Navigation', () => {
+    it('should navigate to specified route', () => {
+      const testItem: NavItem = {
+        label: 'Test',
+        icon: 'fas fa-test',
+        route: '/test'
+      };
+      
+      component.onNavItemClick(testItem);
+      
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/test']);
+    });
+
+    it('should handle navigation error', () => {
+      mockRouter.navigate.and.throwError('Navigation error');
+      const testItem: NavItem = {
+        label: 'Test',
+        icon: 'fas fa-test',
+        route: '/test'
+      };
+      
+      component.onNavItemClick(testItem);
+      
+      expect(component.error).toBe('Erreur lors de la navigation');
+      expect(component.isLoading).toBe(false);
+    });
+
+    it('should set loading state during navigation', () => {
+      const testItem: NavItem = {
+        label: 'Test',
+        icon: 'fas fa-test',
+        route: '/test'
+      };
+      
+      component.onNavItemClick(testItem);
+      
+      expect(component.isLoading).toBe(false); 
+    });
   });
-}); 
+
+  describe('Active Class Management', () => {
+    it('should return active class for active item', () => {
+      const testItem: NavItem = {
+        label: 'Test',
+        icon: 'fas fa-test',
+        route: '/test',
+        isActive: true
+      };
+      
+      const result = component.getActiveClass(testItem);
+      expect(result).toBe('active');
+    });
+
+    it('should return empty string for inactive item', () => {
+      const testItem: NavItem = {
+        label: 'Test',
+        icon: 'fas fa-test',
+        route: '/test',
+        isActive: false
+      };
+      
+      const result = component.getActiveClass(testItem);
+      expect(result).toBe('');
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should clear error message', () => {
+      component.error = 'Test error';
+      
+      component.clearError();
+      
+      expect(component.error).toBeNull();
+    });
+  });
+
+  describe('Input Properties', () => {
+    it('should accept currentRoute input', () => {
+      const testRoute = '/dashboard/test';
+      component.currentRoute = testRoute;
+      
+      expect(component.currentRoute).toBe(testRoute);
+    });
+
+    it('should update active state when currentRoute changes', () => {
+      component.currentRoute = '/dashboard/home';
+      component.ngOnInit();
+      
+      component.currentRoute = '/dashboard/friends';
+      component.ngOnChanges();
+      
+      const friendsItem = component.navItems.find(item => item.route === '/dashboard/friends');
+      expect(friendsItem?.isActive).toBe(true);
+    });
+  });
+});

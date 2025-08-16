@@ -3,6 +3,10 @@ import { Router } from '@angular/router';
 import { RecordComponent } from './record.component';
 import { AuthService } from '../../../services/auth.service';
 
+/**
+ * Unit tests for RecordComponent.
+ * Tests unitaires pour RecordComponent.
+ */
 describe('RecordComponent', () => {
   let component: RecordComponent;
   let fixture: ComponentFixture<RecordComponent>;
@@ -31,7 +35,12 @@ describe('RecordComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize component successfully', () => {
+  it('should initialize with default values', () => {
+    expect(component.isLoading).toBe(false);
+    expect(component.error).toBeNull();
+  });
+
+  it('should initialize component successfully when user is authenticated', () => {
     const mockUser = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
     mockAuthService.getCurrentUser.and.returnValue(mockUser);
     mockAuthService.isAuthenticated.and.returnValue(true);
@@ -46,10 +55,21 @@ describe('RecordComponent', () => {
   it('should handle authentication error and redirect to login', () => {
     mockAuthService.getCurrentUser.and.returnValue(null);
     mockAuthService.isAuthenticated.and.returnValue(false);
+    spyOn(window, 'setTimeout').and.callFake((callback: any) => callback());
 
     component.ngOnInit();
 
     expect(component.error).toBe('Utilisateur non connecté. Redirection vers la page de connexion.');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should handle initialization error', () => {
+    mockAuthService.getCurrentUser.and.throwError('Auth error');
+
+    component.ngOnInit();
+
+    expect(component.error).toBe('Erreur lors du chargement des données');
+    expect(component.isLoading).toBe(false);
   });
 
   it('should navigate to select-program when startTraining is called', () => {
@@ -76,12 +96,9 @@ describe('RecordComponent', () => {
     expect(console.error).toHaveBeenCalled();
   });
 
-  it('should clear error', () => {
+  it('should clear error and reinitialize component', () => {
     const mockUser = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
     mockAuthService.getCurrentUser.and.returnValue(mockUser);
-    mockAuthService.isAuthenticated.and.returnValue(true);
-    component.ngOnInit();
-    
     component.error = 'Test error';
 
     component.clearError();
@@ -89,7 +106,7 @@ describe('RecordComponent', () => {
     expect(component.error).toBeNull();
   });
 
-  it('should clean up subscriptions on destroy', () => {
+  it('should complete destroy subject on ngOnDestroy', () => {
     spyOn(component['destroy$'], 'next');
     spyOn(component['destroy$'], 'complete');
 

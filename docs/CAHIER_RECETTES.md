@@ -59,11 +59,11 @@
 5. Cliquer sur le bouton "Se connecter"
 
 **Résultats attendus**:
-- ✅ Redirection automatique vers `/dashboard/home`
-- ✅ Affichage du header avec le nom de l'utilisateur
-- ✅ Affichage de la barre de navigation en bas
-- ✅ Token JWT stocké dans localStorage
-- ✅ Informations utilisateur stockées dans localStorage
+- Redirection automatique vers `/dashboard/home`
+- Affichage du header avec le nom de l'utilisateur
+- Affichage de la barre de navigation en bas
+- Token JWT stocké dans localStorage
+- Informations utilisateur stockées dans localStorage
 
 ### Scénario 2: Connexion avec Identifiants Invalides
 
@@ -76,10 +76,10 @@
 4. Cliquer sur "Se connecter"
 
 **Résultats attendus**:
-- ❌ Affichage d'un message d'erreur en rouge
-- ❌ Pas de redirection
-- ❌ Formulaire reste visible
-- ❌ Aucun token stocké
+- Affichage d'un message d'erreur en rouge
+- Pas de redirection
+- Formulaire reste visible
+- Aucun token stocké
 
 ### Scénario 3: Validation des Champs de Connexion
 
@@ -92,9 +92,9 @@
 4. Saisir un mot de passe trop court: `123`
 
 **Résultats attendus**:
-- ❌ Messages d'erreur pour chaque champ invalide
-- ❌ Bouton "Se connecter" désactivé
-- ❌ Indicateurs visuels d'erreur sur les champs
+- Messages d'erreur pour chaque champ invalide
+- Bouton "Se connecter" désactivé
+- Indicateurs visuels d'erreur sur les champs
 
 ### Scénario 4: Inscription Nouvel Utilisateur
 
@@ -110,9 +110,9 @@
 4. Cliquer sur "S'inscrire"
 
 **Résultats attendus**:
-- ✅ Redirection vers `/dashboard/home`
-- ✅ Création du compte utilisateur
-- ✅ Connexion automatique
+- Redirection vers `/dashboard/home`
+- Création du compte utilisateur
+- Connexion automatique
 
 ### Scénario 5: Déconnexion
 
@@ -124,10 +124,10 @@
 3. Cliquer sur "Déconnexion"
 
 **Résultats attendus**:
-- ✅ Redirection vers `/login`
-- ✅ Suppression du token JWT
-- ✅ Suppression des données utilisateur
-- ✅ Impossibilité d'accéder aux pages protégées
+- Redirection vers `/login`
+- Suppression du token JWT
+- Suppression des données utilisateur
+- Impossibilité d'accéder aux pages protégées
 
 ---
 
@@ -146,10 +146,10 @@
    - Profil
 
 **Résultats attendus**:
-- ✅ Changement d'URL correct
-- ✅ Chargement du contenu approprié
-- ✅ Indicateur visuel de la page active
-- ✅ Pas de perte de session
+- Changement d'URL correct
+- Chargement du contenu approprié
+- Indicateur visuel de la page active
+- Pas de perte de session
 
 ### Scénario 7: Navigation avec Bouton Retour
 
@@ -161,9 +161,9 @@
 3. Utiliser le bouton avant du navigateur
 
 **Résultats attendus**:
-- ✅ Navigation correcte dans l'historique
-- ✅ État de l'application préservé
-- ✅ Pas de redirection non désirée
+- Navigation correcte dans l'historique
+- État de l'application préservé
+- Pas de redirection non désirée
 
 ---
 
@@ -178,10 +178,10 @@
 2. Vérifier l'affichage de la page d'accueil
 
 **Résultats attendus**:
-- ✅ Affichage des actions rapides (Nouvel Entraînement, Mes Programmes)
-- ✅ Affichage des statistiques utilisateur
-- ✅ Affichage de l'historique des entraînements
-- ✅ État de chargement approprié
+- Affichage des actions rapides (Nouvel Entraînement, Mes Programmes)
+- Affichage des statistiques utilisateur
+- Affichage de l'historique des entraînements
+- État de chargement approprié
 
 ### Scénario 9: Actions Rapides du Dashboard
 
@@ -192,9 +192,9 @@
 2. Cliquer sur "Mes Programmes"
 
 **Résultats attendus**:
-- ✅ Redirection vers `/dashboard/record` pour nouvel entraînement
-- ✅ Redirection vers `/dashboard/programs` pour programmes
-- ✅ Navigation fluide sans erreur
+- Redirection vers `/dashboard/record` pour nouvel entraînement
+- Redirection vers `/dashboard/programs` pour programmes
+- Navigation fluide sans erreur
 
 ### Scénario 10: Affichage des Statistiques
 
@@ -205,10 +205,10 @@
 2. Vérifier les statistiques affichées
 
 **Résultats attendus**:
-- ✅ Nombre total d'entraînements affiché
-- ✅ Heures d'entraînement calculées
-- ✅ Durée moyenne calculée
-- ✅ Données cohérentes avec l'historique
+- Nombre total d'entraînements affiché
+- Heures d'entraînement calculées
+- Durée moyenne calculée
+- Données cohérentes avec l'historique
 
 ### Scénario 11: Historique des Entraînements
 
@@ -219,10 +219,10 @@
 2. Vérifier la section "Tous les Entraînements"
 
 **Résultats attendus**:
-- ✅ Liste des entraînements récents
-- ✅ Informations détaillées (date, durée, type)
-- ✅ État vide approprié si aucun entraînement
-- ✅ Pagination si nécessaire
+- Liste des entraînements récents
+- Informations détaillées (date, durée, type)
+- État vide approprié si aucun entraînement
+- Pagination si nécessaire
 
 ---
 
@@ -237,10 +237,10 @@
 2. Vérifier l'affichage des programmes
 
 **Résultats attendus**:
-- ✅ Liste des programmes organisée par catégories
-- ✅ Informations complètes (nom, description, difficulté)
-- ✅ Filtres fonctionnels
-- ✅ Barre de recherche opérationnelle
+- Liste des programmes organisée par catégories
+- Informations complètes (nom, description, difficulté)
+- Filtres fonctionnels
+- Barre de recherche opérationnelle
 
 ### Scénario 13: Filtrage des Programmes
 
@@ -253,10 +253,10 @@
 4. Utiliser la barre de recherche
 
 **Résultats attendus**:
-- ✅ Filtrage en temps réel
-- ✅ Affichage du nombre de résultats
-- ✅ Possibilité de réinitialiser les filtres
-- ✅ Performance fluide
+- Filtrage en temps réel
+- Affichage du nombre de résultats
+- Possibilité de réinitialiser les filtres
+- Performance fluide
 
 ### Scénario 14: Ajout d'un Programme
 
@@ -268,10 +268,10 @@
 3. Vérifier l'ajout dans "Mes Programmes"
 
 **Résultats attendus**:
-- ✅ Confirmation d'ajout
-- ✅ Programme visible dans la liste personnelle
-- ✅ Pas de duplication
-- ✅ Mise à jour en temps réel
+- Confirmation d'ajout
+- Programme visible dans la liste personnelle
+- Pas de duplication
+- Mise à jour en temps réel
 
 ### Scénario 15: Consultation des Détails d'un Programme
 
@@ -282,10 +282,10 @@
 2. Vérifier les détails affichés
 
 **Résultats attendus**:
-- ✅ Informations complètes du programme
-- ✅ Liste des exercices
-- ✅ Instructions détaillées
-- ✅ Boutons d'action appropriés
+- Informations complètes du programme
+- Liste des exercices
+- Instructions détaillées
+- Boutons d'action appropriés
 
 ---
 
@@ -301,10 +301,10 @@
 3. Sélectionner un programme
 
 **Résultats attendus**:
-- ✅ Affichage de la liste des programmes disponibles
-- ✅ Sélection possible d'un programme
-- ✅ Démarrage de la session d'entraînement
-- ✅ Chronomètre activé
+- Affichage de la liste des programmes disponibles
+- Sélection possible d'un programme
+- Démarrage de la session d'entraînement
+- Chronomètre activé
 
 ### Scénario 17: Suivi d'Entraînement en Temps Réel
 
@@ -316,10 +316,10 @@
 3. Marquer les séries comme terminées
 
 **Résultats attendus**:
-- ✅ Affichage des exercices en cours
-- ✅ Chronomètre fonctionnel
-- ✅ Progression visible
-- ✅ Possibilité de pause/reprise
+- Affichage des exercices en cours
+- Chronomètre fonctionnel
+- Progression visible
+- Possibilité de pause/reprise
 
 ### Scénario 18: Finalisation d'un Entraînement
 
@@ -331,10 +331,10 @@
 3. Ajouter des notes si nécessaire
 
 **Résultats attendus**:
-- ✅ Résumé de l'entraînement
-- ✅ Enregistrement en base de données
-- ✅ Mise à jour des statistiques
-- ✅ Redirection vers le récapitulatif
+- Résumé de l'entraînement
+- Enregistrement en base de données
+- Mise à jour des statistiques
+- Redirection vers le récapitulatif
 
 ---
 
@@ -349,10 +349,10 @@
 2. Vérifier les informations affichées
 
 **Résultats attendus**:
-- ✅ Informations personnelles complètes
-- ✅ Statistiques d'entraînement
-- ✅ Historique des programmes
-- ✅ Options de modification
+- Informations personnelles complètes
+- Statistiques d'entraînement
+- Historique des programmes
+- Options de modification
 
 ### Scénario 20: Modification du Profil
 
@@ -365,10 +365,10 @@
 4. Sauvegarder
 
 **Résultats attendus**:
-- ✅ Formulaire de modification accessible
-- ✅ Validation des champs
-- ✅ Sauvegarde réussie
-- ✅ Mise à jour immédiate de l'affichage
+- Formulaire de modification accessible
+- Validation des champs
+- Sauvegarde réussie
+- Mise à jour immédiate de l'affichage
 
 ---
 
@@ -384,10 +384,10 @@
 3. Vérifier la navigation mobile
 
 **Résultats attendus**:
-- ✅ Interface adaptée à la taille d'écran
-- ✅ Navigation mobile fonctionnelle
-- ✅ Textes lisibles
-- ✅ Boutons accessibles
+- Interface adaptée à la taille d'écran
+- Navigation mobile fonctionnelle
+- Textes lisibles
+- Boutons accessibles
 
 ### Scénario 22: Adaptation Tablette
 
@@ -399,10 +399,10 @@
 3. Vérifier les formulaires
 
 **Résultats attendus**:
-- ✅ Layout adapté pour tablette
-- ✅ Grilles de programmes optimisées
-- ✅ Formulaires utilisables
-- ✅ Navigation intuitive
+- Layout adapté pour tablette
+- Grilles de programmes optimisées
+- Formulaires utilisables
+- Navigation intuitive
 
 ---
 
@@ -419,10 +419,10 @@
 4. Mesurer les temps de réponse
 
 **Résultats attendus**:
-- ✅ Temps de chargement < 3 secondes
-- ✅ Pas de blocage de l'interface
-- ✅ Chargement progressif des données
-- ✅ Optimisation des images
+- Temps de chargement < 3 secondes
+- Pas de blocage de l'interface
+- Chargement progressif des données
+- Optimisation des images
 
 ### Scénario 24: Gestion de la Mémoire
 
@@ -434,10 +434,10 @@
 3. Tester sur une session prolongée
 
 **Résultats attendus**:
-- ✅ Pas de fuite mémoire
-- ✅ Libération des ressources
-- ✅ Performance stable
-- ✅ Pas de crash
+- Pas de fuite mémoire
+- Libération des ressources
+- Performance stable
+- Pas de crash
 
 ---
 
@@ -453,10 +453,10 @@
 3. Vérifier les raccourcis clavier
 
 **Résultats attendus**:
-- ✅ Navigation possible au clavier
-- ✅ Focus visible sur tous les éléments
-- ✅ Ordre de tabulation logique
-- ✅ Raccourcis clavier fonctionnels
+- Navigation possible au clavier
+- Focus visible sur tous les éléments
+- Ordre de tabulation logique
+- Raccourcis clavier fonctionnels
 
 ### Scénario 26: Lecteurs d'Écran
 
@@ -468,10 +468,10 @@
 3. Vérifier les descriptions alternatives
 
 **Résultats attendus**:
-- ✅ Textes alternatifs pour les images
-- ✅ Labels appropriés pour les formulaires
-- ✅ Structure sémantique correcte
-- ✅ Messages d'état annoncés
+- Textes alternatifs pour les images
+- Labels appropriés pour les formulaires
+- Structure sémantique correcte
+- Messages d'état annoncés
 
 ---
 
@@ -487,10 +487,10 @@
 3. Rétablir la connexion
 
 **Résultats attendus**:
-- ✅ Messages d'erreur appropriés
-- ✅ Possibilité de réessayer
-- ✅ Pas de crash de l'application
-- ✅ Récupération automatique
+- Messages d'erreur appropriés
+- Possibilité de réessayer
+- Pas de crash de l'application
+- Récupération automatique
 
 ### Scénario 28: Erreurs Serveur
 
@@ -502,10 +502,10 @@
 3. Redémarrer le service
 
 **Résultats attendus**:
-- ✅ Messages d'erreur informatifs
-- ✅ Fallback approprié
-- ✅ Possibilité de réessayer
-- ✅ Récupération automatique
+- Messages d'erreur informatifs
+- Fallback approprié
+- Possibilité de réessayer
+- Récupération automatique
 
 ---
 
@@ -521,10 +521,10 @@
 3. Tester les performances
 
 **Résultats attendus**:
-- ✅ Fonctionnalités complètes
-- ✅ Performance optimale
-- ✅ Pas d'erreurs console
-- ✅ Rendu correct
+- Fonctionnalités complètes
+- Performance optimale
+- Pas d'erreurs console
+- Rendu correct
 
 ### Scénario 30: Firefox
 
@@ -536,10 +536,10 @@
 3. Tester les performances
 
 **Résultats attendus**:
-- ✅ Fonctionnalités complètes
-- ✅ Performance acceptable
-- ✅ Pas d'erreurs console
-- ✅ Rendu correct
+- Fonctionnalités complètes
+- Performance acceptable
+- Pas d'erreurs console
+- Rendu correct
 
 ---
 

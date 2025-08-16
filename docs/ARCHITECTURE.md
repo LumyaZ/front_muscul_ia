@@ -136,7 +136,6 @@ Component ← Service ← HTTP ← Backend
 
 ### 1. Breakpoints
 ```scss
-// Mobile First
 $mobile: 320px;
 $tablet: 768px;
 $desktop: 1024px;
@@ -187,7 +186,6 @@ describe('ExerciseService', () => {
 
 ### 1. Environnements
 ```typescript
-// environment.ts
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:8080/api',

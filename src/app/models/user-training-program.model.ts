@@ -25,8 +25,6 @@ export interface UserTrainingProgram {
     updatedAt: string;
   };
 
-  // Propriétés calculées pour faciliter l'affichage
-  // Computed properties for easier display
   trainingProgramName?: string;
 
   trainingProgramDescription?: string;

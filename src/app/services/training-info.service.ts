@@ -40,17 +40,17 @@ export class TrainingInfoService {
     return this.http.get<TrainingInfo>(this.apiUrl).pipe(
       tap({
         next: (response) => {
-          console.log('✅ TrainingInfo API call successful:', response);
+          console.log('TrainingInfo API call successful:', response);
         },
         error: (error) => {
-          console.log('❌ TrainingInfo API call failed:', error);
+          console.log('TrainingInfo API call failed:', error);
           console.log('Error status:', error.status);
           console.log('Error message:', error.message);
           console.log('Error details:', error.error);
         }
       }),
       catchError((error) => {
-        console.log('❌ TrainingInfo service error caught:', error);
+        console.log('TrainingInfo service error caught:', error);
         throw error;
       })
     );

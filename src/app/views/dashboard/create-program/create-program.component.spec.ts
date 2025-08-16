@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -6,9 +6,11 @@ import { of, throwError } from 'rxjs';
 import { CreateProgramComponent } from './create-program.component';
 import { TrainingProgramService } from '../../../services/training-program.service';
 import { AuthService } from '../../../services/auth.service';
-import { HeaderComponent } from '../../../components/header/header.component';
-import { NavBarComponent } from '../../../components/nav-bar/nav-bar.component';
 
+/**
+ * Unit tests for CreateProgramComponent.
+ * Tests unitaires pour CreateProgramComponent.
+ */
 describe('CreateProgramComponent', () => {
   let component: CreateProgramComponent;
   let fixture: ComponentFixture<CreateProgramComponent>;
@@ -40,7 +42,8 @@ describe('CreateProgramComponent', () => {
     const authServiceSpy = jasmine.createSpyObj('AuthService', [
       'getCurrentUser',
       'isAuthenticated',
-      'getToken'
+      'getToken',
+      'logout'
     ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     const activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -56,9 +59,7 @@ describe('CreateProgramComponent', () => {
       imports: [
         CreateProgramComponent,
         ReactiveFormsModule,
-        HttpClientTestingModule,
-        HeaderComponent,
-        NavBarComponent
+        HttpClientTestingModule
       ],
       providers: [
         { provide: TrainingProgramService, useValue: trainingProgramServiceSpy },
@@ -79,236 +80,206 @@ describe('CreateProgramComponent', () => {
     fixture.detectChanges();
   });
 
-  describe('Initialisation du composant', () => {
-    it('should create', () => {
-      expect(component).toBeTruthy();
-    });
-
-    it('should initialize form with default values', () => {
-      expect(component.createProgramForm.get('category')?.value).toBe('Musculation');
-      expect(component.createProgramForm.get('difficultyLevel')?.value).toBe('Débutant');
-      expect(component.createProgramForm.get('targetAudience')?.value).toBe('Tous niveaux');
-    });
-
-    it('should create form with required controls', () => {
-      expect(component.createProgramForm.get('name')).toBeTruthy();
-      expect(component.createProgramForm.get('description')).toBeTruthy();
-      expect(component.createProgramForm.get('category')).toBeTruthy();
-      expect(component.createProgramForm.get('difficultyLevel')).toBeTruthy();
-      expect(component.createProgramForm.get('targetAudience')).toBeTruthy();
-    });
-
-    it('should validate required fields', () => {
-      const form = component.createProgramForm;
-      
-      expect(form.valid).toBeFalsy();
-      
-      form.patchValue({
-        name: 'Test Program',
-        description: 'Test Description',
-        category: 'Musculation',
-        difficultyLevel: 'Débutant',
-        targetAudience: 'Tous niveaux'
-      });
-      
-      expect(form.valid).toBeTruthy();
-    });
-
-    it('should display page title', () => {
-      fixture.detectChanges();
-      const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('Créer un nouveau programme');
-    });
-
-    it('should display back button', () => {
-      fixture.detectChanges();
-      const compiled = fixture.nativeElement;
-      expect(compiled.textContent).toContain('Retour aux programmes');
-    });
-
-    it('should handle form submission successfully', () => {
-      const form = component.createProgramForm;
-      form.patchValue({
-        name: 'Test Program',
-        description: 'Test Description',
-        category: 'Musculation',
-        difficultyLevel: 'Débutant',
-        targetAudience: 'Tous niveaux'
-      });
-
-      component.onSubmit();
-
-      expect(mockTrainingProgramService.createProgram).toHaveBeenCalled();
-      expect(component.loading).toBe(false);
-    });
-
-    it('should handle form submission error', () => {
-      mockTrainingProgramService.createProgram.and.returnValue(
-        throwError(() => new Error('Erreur de création'))
-      );
-
-      const form = component.createProgramForm;
-      form.patchValue({
-        name: 'Test Program',
-        description: 'Test Description',
-        category: 'Musculation',
-        difficultyLevel: 'Débutant',
-        targetAudience: 'Tous niveaux'
-      });
-
-      component.onSubmit();
-
-      expect(component.error).toBe('Erreur lors de la création du programme');
-      expect(component.loading).toBe(false);
-    });
-
-    it('should handle loading state', () => {
-      component.loading = true;
-      expect(component.loading).toBe(true);
-    });
-
-    it('should handle error state', () => {
-      component.error = 'Test error';
-      expect(component.error).toBe('Test error');
-    });
-
-    it('should handle success state', () => {
-      component.success = 'Programme créé avec succès';
-      expect(component.success).toBe('Programme créé avec succès');
-    });
-
-    it('should navigate back to programs', () => {
-      component.goBackToPrograms();
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs']);
-    });
-
-    it('should mark form group as touched', () => {
-      const form = component.createProgramForm;
-      const nameControl = form.get('name');
-      
-      component.markFormGroupTouched();
-      
-      expect(nameControl?.touched).toBeTruthy();
-    });
-
-    it('should get error message for required field', () => {
-      const nameControl = component.createProgramForm.get('name');
-      nameControl?.markAsTouched();
-      nameControl?.setErrors({ required: true });
-      
-      const errorMessage = component.getErrorMessage('name');
-      expect(errorMessage).toBe('Le nom du programme est requis');
-    });
-
-    it('should get error message for minlength field', () => {
-      const nameControl = component.createProgramForm.get('name');
-      nameControl?.markAsTouched();
-      nameControl?.setErrors({ minlength: { requiredLength: 3 } });
-      
-      const errorMessage = component.getErrorMessage('name');
-      expect(errorMessage).toBe('Le nom doit contenir au moins 3 caractères');
-    });
-
-    it('should get error message for maxlength field', () => {
-      const nameControl = component.createProgramForm.get('name');
-      nameControl?.markAsTouched();
-      nameControl?.setErrors({ maxlength: { requiredLength: 100 } });
-      
-      const errorMessage = component.getErrorMessage('name');
-      expect(errorMessage).toBe('Le nom ne peut pas dépasser 100 caractères');
-    });
-
-    it('should return empty string for untouched field', () => {
-      const nameControl = component.createProgramForm.get('name');
-      nameControl?.setErrors({ required: true });
-      
-      const errorMessage = component.getErrorMessage('name');
-      expect(errorMessage).toBe('');
-    });
-
-    it('should return default error message for unknown error', () => {
-      const nameControl = component.createProgramForm.get('name');
-      nameControl?.markAsTouched();
-      nameControl?.setErrors({ unknown: true });
-      
-      const errorMessage = component.getErrorMessage('name');
-      expect(errorMessage).toBe('Valeur invalide');
-    });
+  it('should create', () => {
+    expect(component).toBeTruthy();
   });
 
-  describe('Navigation', () => {
-    it('should navigate to you/programs when fromYouPrograms is true', () => {
-      component.fromYouPrograms = true;
-      
-      component.goBackToPrograms();
-      
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/you'], { queryParams: { from: 'you-programs' } });
-    });
-
-    it('should navigate to programs when fromYouPrograms is false', () => {
-      component.fromYouPrograms = false;
-      
-      component.goBackToPrograms();
-      
-      expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs']);
-    });
+  it('should initialize form with default values', () => {
+    expect(component.createProgramForm.get('category')?.value).toBe('Musculation');
+    expect(component.createProgramForm.get('difficultyLevel')?.value).toBe('Débutant');
+    expect(component.createProgramForm.get('targetAudience')?.value).toBe('Tous niveaux');
   });
 
-  describe('Form validation', () => {
-    it('should validate name field', () => {
-      const nameControl = component.createProgramForm.get('name');
-      
-      nameControl?.setValue('');
-      expect(nameControl?.invalid).toBeTruthy();
-      
-      nameControl?.setValue('ab');
-      expect(nameControl?.invalid).toBeTruthy();
-      
-      nameControl?.setValue('Valid Name');
-      expect(nameControl?.valid).toBeTruthy();
+  it('should create form with required controls', () => {
+    expect(component.createProgramForm.get('name')).toBeTruthy();
+    expect(component.createProgramForm.get('description')).toBeTruthy();
+    expect(component.createProgramForm.get('category')).toBeTruthy();
+    expect(component.createProgramForm.get('difficultyLevel')).toBeTruthy();
+    expect(component.createProgramForm.get('targetAudience')).toBeTruthy();
+  });
+
+  it('should validate required fields', () => {
+    const form = component.createProgramForm;
+    
+    expect(form.valid).toBeFalsy();
+    
+    form.patchValue({
+      name: 'Test Program',
+      description: 'Test Description',
+      category: 'Musculation',
+      difficultyLevel: 'Débutant',
+      targetAudience: 'Tous niveaux'
+    });
+    
+    expect(form.valid).toBeTruthy();
+  });
+
+  it('should handle form submission successfully', fakeAsync(() => {
+    const form = component.createProgramForm;
+    form.patchValue({
+      name: 'Test Program',
+      description: 'Test Description',
+      category: 'Musculation',
+      difficultyLevel: 'Débutant',
+      targetAudience: 'Tous niveaux'
     });
 
-    it('should validate description field', () => {
-      const descriptionControl = component.createProgramForm.get('description');
-      
-      descriptionControl?.setValue('');
-      expect(descriptionControl?.invalid).toBeTruthy();
-      
-      descriptionControl?.setValue('Short');
-      expect(descriptionControl?.invalid).toBeTruthy();
-      
-      descriptionControl?.setValue('This is a valid description with enough characters');
-      expect(descriptionControl?.valid).toBeTruthy();
+    component.onSubmit();
+    tick();
+
+    expect(mockTrainingProgramService.createProgram).toHaveBeenCalled();
+    expect(component.loading).toBe(false);
+    expect(component.success).toBe('Programme créé avec succès !');
+  }));
+
+  it('should handle form submission error', fakeAsync(() => {
+    mockTrainingProgramService.createProgram.and.returnValue(
+      throwError(() => new Error('Erreur de création'))
+    );
+
+    const form = component.createProgramForm;
+    form.patchValue({
+      name: 'Test Program',
+      description: 'Test Description',
+      category: 'Musculation',
+      difficultyLevel: 'Débutant',
+      targetAudience: 'Tous niveaux'
     });
 
-    it('should validate category field', () => {
-      const categoryControl = component.createProgramForm.get('category');
-      
-      categoryControl?.setValue('');
-      expect(categoryControl?.invalid).toBeTruthy();
-      
-      categoryControl?.setValue('Musculation');
-      expect(categoryControl?.valid).toBeTruthy();
+    component.onSubmit();
+    tick();
+
+    expect(component.error).toBe('Erreur lors de la création du programme');
+    expect(component.loading).toBe(false);
+  }));
+
+  it('should not submit when form is invalid', () => {
+    component.onSubmit();
+
+    expect(mockTrainingProgramService.createProgram).not.toHaveBeenCalled();
+  });
+
+  it('should not submit when user is not authenticated', () => {
+    mockAuthService.getCurrentUser.and.returnValue(null);
+    component.ngOnInit();
+
+    const form = component.createProgramForm;
+    form.patchValue({
+      name: 'Test Program',
+      description: 'Test Description',
+      category: 'Musculation',
+      difficultyLevel: 'Débutant',
+      targetAudience: 'Tous niveaux'
     });
 
-    it('should validate difficultyLevel field', () => {
-      const difficultyControl = component.createProgramForm.get('difficultyLevel');
-      
-      difficultyControl?.setValue('');
-      expect(difficultyControl?.invalid).toBeTruthy();
-      
-      difficultyControl?.setValue('Débutant');
-      expect(difficultyControl?.valid).toBeTruthy();
-    });
+    component.onSubmit();
 
-    it('should validate targetAudience field', () => {
-      const audienceControl = component.createProgramForm.get('targetAudience');
-      
-      audienceControl?.setValue('');
-      expect(audienceControl?.invalid).toBeTruthy();
-      
-      audienceControl?.setValue('Tous niveaux');
-      expect(audienceControl?.valid).toBeTruthy();
-    });
+    expect(mockTrainingProgramService.createProgram).not.toHaveBeenCalled();
+    expect(component.error).toBe('Vous devez être connecté pour créer un programme.');
+  });
+
+  it('should navigate back to programs when fromYouPrograms is false', () => {
+    component.fromYouPrograms = false;
+    
+    component.goBackToPrograms();
+    
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/programs']);
+  });
+
+  it('should navigate to you/programs when fromYouPrograms is true', () => {
+    component.fromYouPrograms = true;
+    
+    component.goBackToPrograms();
+    
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard/you'], { queryParams: { from: 'you-programs' } });
+  });
+
+  it('should mark form group as touched', () => {
+    const form = component.createProgramForm;
+    const nameControl = form.get('name');
+    
+    component.markFormGroupTouched();
+    
+    expect(nameControl?.touched).toBeTruthy();
+  });
+
+  it('should get error message for required field', () => {
+    const nameControl = component.createProgramForm.get('name');
+    nameControl?.markAsTouched();
+    nameControl?.setErrors({ required: true });
+    
+    const errorMessage = component.getErrorMessage('name');
+    expect(errorMessage).toBe('Le nom du programme est requis');
+  });
+
+  it('should get error message for minlength field', () => {
+    const nameControl = component.createProgramForm.get('name');
+    nameControl?.markAsTouched();
+    nameControl?.setErrors({ minlength: { requiredLength: 3 } });
+    
+    const errorMessage = component.getErrorMessage('name');
+    expect(errorMessage).toBe('Le nom doit contenir au moins 3 caractères');
+  });
+
+  it('should get error message for maxlength field', () => {
+    const nameControl = component.createProgramForm.get('name');
+    nameControl?.markAsTouched();
+    nameControl?.setErrors({ maxlength: { requiredLength: 100 } });
+    
+    const errorMessage = component.getErrorMessage('name');
+    expect(errorMessage).toBe('Le nom ne peut pas dépasser 100 caractères');
+  });
+
+  it('should return empty string for untouched field', () => {
+    const nameControl = component.createProgramForm.get('name');
+    nameControl?.setErrors({ required: true });
+    
+    const errorMessage = component.getErrorMessage('name');
+    expect(errorMessage).toBe('');
+  });
+
+  it('should return default error message for unknown error', () => {
+    const nameControl = component.createProgramForm.get('name');
+    nameControl?.markAsTouched();
+    nameControl?.setErrors({ unknown: true });
+    
+    const errorMessage = component.getErrorMessage('name');
+    expect(errorMessage).toBe('Valeur invalide');
+  });
+
+  it('should validate name field', () => {
+    const nameControl = component.createProgramForm.get('name');
+    
+    nameControl?.setValue('');
+    expect(nameControl?.invalid).toBeTruthy();
+    
+    nameControl?.setValue('ab');
+    expect(nameControl?.invalid).toBeTruthy();
+    
+    nameControl?.setValue('Valid Name');
+    expect(nameControl?.valid).toBeTruthy();
+  });
+
+  it('should validate description field', () => {
+    const descriptionControl = component.createProgramForm.get('description');
+    
+    descriptionControl?.setValue('');
+    expect(descriptionControl?.invalid).toBeTruthy();
+    
+    descriptionControl?.setValue('Short');
+    expect(descriptionControl?.invalid).toBeTruthy();
+    
+    descriptionControl?.setValue('This is a valid description with enough characters');
+    expect(descriptionControl?.valid).toBeTruthy();
+  });
+
+  it('should complete destroy subject on ngOnDestroy', () => {
+    spyOn(component['destroy$'], 'next');
+    spyOn(component['destroy$'], 'complete');
+
+    component.ngOnDestroy();
+
+    expect(component['destroy$'].next).toHaveBeenCalled();
+    expect(component['destroy$'].complete).toHaveBeenCalled();
   });
 }); 

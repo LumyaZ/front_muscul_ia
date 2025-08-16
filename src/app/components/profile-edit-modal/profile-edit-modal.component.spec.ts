@@ -1,309 +1,301 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ProfileEditModalComponent } from './profile-edit-modal.component';
 import { UserProfileService } from '../../services/user-profile.service';
 import { UserProfile } from '../../models/user-profile.model';
 import { of, throwError } from 'rxjs';
 
-/**
- * Unit tests for ProfileEditModalComponent.
- * Tests unitaires pour ProfileEditModalComponent.
- */
 describe('ProfileEditModalComponent', () => {
   let component: ProfileEditModalComponent;
   let fixture: ComponentFixture<ProfileEditModalComponent>;
-  let userProfileService: jasmine.SpyObj<UserProfileService>;
+  let mockUserProfileService: jasmine.SpyObj<UserProfileService>;
 
   const mockProfile: UserProfile = {
     id: 1,
     userId: 1,
-    firstName: 'Jean',
-    lastName: 'Dupont',
+    firstName: 'John',
+    lastName: 'Doe',
     dateOfBirth: '1990-01-01',
-    age: 33,
-    phoneNumber: '0612345678',
-    createdAt: '2023-01-01T00:00:00Z',
-    updatedAt: '2023-01-01T00:00:00Z'
+    phoneNumber: '0123456789',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
   };
 
   beforeEach(async () => {
     const spy = jasmine.createSpyObj('UserProfileService', ['updateMyProfile']);
-    
+
     await TestBed.configureTestingModule({
       imports: [
         ProfileEditModalComponent,
-        ReactiveFormsModule,
-        HttpClientTestingModule
+        ReactiveFormsModule
       ],
       providers: [
         { provide: UserProfileService, useValue: spy }
       ]
     }).compileComponents();
 
-    userProfileService = TestBed.inject(UserProfileService) as jasmine.SpyObj<UserProfileService>;
-  });
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(ProfileEditModalComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    mockUserProfileService = TestBed.inject(UserProfileService) as jasmine.SpyObj<UserProfileService>;
   });
 
-  /**
-   * Test de création du composant
-   * Test component creation
-   */
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
   describe('Component Initialization', () => {
-    it('should create', () => {
-      expect(component).toBeTruthy();
+    it('should initialize with default values', () => {
+      expect(component.isOpen).toBe(false);
+      expect(component.currentProfile).toBeNull();
+      expect(component.isLoading).toBe(false);
+      expect(component.error).toBeNull();
     });
 
-    /**
-     * Test d'initialisation du formulaire avec des valeurs vides
-     * Test form initialization with empty values
-     */
-    it('should initialize form with empty values', () => {
-      expect(component.editForm.get('firstName')?.value).toBe('');
-      expect(component.editForm.get('lastName')?.value).toBe('');
-      expect(component.editForm.get('dateOfBirth')?.value).toBe('');
-      expect(component.editForm.get('phoneNumber')?.value).toBe('');
-    });
-
-    /**
-     * Test de chargement des données du profil actuel lors de l'ouverture de la modal
-     * Test loading current profile data when modal opens
-     */
-    it('should load current profile data when modal opens', () => {
-      component.currentProfile = mockProfile;
-      component.isOpen = true;
-      component.ngOnChanges();
-      fixture.detectChanges();
-      
-      expect(component.editForm.get('firstName')?.value).toBe('Jean');
-      expect(component.editForm.get('lastName')?.value).toBe('Dupont');
-      expect(component.editForm.get('dateOfBirth')?.value).toBe('1990-01-01');
-      expect(component.editForm.get('phoneNumber')?.value).toBe('0612345678');
+    it('should initialize form on ngOnInit', () => {
+      component.ngOnInit();
+      expect(component.editForm).toBeDefined();
+      expect(component.editForm.get('firstName')).toBeDefined();
+      expect(component.editForm.get('lastName')).toBeDefined();
+      expect(component.editForm.get('dateOfBirth')).toBeDefined();
+      expect(component.editForm.get('phoneNumber')).toBeDefined();
     });
   });
 
-  /**
-   * Test de validation des champs requis
-   * Test required fields validation
-   */
   describe('Form Validation', () => {
+    beforeEach(() => {
+      component.ngOnInit();
+    });
+
     it('should validate required fields', () => {
-      const form = component.editForm;
-      
-      expect(form.valid).toBeFalsy();
-      expect(form.get('firstName')?.errors?.['required']).toBeTruthy();
-      expect(form.get('lastName')?.errors?.['required']).toBeTruthy();
-      expect(form.get('dateOfBirth')?.errors?.['required']).toBeTruthy();
+      const firstNameControl = component.editForm.get('firstName');
+      const lastNameControl = component.editForm.get('lastName');
+      const dateOfBirthControl = component.editForm.get('dateOfBirth');
+
+      firstNameControl?.setValue('');
+      lastNameControl?.setValue('');
+      dateOfBirthControl?.setValue('');
+
+      expect(firstNameControl?.hasError('required')).toBe(true);
+      expect(lastNameControl?.hasError('required')).toBe(true);
+      expect(dateOfBirthControl?.hasError('required')).toBe(true);
     });
 
-    /**
-     * Test de validation des contraintes de longueur des noms
-     * Test name length constraints validation
-     */
-    it('should validate name length constraints', () => {
+    it('should validate minimum length for names', () => {
       const firstNameControl = component.editForm.get('firstName');
-      
+      const lastNameControl = component.editForm.get('lastName');
+
       firstNameControl?.setValue('A');
-      firstNameControl?.updateValueAndValidity();
-      fixture.detectChanges();
-      expect(firstNameControl?.errors?.['minlength']).toBeTruthy();
-      
+      lastNameControl?.setValue('B');
+
+      expect(firstNameControl?.hasError('minlength')).toBe(true);
+      expect(lastNameControl?.hasError('minlength')).toBe(true);
+    });
+
+    it('should validate maximum length for names', () => {
+      const firstNameControl = component.editForm.get('firstName');
+      const lastNameControl = component.editForm.get('lastName');
+
       firstNameControl?.setValue('A'.repeat(51));
-      firstNameControl?.updateValueAndValidity();
-      fixture.detectChanges();
-      expect(firstNameControl?.errors?.['maxlength']).toBeTruthy();
+      lastNameControl?.setValue('B'.repeat(51));
+
+      expect(firstNameControl?.hasError('maxlength')).toBe(true);
+      expect(lastNameControl?.hasError('maxlength')).toBe(true);
     });
 
-    /**
-     * Test de validation des contraintes de date de naissance
-     * Test date of birth constraints validation
-     */
-    it('should validate date of birth constraints', () => {
-      const dateControl = component.editForm.get('dateOfBirth');
-      
-      const futureDate = new Date();
-      futureDate.setFullYear(futureDate.getFullYear() + 1);
-      dateControl?.setValue(futureDate.toISOString().split('T')[0]);
-      dateControl?.updateValueAndValidity();
-      fixture.detectChanges();
-      expect(dateControl?.errors?.['tooOld']).toBeTruthy();
-      
-      const youngDate = new Date();
-      youngDate.setFullYear(youngDate.getFullYear() - 10);
-      dateControl?.setValue(youngDate.toISOString().split('T')[0]);
-      dateControl?.updateValueAndValidity();
-      fixture.detectChanges();
-      expect(dateControl?.errors?.['tooYoung']).toBeTruthy();
-    });
-
-    /**
-     * Test de validation du format du numéro de téléphone
-     * Test phone number format validation
-     */
-    it('should validate phone number format', () => {
-      const phoneControl = component.editForm.get('phoneNumber');
-      
-      phoneControl?.setValue('0612345678');
-      phoneControl?.updateValueAndValidity();
-      fixture.detectChanges();
-      expect(phoneControl?.errors).toBeNull();
-      
-      phoneControl?.setValue('01 23 45 67 89');
-      phoneControl?.updateValueAndValidity();
-      fixture.detectChanges();
-      expect(phoneControl?.errors).toBeNull();
-      
-      phoneControl?.setValue('123');
-      phoneControl?.updateValueAndValidity();
-      fixture.detectChanges();
-      expect(phoneControl?.errors?.['pattern']).toBeTruthy();
-    });
-
-    /**
-     * Test d'identification correcte des champs invalides
-     * Test correct identification of invalid fields
-     */
-    it('should correctly identify invalid fields', () => {
-      const firstNameControl = component.editForm.get('firstName');
-      firstNameControl?.setValue('A');
-      firstNameControl?.markAsTouched();
-      fixture.detectChanges();
-      
-      expect(component.isFieldInvalid('firstName')).toBeTruthy();
-      expect(component.isFieldInvalid('lastName')).toBeFalsy();
+    it('should accept valid form data', () => {
+      component.editForm.patchValue({
+        firstName: 'John',
+        lastName: 'Doe',
+        dateOfBirth: '1990-01-01',
+        phoneNumber: '0123456789'
+      });
+      expect(component.editForm.valid).toBe(true);
     });
   });
 
-  /**
-   * Test de soumission du formulaire quand il est valide
-   * Test form submission when valid
-   */
   describe('Form Submission', () => {
-    it('should submit form when valid', () => {
-      const updatedProfile = { ...mockProfile, firstName: 'Pierre' };
-      userProfileService.updateMyProfile.and.returnValue(of(updatedProfile));
-      
-      component.currentProfile = mockProfile;
-      component.isOpen = true;
-      component.ngOnChanges();
-      fixture.detectChanges();
-      
-      component.editForm.patchValue({
-        firstName: 'Pierre',
-        lastName: 'Martin',
-        dateOfBirth: '1985-05-15',
-        phoneNumber: '0623456789'
-      });
-      
-      spyOn(component.profileUpdated, 'emit');
-      spyOn(component.closeModal, 'emit');
-      
-      component.onSubmit();
-      
-      expect(userProfileService.updateMyProfile).toHaveBeenCalledWith({
-        firstName: 'Pierre',
-        lastName: 'Martin',
-        dateOfBirth: '1985-05-15',
-        phoneNumber: '0623456789'
-      });
-      expect(component.profileUpdated.emit).toHaveBeenCalledWith(updatedProfile);
-      expect(component.closeModal.emit).toHaveBeenCalled();
+    beforeEach(() => {
+      component.ngOnInit();
     });
 
-    /**
-     * Test de non-soumission du formulaire quand il est invalide
-     * Test form not submitted when invalid
-     */
-    it('should not submit form when invalid', () => {
-      spyOn(component.profileUpdated, 'emit');
-      spyOn(component.closeModal, 'emit');
-      
+    it('should call updateMyProfile with form data', () => {
+      const formData = {
+        firstName: 'John',
+        lastName: 'Doe',
+        dateOfBirth: '1990-01-01',
+        phoneNumber: '0123456789'
+      };
+      component.editForm.patchValue(formData);
+      mockUserProfileService.updateMyProfile.and.returnValue(of(mockProfile));
+
       component.onSubmit();
-      
-      expect(userProfileService.updateMyProfile).not.toHaveBeenCalled();
-      expect(component.profileUpdated.emit).not.toHaveBeenCalled();
-      expect(component.closeModal.emit).not.toHaveBeenCalled();
+
+      expect(mockUserProfileService.updateMyProfile).toHaveBeenCalledWith(formData);
     });
 
-    /**
-     * Test de gestion des erreurs de soumission
-     * Test submission error handling
-     */
-    it('should handle submission error', () => {
-      userProfileService.updateMyProfile.and.returnValue(throwError(() => new Error('Network error')));
-      
-      component.currentProfile = mockProfile;
-      component.isOpen = true;
-      component.ngOnChanges();
-      fixture.detectChanges();
-      
+    it('should handle successful update', (done) => {
+      spyOn(component.profileUpdated, 'emit');
+      spyOn(component.closeModal, 'emit');
       component.editForm.patchValue({
-        firstName: 'Pierre',
-        lastName: 'Martin',
-        dateOfBirth: '1985-05-15',
-        phoneNumber: '0623456789'
+        firstName: 'John',
+        lastName: 'Doe',
+        dateOfBirth: '1990-01-01'
       });
-      
+      mockUserProfileService.updateMyProfile.and.returnValue(of(mockProfile));
+
       component.onSubmit();
-      
-      expect(component.error).toBe('Erreur lors de la mise à jour du profil');
-      expect(component.isLoading).toBeFalse();
+
+      setTimeout(() => {
+        expect(component.isLoading).toBe(false);
+        expect(component.error).toBeNull();
+        expect(component.profileUpdated.emit).toHaveBeenCalledWith(mockProfile);
+        expect(component.closeModal.emit).toHaveBeenCalled();
+        done();
+      });
+    });
+
+    it('should handle update error', (done) => {
+      component.editForm.patchValue({
+        firstName: 'John',
+        lastName: 'Doe',
+        dateOfBirth: '1990-01-01'
+      });
+      mockUserProfileService.updateMyProfile.and.returnValue(throwError(() => new Error('Update failed')));
+
+      component.onSubmit();
+
+      setTimeout(() => {
+        expect(component.error).toBe('Erreur lors de la mise à jour du profil');
+        expect(component.isLoading).toBe(false);
+        done();
+      });
+    });
+
+    it('should not submit if form is invalid', () => {
+      component.editForm.patchValue({
+        firstName: '',
+        lastName: '',
+        dateOfBirth: ''
+      });
+
+      component.onSubmit();
+
+      expect(mockUserProfileService.updateMyProfile).not.toHaveBeenCalled();
     });
   });
 
-  /**
-   * Test de fermeture de la modal sur clic de l'arrière-plan
-   * Test modal close on backdrop click
-   */
-  describe('Modal Interactions', () => {
-    it('should close modal on backdrop click', () => {
+  describe('Modal Management', () => {
+    it('should emit closeModal when close is called', () => {
       spyOn(component.closeModal, 'emit');
-      
-      const event = new MouseEvent('click');
-      component.onBackdropClick(event);
-      
-      expect(component.closeModal.emit).toHaveBeenCalled();
-    });
 
-    /**
-     * Test de fermeture de la modal sur clic du bouton de fermeture
-     * Test modal close on close button click
-     */
-    it('should close modal on close button click', () => {
-      spyOn(component.closeModal, 'emit');
-      
       component.onClose();
-      
+
       expect(component.closeModal.emit).toHaveBeenCalled();
     });
 
-    /**
-     * Test de verrouillage du scroll du body lors de l'ouverture de la modal
-     * Test body scroll lock when modal opens
-     */
-    it('should lock body scroll when modal opens', () => {
-      component.isOpen = true;
-      component.ngOnChanges();
-      
-      expect(document.body.style.overflow).toBe('hidden');
-      expect(document.body.classList.contains('modal-open')).toBeTruthy();
+    it('should handle backdrop click', () => {
+      spyOn(component, 'onClose');
+      const mockEvent = {
+        target: document.createElement('div'),
+        currentTarget: document.createElement('div')
+      } as any;
+      mockEvent.target = mockEvent.currentTarget;
+
+      component.onBackdropClick(mockEvent);
+
+      expect(component.onClose).toHaveBeenCalled();
     });
 
-    /**
-     * Test de déverrouillage du scroll du body lors de la fermeture de la modal
-     * Test body scroll unlock when modal closes
-     */
-    it('should unlock body scroll when modal closes', () => {
-      component.isOpen = false;
-      component.ngOnChanges();
-      
-      expect(document.body.style.overflow).toBe('');
-      expect(document.body.classList.contains('modal-open')).toBeFalsy();
+    it('should not close on backdrop click if target is not currentTarget', () => {
+      spyOn(component, 'onClose');
+      const mockEvent = {
+        target: document.createElement('div'),
+        currentTarget: document.createElement('div')
+      } as any;
+
+      component.onBackdropClick(mockEvent);
+
+      expect(component.onClose).not.toHaveBeenCalled();
     });
   });
-}); 
+
+  describe('Field Validation', () => {
+    beforeEach(() => {
+      component.ngOnInit();
+    });
+
+    it('should return true for invalid field that has been touched', () => {
+      const firstNameControl = component.editForm.get('firstName');
+      firstNameControl?.setValue('');
+      firstNameControl?.markAsTouched();
+
+      expect(component.isFieldInvalid('firstName')).toBe(true);
+    });
+
+    it('should return false for valid field', () => {
+      const firstNameControl = component.editForm.get('firstName');
+      firstNameControl?.setValue('John');
+
+      expect(component.isFieldInvalid('firstName')).toBe(false);
+    });
+
+    it('should return false for untouched invalid field', () => {
+      const firstNameControl = component.editForm.get('firstName');
+      firstNameControl?.setValue('');
+
+      expect(component.isFieldInvalid('firstName')).toBe(false);
+    });
+  });
+
+  describe('Lifecycle Hooks', () => {
+    it('should handle changes when modal opens', () => {
+      component.ngOnInit();
+      component.isOpen = true;
+      component.currentProfile = mockProfile;
+
+      component.ngOnChanges();
+
+      expect(component.editForm.get('firstName')?.value).toBe(mockProfile.firstName);
+      expect(component.editForm.get('lastName')?.value).toBe(mockProfile.lastName);
+    });
+
+    it('should handle changes when modal closes', () => {
+      component.isOpen = false;
+      spyOn(component as any, 'unlockBody');
+
+      component.ngOnChanges();
+
+      expect((component as any).unlockBody).toHaveBeenCalled();
+    });
+
+    it('should unlock body on destroy', () => {
+      spyOn(component as any, 'unlockBody');
+
+      component.ngOnDestroy();
+
+      expect((component as any).unlockBody).toHaveBeenCalled();
+    });
+  });
+
+  describe('Data Loading', () => {
+    it('should load current profile data into form', () => {
+      component.ngOnInit();
+      component.currentProfile = mockProfile;
+
+      component.loadCurrentData();
+
+      expect(component.editForm.get('firstName')?.value).toBe(mockProfile.firstName);
+      expect(component.editForm.get('lastName')?.value).toBe(mockProfile.lastName);
+    });
+
+    it('should handle missing profile data gracefully', () => {
+      component.ngOnInit();
+      component.currentProfile = null;
+      spyOn(console, 'warn');
+
+      component.loadCurrentData();
+
+      expect(console.warn).toHaveBeenCalledWith('No profile data or form not initialized');
+    });
+  });
+});

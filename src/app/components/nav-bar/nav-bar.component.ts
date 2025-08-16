@@ -19,29 +19,10 @@ export interface NavItem {
 export class NavBarComponent implements OnInit, OnChanges {
   
   private router = inject(Router);
-
-  /**
-   * Current route path to determine active navigation item.
-   * Chemin de route actuel pour déterminer l'élément de navigation actif.
-   */
   @Input() currentRoute: string = '';
-
-  /**
-   * Error message for navigation failures.
-   * Message d'erreur pour les échecs de navigation.
-   */
   error: string | null = null;
-
-  /**
-   * Loading state for navigation actions.
-   * État de chargement pour les actions de navigation.
-   */
   isLoading = false;
 
-  /**
-   * Array of navigation items displayed in the navigation bar.
-   * Tableau des éléments de navigation affichés dans la barre de navigation.
-   */
   navItems: NavItem[] = [
     {
       label: 'Accueil',

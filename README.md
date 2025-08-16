@@ -98,7 +98,6 @@ ng build --configuration production --stats-json
 ```typescript
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // Méthodes principales
   login(request: LoginRequest): Observable<User>
   signup(request: RegisterRequest): Observable<User>
   logout(): void

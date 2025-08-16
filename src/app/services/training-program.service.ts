@@ -30,16 +30,16 @@ export class TrainingProgramService {
     return this.http.get<TrainingProgram[]>(`${this.apiUrl}/public`).pipe(
       tap({
         next: (response) => {
-          console.log('✅ TrainingProgram API call successful:', response);
+          console.log('TrainingProgram API call successful:', response);
         },
         error: (error) => {
-          console.log('❌ TrainingProgram API call failed:', error);
+          console.log('TrainingProgram API call failed:', error);
           console.log('Error status:', error.status);
           console.log('Error message:', error.message);
         }
       }),
       catchError((error) => {
-        console.log('❌ TrainingProgram service error caught:', error);
+        console.log('TrainingProgram service error caught:', error);
         throw error;
       })
     );

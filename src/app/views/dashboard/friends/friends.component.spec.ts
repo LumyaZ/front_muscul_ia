@@ -1,77 +1,95 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 import { FriendsComponent } from './friends.component';
 import { AuthService } from '../../../services/auth.service';
+import { Router } from '@angular/router';
 
+/**
+ * Unit tests for FriendsComponent.
+ * Tests unitaires pour FriendsComponent.
+ */
 describe('FriendsComponent', () => {
   let component: FriendsComponent;
   let fixture: ComponentFixture<FriendsComponent>;
-  let mockRouter: jasmine.SpyObj<Router>;
   let mockAuthService: jasmine.SpyObj<AuthService>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['getCurrentUser', 'isAuthenticated']);
 
     await TestBed.configureTestingModule({
-      imports: [FriendsComponent],
+      imports: [
+        FriendsComponent,
+        RouterTestingModule
+      ],
       providers: [
-        { provide: Router, useValue: routerSpy },
-        { provide: AuthService, useValue: authServiceSpy }
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: Router, useValue: routerSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FriendsComponent);
     component = fixture.componentInstance;
-    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     mockAuthService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize component successfully', () => {
-    const mockUser = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
-    mockAuthService.getCurrentUser.and.returnValue(mockUser);
-    mockAuthService.isAuthenticated.and.returnValue(true);
-
-    component.ngOnInit();
-
-    expect(mockAuthService.getCurrentUser).toHaveBeenCalled();
+  it('should initialize with default values', () => {
     expect(component.isLoading).toBe(false);
     expect(component.error).toBeNull();
   });
 
-  it('should handle authentication error and redirect to login', () => {
-    mockAuthService.getCurrentUser.and.returnValue(null);
-    mockAuthService.isAuthenticated.and.returnValue(false);
-
-    component.ngOnInit();
-
-    expect(component.error).toBe('Utilisateur non connecté. Redirection vers la page de connexion.');
-  });
-
-  it('should clear error', () => {
-    const mockUser = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
+  it('should load successfully when user is authenticated', () => {
+    const mockUser = { id: 1, email: 'test@example.com' };
     mockAuthService.getCurrentUser.and.returnValue(mockUser);
-    mockAuthService.isAuthenticated.and.returnValue(true);
+    
     component.ngOnInit();
     
-    component.error = 'Test error';
-
-    component.clearError();
-
+    expect(component.isLoading).toBe(false);
     expect(component.error).toBeNull();
   });
 
-  it('should clean up subscriptions on destroy', () => {
+  it('should redirect to login when user is not authenticated', () => {
+    mockAuthService.getCurrentUser.and.returnValue(null);
+    spyOn(window, 'setTimeout').and.callFake((callback: any) => callback());
+    
+    component.ngOnInit();
+    
+    expect(component.error).toBe('Utilisateur non connecté. Redirection vers la page de connexion.');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('should handle authentication error', () => {
+    mockAuthService.getCurrentUser.and.throwError('Auth error');
+    
+    component.ngOnInit();
+    
+    expect(component.error).toBe('Erreur lors du chargement des données');
+    expect(component.isLoading).toBe(false);
+  });
+
+  it('should clear error and reinitialize component', () => {
+    const mockUser = { id: 1, email: 'test@example.com' };
+    mockAuthService.getCurrentUser.and.returnValue(mockUser);
+    component.error = 'Test error';
+    
+    component.clearError();
+    
+    expect(component.error).toBeNull();
+  });
+
+  it('should complete destroy subject on ngOnDestroy', () => {
     spyOn(component['destroy$'], 'next');
     spyOn(component['destroy$'], 'complete');
-
+    
     component.ngOnDestroy();
-
+    
     expect(component['destroy$'].next).toHaveBeenCalled();
     expect(component['destroy$'].complete).toHaveBeenCalled();
   });
-}); 
+});

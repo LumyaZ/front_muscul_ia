@@ -4,7 +4,6 @@ import { SignupComponent } from './views/auth/signup/signup.component';
 import { TrainingInfoFormComponent } from './views/training-info/training-info-form.component';
 import { ProfileComponent } from './views/profile/profile.component';
 
-// Import des nouvelles pages du dashboard
 import { HomeComponent } from './views/dashboard/home/home.component';
 import { FriendsComponent } from './views/dashboard/friends/friends.component';
 import { RecordComponent } from './views/dashboard/record/record.component';

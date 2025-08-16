@@ -1,22 +1,39 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
-import { AuthService } from './auth.service';
-import { LoginRequest, RegisterRequest } from '../models/user.model';
-import { User } from '../models/user.model';
-import { CreateUserWithProfileRequest } from '../models/user-profile.model';
+import { of, throwError } from 'rxjs';
+
+import { AuthService, AuthResponse } from './auth.service';
 import { environment } from '../../environments/environment';
+import { User, LoginRequest, RegisterRequest } from '../models/user.model';
+import { CreateUserWithProfileRequest, CreateUserWithProfileResponse } from '../models/user-profile.model';
+import { STORAGE_KEYS } from '../constants/storage.constants';
 
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
-  let router: jasmine.SpyObj<Router>;
+  let mockRouter: jasmine.SpyObj<Router>;
+
+  const mockUser: User = {
+    id: 1,
+    email: 'test@example.com',
+    creationDate: '2024-01-01T00:00:00Z'
+  };
+
+  const mockAuthResponse: AuthResponse = {
+    user: mockUser,
+    token: 'jwt.token.here'
+  };
 
   beforeEach(() => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule
+      ],
       providers: [
         AuthService,
         { provide: Router, useValue: routerSpy }
@@ -25,7 +42,7 @@ describe('AuthService', () => {
 
     service = TestBed.inject(AuthService);
     httpMock = TestBed.inject(HttpTestingController);
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
     localStorage.clear();
   });
@@ -46,90 +63,61 @@ describe('AuthService', () => {
         password: 'password123'
       };
 
-      const mockResponse = {
-        user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
-        token: 'jwt.token.here'
-      };
-
-      service.login(loginRequest).subscribe();
+      service.login(loginRequest).subscribe(response => {
+        expect(response).toEqual(mockAuthResponse);
+        expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBe(mockAuthResponse.token);
+        expect(localStorage.getItem(STORAGE_KEYS.CURRENT_USER)).toBe(JSON.stringify(mockAuthResponse.user));
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
+      });
 
       const req = httpMock.expectOne(`${environment.apiUrl}/auth/login`);
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(loginRequest);
+      req.flush(mockAuthResponse);
+    });
 
-      req.flush(mockResponse);
+    it('should handle login error', () => {
+      const loginRequest: LoginRequest = {
+        email: 'test@example.com',
+        password: 'wrongpassword'
+      };
 
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
-      expect(localStorage.getItem('auth_token')).toBe('jwt.token.here');
-      expect(localStorage.getItem('current_user')).toBe(JSON.stringify(mockResponse.user));
+      service.login(loginRequest).subscribe({
+        error: (error) => {
+          expect(error.status).toBe(401);
+        }
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/auth/login`);
+      req.flush({ message: 'Invalid credentials' }, { status: 401, statusText: 'Unauthorized' });
     });
   });
 
   describe('signup', () => {
     it('should register user and save auth data', () => {
-      const signupRequest: RegisterRequest = {
-        email: 'test@example.com',
+      const registerRequest: RegisterRequest = {
+        email: 'new@example.com',
         password: 'password123',
         confirmPassword: 'password123'
       };
 
-      const mockResponse = {
-        user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
-        token: 'jwt.token.here'
-      };
-
-      service.signup(signupRequest).subscribe();
+      service.signup(registerRequest).subscribe(response => {
+        expect(response).toEqual(mockAuthResponse);
+        expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBe(mockAuthResponse.token);
+        expect(localStorage.getItem(STORAGE_KEYS.CURRENT_USER)).toBe(JSON.stringify(mockAuthResponse.user));
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/dashboard']);
+      });
 
       const req = httpMock.expectOne(`${environment.apiUrl}/auth/register`);
       expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(signupRequest);
-
-      req.flush(mockResponse);
-
-      expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
-      expect(localStorage.getItem('auth_token')).toBe('jwt.token.here');
-      expect(localStorage.getItem('current_user')).toBe(JSON.stringify(mockResponse.user));
-    });
-  });
-
-  describe('createUserWithProfile', () => {
-    it('should create user with profile', () => {
-      const request: CreateUserWithProfileRequest = {
-        userData: {
-          email: 'test@example.com',
-          password: 'password123',
-          confirmPassword: 'password123'
-        },
-        profileData: {
-          firstName: 'John',
-          lastName: 'Doe',
-          dateOfBirth: '1990-01-01',
-          phoneNumber: '1234567890'
-        }
-      };
-
-      const mockResponse = {
-        user: { id: 1, email: 'test@example.com', creationDate: '2024-01-01' },
-        profile: { id: 1, userId: 1, firstName: 'John', lastName: 'Doe' },
-        token: 'jwt.token.here'
-      };
-
-      service.createUserWithProfile(request).subscribe(response => {
-        expect(response).toEqual(mockResponse);
-      });
-
-      const req = httpMock.expectOne(`${environment.apiUrl}/auth/create-user-with-profile`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(request);
-
-      req.flush(mockResponse);
+      expect(req.request.body).toEqual(registerRequest);
+      req.flush(mockAuthResponse);
     });
   });
 
   describe('getCurrentUser', () => {
-    it('should return current user from localStorage', () => {
-      const mockUser: User = { id: 1, email: 'test@example.com', creationDate: '2024-01-01' };
-      localStorage.setItem('current_user', JSON.stringify(mockUser));
+    it('should return user from localStorage', () => {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(mockUser));
 
       const result = service.getCurrentUser();
       expect(result).toEqual(mockUser);
@@ -139,12 +127,23 @@ describe('AuthService', () => {
       const result = service.getCurrentUser();
       expect(result).toBeNull();
     });
+
+    it('should handle invalid JSON in localStorage', () => {
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, 'invalid-json');
+
+      spyOn(console, 'error');
+      
+      const result = service.getCurrentUser();
+      expect(result).toBeNull();
+      expect(console.error).toHaveBeenCalledWith('Error parsing user data from localStorage:', jasmine.any(Error));
+      expect(localStorage.getItem(STORAGE_KEYS.CURRENT_USER)).toBeNull(); 
+    });
   });
 
   describe('getToken', () => {
     it('should return token from localStorage', () => {
       const token = 'jwt.token.here';
-      localStorage.setItem('auth_token', token);
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
 
       const result = service.getToken();
       expect(result).toBe(token);
@@ -158,7 +157,7 @@ describe('AuthService', () => {
 
   describe('isAuthenticated', () => {
     it('should return true when token exists', () => {
-      localStorage.setItem('auth_token', 'jwt.token.here');
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'jwt.token.here');
 
       const result = service.isAuthenticated();
       expect(result).toBe(true);
@@ -168,18 +167,115 @@ describe('AuthService', () => {
       const result = service.isAuthenticated();
       expect(result).toBe(false);
     });
+
+    it('should return false when token is empty string', () => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, '');
+
+      const result = service.isAuthenticated();
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('validateToken', () => {
+    it('should return true for valid token', () => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'valid.token.here');
+
+      service.validateToken().subscribe((result: boolean) => {
+        expect(result).toBe(true);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/profiles/me`);
+      expect(req.request.method).toBe('GET');
+      req.flush({});
+    });
+
+    it('should return false for invalid token', () => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'invalid.token.here');
+
+      service.validateToken().subscribe((result: boolean) => {
+        expect(result).toBe(false);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/profiles/me`);
+      req.flush({}, { status: 401, statusText: 'Unauthorized' });
+    });
+
+    it('should return false when no token exists', () => {
+      service.validateToken().subscribe((result: boolean) => {
+        expect(result).toBe(false);
+      });
+    });
+
+    it('should handle validation error', () => {
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'valid.token.here');
+
+      service.validateToken().subscribe((result: boolean) => {
+        expect(result).toBe(false);
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/profiles/me`);
+      req.flush({}, { status: 500, statusText: 'Internal Server Error' });
+    });
   });
 
   describe('logout', () => {
     it('should clear localStorage and navigate to login', () => {
-      localStorage.setItem('auth_token', 'jwt.token.here');
-      localStorage.setItem('current_user', '{"id": 1}');
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'jwt.token.here');
+      localStorage.setItem(STORAGE_KEYS.CURRENT_USER, '{"id": 1}');
 
       service.logout();
 
-      expect(localStorage.getItem('auth_token')).toBeNull();
-      expect(localStorage.getItem('current_user')).toBeNull();
-      expect(router.navigate).toHaveBeenCalledWith(['/login']);
+      expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
+      expect(localStorage.getItem(STORAGE_KEYS.CURRENT_USER)).toBeNull();
+      expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
     });
   });
-}); 
+
+  describe('createUserWithProfile', () => {
+    it('should create user with profile and save auth data', () => {
+      const createRequest: CreateUserWithProfileRequest = {
+        userData: {
+          email: 'new@example.com',
+          password: 'password123',
+          confirmPassword: 'password123'
+        },
+        profileData: {
+          firstName: 'John',
+          lastName: 'Doe',
+          dateOfBirth: '1990-01-01',
+          phoneNumber: '0123456789'
+        }
+      };
+
+      const mockResponse: CreateUserWithProfileResponse = {
+        user: {
+          id: 1,
+          email: 'new@example.com',
+          creationDate: '2024-01-01T00:00:00Z'
+        },
+        profile: {
+          id: 1,
+          userId: 1,
+          firstName: 'John',
+          lastName: 'Doe',
+          dateOfBirth: '1990-01-01',
+          phoneNumber: '0123456789',
+          createdAt: '2024-01-01T00:00:00Z',
+          updatedAt: '2024-01-01T00:00:00Z'
+        },
+        token: 'jwt.token.here'
+      };
+
+      service.createUserWithProfile(createRequest).subscribe(response => {
+        expect(response).toEqual(mockResponse);
+        expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBe(mockResponse.token);
+        expect(localStorage.getItem(STORAGE_KEYS.CURRENT_USER)).toBe(JSON.stringify(mockResponse.user));
+      });
+
+      const req = httpMock.expectOne(`${environment.apiUrl}/auth/create-user-with-profile`);
+      expect(req.request.method).toBe('POST');
+      expect(req.request.body).toEqual(createRequest);
+      req.flush(mockResponse);
+    });
+  });
+});

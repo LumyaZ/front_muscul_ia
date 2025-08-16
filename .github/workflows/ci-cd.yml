@@ -24,8 +24,9 @@ jobs:
       run: npm ci
     
     - name: Security audit and fix
-      run: npm audit --audit-level=moderate
-      run: npm audit fix --force || echo "Some vulnerabilities may require manual review"
+      run: |
+        npm audit --audit-level=moderate
+        npm audit fix --force || echo "Some vulnerabilities may require manual review"
     
     - name: Run linting
       run: npm run lint -- --max-warnings=0

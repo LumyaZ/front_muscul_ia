@@ -26,13 +26,19 @@ jobs:
     - name: Run linting
       run: npm run lint -- --max-warnings=0 || true
     
-    - name: Install Puppeteer
-      run: npm install -g puppeteer
+    - name: Setup Chrome headless environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable xvfb
+        export DISPLAY=:99
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        sleep 2
 
     - name: Run unit tests
       env:
-        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
-        PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+        CHROME_BIN: /usr/bin/google-chrome
+        CHROME_HEADLESS: true
+        DISPLAY: :99
       run: npm run test -- --watch=false
     
     - name: Upload coverage reports to Codecov

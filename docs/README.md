@@ -4,7 +4,7 @@
 
 Ce dossier contient la documentation technique du frontend Angular de l'application Muscul IA.
 
-## 📁 Structure de la documentation
+## Structure de la documentation
 
 ### Guides de développement
 - **ARCHITECTURE.md** - Architecture et structure du projet

@@ -3,7 +3,7 @@
 ## Description
 Frontend Angular pour l'application Muscul IA - interface utilisateur moderne pour la gestion des programmes d'entraînement de musculation avec système d'authentification complet.
 
-## 🏗️ Architecture
+## Architecture
 
 ### Structure du projet
 ```
@@ -129,7 +129,7 @@ export class AuthService {
 - Vue d'ensemble des programmes
 - Accès rapide aux fonctionnalités
 
-## 🧪 Tests et Qualité
+## Tests et Qualité
 
 ### Tests unitaires
 ```bash
@@ -193,7 +193,7 @@ npm run docs:all
 - **TypeScript** - Typage strict
 - **JSDoc** - Documentation complète
 
-## 📖 Documentation
+## Documentation
 
 ### Guides disponibles
 - **Architecture :** `docs/ARCHITECTURE.md`
@@ -205,7 +205,7 @@ npm run docs:all
 - **Rapport de validation :** `docs/validation/report.html`
 - **Couverture de documentation :** `docs/validation/coverage.html`
 
-## 🐳 Docker
+## Docker
 
 ### Construction de l'image
 ```bash
@@ -248,7 +248,7 @@ npm run docs:validate  # Valider documentation
 npm run docs:all       # Tout en une fois
 ```
 
-## 🤝 Contribution
+## Contribution
 
 1. Fork le projet
 2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)

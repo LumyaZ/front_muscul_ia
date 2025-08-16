@@ -1,6 +1,6 @@
 # Guide des Tests - Frontend Muscul IA
 
-## 🧪 Vue d'ensemble
+## Vue d'ensemble
 
 Ce guide décrit les stratégies et outils de test pour l'application frontend Angular.
 
@@ -253,7 +253,7 @@ export default defineConfig({
 });
 ```
 
-## 🎯 Bonnes pratiques
+## Bonnes pratiques
 
 ### 1. Nommage des tests
 ```typescript

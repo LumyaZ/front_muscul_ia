@@ -1,10 +1,10 @@
 # Architecture Frontend - Muscul IA
 
-## 🏗️ Vue d'ensemble
+## Vue d'ensemble
 
 L'application frontend Muscul IA est construite avec Angular 17 et suit une architecture modulaire basée sur les composants.
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 src/
@@ -58,7 +58,7 @@ src/
 - **Jasmine/Karma** - Tests unitaires
 - **Cypress** - Tests end-to-end
 
-## 🎯 Patterns architecturaux
+## Patterns architecturaux
 
 ### 1. Architecture par composants
 ```typescript
@@ -147,7 +147,7 @@ $large: 1440px;
 - **Media Queries** - Adaptation par écran
 - **Touch-friendly** - Interface tactile
 
-## 🧪 Tests
+## Tests
 
 ### 1. Tests unitaires
 ```typescript

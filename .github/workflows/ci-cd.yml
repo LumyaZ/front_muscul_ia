@@ -26,11 +26,13 @@ jobs:
     - name: Run linting
       run: npm run lint -- --max-warnings=0 || true
     
+    - name: Install Puppeteer
+      run: npm install -g puppeteer
+
     - name: Run unit tests
       env:
-        CHROME_BIN: /usr/bin/google-chrome
-        CHROME_HEADLESS: true
-        DISPLAY: :99
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+        PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
       run: npm run test -- --watch=false
     
     - name: Upload coverage reports to Codecov

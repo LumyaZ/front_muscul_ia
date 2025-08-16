@@ -117,12 +117,6 @@ jobs:
       with:
         name: frontend-dist
     
-    - name: Install Docker Compose
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker-compose-plugin
-        docker compose version
-
     - name: Test Docker Compose integration
       run: |
         docker compose -f ../../docker-compose.yml build frontend

@@ -117,8 +117,8 @@ jobs:
       with:
         name: frontend-dist
     
-- name: Test Docker build
-  run: |
-    docker build -t muscul-ia-frontend:test .
-    docker run --rm muscul-ia-frontend:test echo "Docker build test successful"
-    docker rmi muscul-ia-frontend:test
+    - name: Test Docker build
+      run: |
+        docker build -t muscul-ia-frontend:test .
+        docker run --rm muscul-ia-frontend:test echo "Docker build test successful"
+        docker rmi muscul-ia-frontend:test

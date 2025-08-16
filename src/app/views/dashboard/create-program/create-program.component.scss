@@ -293,7 +293,7 @@
       animation: fadeIn 0.3s ease-in-out;
 
       &::before {
-        content: '⚠';
+        content: '';
         font-size: 0.8rem;
       }
     }

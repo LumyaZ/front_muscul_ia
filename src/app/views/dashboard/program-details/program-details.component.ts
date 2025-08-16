@@ -189,7 +189,7 @@ export class ProgramDetailsComponent implements OnInit {
       case 'Musculation': return '💪';
       case 'Cardio': return '❤️';
       case 'Flexibilité': return '🧘';
-      case 'Mixte': return '⚡';
+      case 'Mixte': return '';
       default: return '🏋️';
     }
   }

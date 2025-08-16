@@ -107,7 +107,7 @@ export class AuthService {
 }
 ```
 
-## 📱 Interface utilisateur
+## Interface utilisateur
 
 ### Pages disponibles
 
@@ -179,7 +179,7 @@ npm run docs:validate
 npm run docs:all
 ```
 
-## 📊 Métriques de qualité
+## Métriques de qualité
 
 ### Couverture de code
 - **Minimum requis :** 80%
@@ -217,7 +217,7 @@ docker build -t muscul-ia-frontend .
 docker run -p 80:80 muscul-ia-frontend
 ```
 
-## 🔧 Scripts disponibles
+## Scripts disponibles
 
 ### Développement
 ```bash

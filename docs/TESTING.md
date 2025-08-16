@@ -22,7 +22,7 @@ Ce guide décrit les stratégies et outils de test pour l'application frontend A
 - **Workflows** - Processus métier
 - **Responsive** - Adaptation mobile/desktop
 
-## 🛠️ Outils de test
+## Outils de test
 
 ### Framework principal
 - **Jasmine** - Framework de test
@@ -67,7 +67,7 @@ npx cypress open
 npx cypress run
 ```
 
-## 📝 Exemples de tests
+## Exemples de tests
 
 ### 1. Test de service
 ```typescript
@@ -183,7 +183,7 @@ describe('AuthGuard', () => {
 });
 ```
 
-## 📊 Métriques de qualité
+## Métriques de qualité
 
 ### 1. Couverture de code
 - **Minimum requis :** 80%
@@ -206,7 +206,7 @@ ng test --code-coverage
 open coverage/index.html
 ```
 
-## 🔧 Configuration avancée
+## Configuration avancée
 
 ### 1. Karma configuration
 ```javascript
@@ -301,7 +301,7 @@ const mockExercises = [
 ];
 ```
 
-## 🚨 Tests critiques
+## Tests critiques
 
 ### 1. Authentification
 - Connexion réussie
@@ -319,7 +319,7 @@ const mockExercises = [
 - Adaptation tablette
 - Adaptation desktop
 
-## 📈 Monitoring des tests
+## Monitoring des tests
 
 ### 1. Intégration continue
 ```yaml

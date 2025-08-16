@@ -25,7 +25,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
     console.log('Headers ajoutés:', req.headers);
   } else {
-    console.log('⚠️ Pas de token trouvé dans localStorage');
+    console.log('️ Pas de token trouvé dans localStorage');
   }
   
   return next(req).pipe(

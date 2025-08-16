@@ -1,6 +1,6 @@
 # Documentation Frontend - Muscul IA
 
-## 📚 Vue d'ensemble
+## Vue d'ensemble
 
 Ce dossier contient la documentation technique du frontend Angular de l'application Muscul IA.
 
@@ -46,7 +46,7 @@ npm run docs:validate
 - **Description :** ≥ 50 caractères par élément
 - **Exemples :** Pour toutes les interfaces complexes
 
-## 🔧 Configuration
+## Configuration
 
 ### Scripts npm
 ```json
@@ -67,7 +67,7 @@ DOCS_SOURCE_DIRS=src/app
 DOCS_TEMPLATE=default
 ```
 
-## 📊 Métriques de qualité
+## Métriques de qualité
 
 ### Couverture de documentation
 - **Interfaces :** 100% documentées

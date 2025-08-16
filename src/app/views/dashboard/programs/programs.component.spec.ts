@@ -177,7 +177,7 @@ describe('ProgramsComponent', () => {
     expect(component.getCategoryIcon('Musculation')).toBe('💪');
     expect(component.getCategoryIcon('Cardio')).toBe('❤️');
     expect(component.getCategoryIcon('Flexibilité')).toBe('🧘');
-    expect(component.getCategoryIcon('Mixte')).toBe('⚡');
+    expect(component.getCategoryIcon('Mixte')).toBe('');
     expect(component.getCategoryIcon('Unknown')).toBe('🏋️');
   });
 

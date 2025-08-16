@@ -536,7 +536,7 @@ function generateHTMLReport(report) {
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Rapport de Validation Documentation</h1>
+            <h1>Rapport de Validation Documentation</h1>
             <h2>Muscul IA Frontend - Qualité de Documentation</h2>
             <p>Généré le: ${new Date(report.generatedAt).toLocaleString('fr-FR')}</p>
         </div>
@@ -642,7 +642,7 @@ function generateHTMLReport(report) {
 
         ${report.warnings.length > 0 ? `
         <div class="section">
-            <h3>⚠️ Avertissements (${report.warnings.length})</h3>
+            <h3>️ Avertissements (${report.warnings.length})</h3>
             ${report.warnings.map(warning => `
                 <div class="warning">
                     <strong>${warning.element}</strong> (${warning.type}): ${warning.message}
@@ -703,7 +703,7 @@ function validateDocumentation() {
     }
   });
 
-  console.log(`📊 ${validationResults.length} fichiers validés`);
+  console.log(`${validationResults.length} fichiers validés`);
 
   // Generate validation report
   const report = generateValidationReport(validationResults);
@@ -711,7 +711,7 @@ function validateDocumentation() {
   // Save JSON report
   const jsonPath = path.join(CONFIG.outputDir, 'validation-report.json');
   fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2));
-  console.log(`📈 Rapport JSON généré: ${jsonPath}`);
+  console.log(`Rapport JSON généré: ${jsonPath}`);
 
   // Generate HTML report
   const html = generateHTMLReport(report);
@@ -720,7 +720,7 @@ function validateDocumentation() {
   console.log(`📖 Rapport HTML généré: ${htmlPath}`);
 
   // Display summary
-  console.log('\n📊 Résumé de la Validation:');
+  console.log('\nRésumé de la Validation:');
   console.log(`   • Fichiers analysés: ${report.summary.totalFiles}`);
   console.log(`   • Éléments totaux: ${report.summary.totalElements}`);
   console.log(`   • Éléments documentés: ${report.summary.documentedElements}`);

@@ -205,7 +205,7 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
       case 'Musculation': return '💪';
       case 'Cardio': return '❤️';
       case 'Flexibilité': return '🧘';
-      case 'Mixte': return '⚡';
+      case 'Mixte': return '';
       default: return '🏋️';
     }
   }

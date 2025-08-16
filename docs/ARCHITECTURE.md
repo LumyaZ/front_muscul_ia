@@ -40,7 +40,7 @@ src/
 └── assets/                # Ressources statiques
 ```
 
-## 🔧 Technologies utilisées
+## Technologies utilisées
 
 ### Framework principal
 - **Angular 17** - Framework de développement
@@ -101,7 +101,7 @@ export interface Exercise {
 }
 ```
 
-## 🔄 Flux de données
+## Flux de données
 
 ### 1. Flux unidirectionnel
 ```
@@ -120,7 +120,7 @@ Component ← Service ← HTTP ← Backend
 - **Services** - Communication entre composants non liés
 - **EventEmitter** - Événements personnalisés
 
-## 🛡️ Sécurité
+## Sécurité
 
 ### 1. Authentification
 - **JWT** - Tokens d'authentification
@@ -132,7 +132,7 @@ Component ← Service ← HTTP ← Backend
 - **TypeScript** - Typage strict
 - **Sanitization** - Protection XSS
 
-## 📱 Responsive Design
+## Responsive Design
 
 ### 1. Breakpoints
 ```scss
@@ -182,7 +182,7 @@ describe('ExerciseService', () => {
 - **Lighthouse** - Métriques de performance
 - **Bundle Analyzer** - Analyse de la taille des bundles
 
-## 🔧 Configuration
+## Configuration
 
 ### 1. Environnements
 ```typescript
@@ -205,7 +205,7 @@ ng build --configuration production
 ng test
 ```
 
-## 📊 Métriques
+## Métriques
 
 ### 1. Performance
 - **First Contentful Paint** < 1.5s

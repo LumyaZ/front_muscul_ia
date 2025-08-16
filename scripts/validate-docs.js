@@ -597,7 +597,7 @@ function generateHTMLReport(report) {
         </div>
 
         <div class="section">
-            <h3>📋 Détails par Fichier</h3>
+            <h3>Détails par Fichier</h3>
             <table class="file-table">
                 <thead>
                     <tr>
@@ -674,7 +674,7 @@ function generateHTMLReport(report) {
  * Fonction principale pour valider la documentation.
  */
 function validateDocumentation() {
-  console.log('🔍 Démarrage de la validation de documentation...');
+  console.log('Démarrage de la validation de documentation...');
   
   // Create output directory if it doesn't exist
   if (!fs.existsSync(CONFIG.outputDir)) {
@@ -690,7 +690,7 @@ function validateDocumentation() {
     allFiles.push(...files);
   });
 
-  console.log(`📋 ${allFiles.length} fichiers TypeScript trouvés`);
+  console.log(`${allFiles.length} fichiers TypeScript trouvés`);
 
   // Validate documentation in each file
   const validationResults = [];

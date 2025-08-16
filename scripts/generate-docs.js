@@ -196,7 +196,7 @@ function generateHTMLDocumentation(allDocs) {
  * Fonction principale
  */
 function main() {
-  console.log('🚀 Génération de la documentation...');
+  console.log('Génération de la documentation...');
   
   try {
     if (!fs.existsSync(CONFIG.outputDir)) {

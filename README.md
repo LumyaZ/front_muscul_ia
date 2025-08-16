@@ -1,6 +1,6 @@
 # Muscul IA - Frontend Angular
 
-## 📋 Description
+## Description
 Frontend Angular pour l'application Muscul IA - interface utilisateur moderne pour la gestion des programmes d'entraînement de musculation avec système d'authentification complet.
 
 ## 🏗️ Architecture
@@ -47,7 +47,7 @@ scripts/                # Scripts utilitaires
 - **Angular HttpClient** - Requêtes HTTP
 - **Standalone Components** - Architecture moderne
 
-## 🚀 Installation et démarrage
+## Installation et démarrage
 
 ### Prérequis
 - Node.js 18+ et npm

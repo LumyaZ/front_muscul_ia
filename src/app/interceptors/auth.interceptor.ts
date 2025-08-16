@@ -7,7 +7,7 @@ import { STORAGE_KEYS, HTTP_STATUS } from '../constants/storage.constants';
  * Intercepteur HTTP pour ajouter le token JWT à toutes les requêtes.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  console.log('🔍 === AUTH INTERCEPTOR CALLED ===');
+  console.log('=== AUTH INTERCEPTOR CALLED ===');
   console.log('URL:', req.url);
   console.log('Method:', req.method);
   

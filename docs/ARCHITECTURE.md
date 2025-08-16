@@ -170,7 +170,7 @@ describe('ExerciseService', () => {
 - **Composants** - Tests des interactions
 - **Guards** - Tests de protection des routes
 
-## 🚀 Performance
+## Performance
 
 ### 1. Optimisations
 - **OnPush** - Détection de changements optimisée

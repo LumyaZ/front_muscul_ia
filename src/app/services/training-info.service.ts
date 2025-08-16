@@ -32,7 +32,7 @@ export class TrainingInfoService {
    * Obtenir les informations d'entraînement pour l'utilisateur actuel.
    */
   getTrainingInfo(): Observable<TrainingInfo> {
-    console.log('🔍 === TRAINING-INFO SERVICE CALLED ===');
+    console.log('=== TRAINING-INFO SERVICE CALLED ===');
     console.log('API URL:', this.apiUrl);
     console.log('localStorage token:', localStorage.getItem('auth_token'));
     console.log('localStorage user:', localStorage.getItem('current_user'));

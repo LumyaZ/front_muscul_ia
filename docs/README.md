@@ -16,7 +16,7 @@ Ce dossier contient la documentation technique du frontend Angular de l'applicat
 - **generate-docs.js** - Générateur automatique de documentation
 - **validate-docs.js** - Validateur de qualité de documentation
 
-## 🚀 Génération de la documentation
+## Génération de la documentation
 
 ### Génération automatique
 ```bash
@@ -32,7 +32,7 @@ npm run docs:validate
 - **Rapport de validation :** `docs/validation/report.html`
 - **Couverture de documentation :** `docs/validation/coverage.html`
 
-## 📋 Standards de documentation
+## Standards de documentation
 
 ### JSDoc requis
 - **Interfaces** - Description complète avec exemples

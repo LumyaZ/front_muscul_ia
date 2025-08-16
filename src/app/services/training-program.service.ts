@@ -22,7 +22,7 @@ export class TrainingProgramService {
    * Récupérer tous les programmes d'entraînement publics.
    */
   getPublicPrograms(): Observable<TrainingProgram[]> {
-    console.log('🔍 === TRAINING-PROGRAM SERVICE CALLED ===');
+    console.log('=== TRAINING-PROGRAM SERVICE CALLED ===');
     console.log('API URL:', `${this.apiUrl}/public`);
     console.log('localStorage token:', localStorage.getItem('auth_token'));
     console.log('localStorage user:', localStorage.getItem('current_user'));

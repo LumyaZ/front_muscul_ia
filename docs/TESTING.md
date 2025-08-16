@@ -4,7 +4,7 @@
 
 Ce guide décrit les stratégies et outils de test pour l'application frontend Angular.
 
-## 📋 Types de tests
+## Types de tests
 
 ### 1. Tests unitaires
 - **Composants** - Logique et interactions
@@ -38,7 +38,7 @@ Ce guide décrit les stratégies et outils de test pour l'application frontend A
 - **Prettier** - Formatage
 - **SonarQube** - Qualité du code
 
-## 🚀 Configuration
+## Configuration
 
 ### 1. Tests unitaires
 ```bash
@@ -342,7 +342,7 @@ jobs:
 - **Tests E2E** - Screenshots en cas d'échec
 - **Performance** - Métriques de temps d'exécution
 
-## 🔍 Debugging des tests
+## Debugging des tests
 
 ### 1. Tests unitaires
 ```bash

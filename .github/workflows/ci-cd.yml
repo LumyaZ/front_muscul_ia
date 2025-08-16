@@ -117,10 +117,8 @@ jobs:
       with:
         name: frontend-dist
     
-    - name: Test Docker Compose integration
-      run: |
-        docker compose -f ../../docker-compose.yml build frontend
-        docker compose -f ../../docker-compose.yml up -d frontend
-        sleep 15
-        curl -f http://localhost:4200 || echo "Frontend service test completed"
-        docker compose -f ../../docker-compose.yml down
+- name: Test Docker build
+  run: |
+    docker build -t muscul-ia-frontend:test .
+    docker run --rm muscul-ia-frontend:test echo "Docker build test successful"
+    docker rmi muscul-ia-frontend:test

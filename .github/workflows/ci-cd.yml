@@ -30,6 +30,7 @@ jobs:
       env:
         CHROME_BIN: /usr/bin/google-chrome
         CHROME_HEADLESS: true
+        DISPLAY: :99
       run: npm run test -- --watch=false
     
     - name: Upload coverage reports to Codecov

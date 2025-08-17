@@ -335,14 +335,27 @@ export class TrainingComponent implements OnInit, OnDestroy {
     }
 
     try {
+      // Logs de débogage pour identifier le problème
+      console.log('=== DONNÉES ENVOYÉES ===');
+      console.log('Program ID:', this.programId);
+      console.log('Start Time:', this.startTime);
+      console.log('Elapsed Time:', this.elapsedTime);
+      console.log('Current User:', this.currentUser);
+      console.log('========================');
+
       const createRequest: CreateTrainingSessionRequest = {
         name: `Entraînement ${this.programId} - ${new Date().toLocaleDateString()}`,
         description: this.generateSessionDescription(),
-        sessionDate: this.startTime.toISOString(),
+        sessionDate: this.startTime.toISOString().slice(0, 19), // Format "2024-01-15T10:00:00" pour LocalDateTime
         sessionType: 'Musculation',
         durationMinutes: Math.floor(this.elapsedTime / 60),
-        trainingProgramId: this.programId!
+        trainingProgramId: this.programId!,
+        userId: this.currentUser?.id // Ajout de l'userId
       };
+
+      console.log('=== REQUÊTE CRÉÉE ===');
+      console.log('Create Request:', createRequest);
+      console.log('========================');
 
       this.trainingSessionService.createTrainingSession(createRequest)
         .pipe(takeUntil(this.destroy$))
@@ -412,10 +425,11 @@ export class TrainingComponent implements OnInit, OnDestroy {
     const createRequest: CreateTrainingSessionRequest = {
       name: `Entraînement ${this.programId} - ${new Date().toLocaleDateString()}`,
       description: this.generateSessionDescription(),
-      sessionDate: this.startTime.toISOString(),
+      sessionDate: this.startTime.toISOString().slice(0, 19), // Format "2024-01-15T10:00:00" pour LocalDateTime
       sessionType: 'Musculation',
       durationMinutes: Math.floor(this.elapsedTime / 60),
-      trainingProgramId: this.programId!
+      trainingProgramId: this.programId!,
+      userId: this.currentUser?.id // Ajout de l'userId
     };
 
     this.trainingSessionService.createTrainingSession(createRequest)

@@ -114,7 +114,6 @@ export class AuthService {
     return this.http.get(`${environment.apiUrl}/profiles/me`, { 
       observe: 'response'
     }).pipe(
-      tap(() => console.log('Token is valid')),
       map(() => true),
       catchError((error: any) => {
         console.warn('Token validation failed:', error);

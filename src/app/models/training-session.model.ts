@@ -83,14 +83,15 @@ export interface CreateTrainingSessionRequest {
 
   description?: string;
   
-  sessionDate: string;
+  sessionDate: string; // Format ISO string qui sera converti en LocalDateTime côté backend
   
   durationMinutes: number;
   
   sessionType: string;
-  
 
   trainingProgramId?: number;
+  
+  userId?: number; // Ajouté pour correspondre au backend
 }
 
 /**

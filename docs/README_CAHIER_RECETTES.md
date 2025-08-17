@@ -46,7 +46,7 @@ Tous les scénarios nécessitent des tests manuels. Pour chaque scénario :
 
 ### 3. Fréquence des Tests
 
-- **Tests critiques (1-15)** : À chaque déploiement
+- **Tests critiques (1-15)** : À chaque développement
 - **Tests fonctionnels (16-25)** : Semaine
 - **Tests de performance (26-30)** : Mensuel
 
@@ -143,15 +143,3 @@ Pour ajouter un nouveau test :
 3. Décrire les étapes précises
 4. Spécifier les résultats attendus
 5. Ajouter le test dans la section appropriée
-
-## Support
-
-Pour toute question sur le cahier de recettes :
-
-1. Consulter la documentation technique
-2. Vérifier les issues GitHub
-3. Contacter l'équipe de développement
-
----
-
-**Note** : Ce document est vivant et doit être maintenu à jour avec l'évolution de l'application. 

@@ -93,7 +93,6 @@ export class ProgramsComponent implements OnInit, AfterViewInit {
 
     this.trainingProgramService.getPublicPrograms().subscribe({
       next: (programs) => {
-        console.log('=== PROGRAMS COMPONENT CALLED ===');
         this.programs = programs;
         this.groupProgramsByCategory();
         this.loading = false;
